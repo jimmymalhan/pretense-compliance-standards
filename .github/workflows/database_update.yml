@@ -1,0 +1,614 @@
+name: Database Update
+
+on:
+  push:
+    branches:
+      - 'main'
+  schedule:
+    - cron: '0 12 * * SUN'
+
+jobs:
+  Add-New-Ticker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v6
+      - name: pull changes
+        run: git pull https://${{secrets.PAT}}@github.com/JerBouma/FinanceDatabase.git main
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: pip install "pandas[excel]" financedatabase
+      - name: Add New Tickers and Update Old Ones
+        uses: jannekem/run-python-script-action@v1.8
+        with:
+          script: |
+            import glob
+            import os
+            import numpy as np
+            import pandas as pd
+            from typing import Optional
+
+            # Market cap thresholds in USD
+            MARKET_CAP_THRESHOLDS = {
+                'Mega Cap':  200_000_000_000,
+                'Large Cap':  10_000_000_000,
+                'Mid Cap':    2_000_000_000,
+                'Small Cap':    300_000_000,
+                'Micro Cap':     50_000_000,
+                'Nano Cap':               0,
+            }
+
+            def calculate_market_cap(value: Optional[float]) -> Optional[str]:
+                """Categorize a market capitalization value into a named tier.
+                
+                Args:
+                    value: Market capitalization in USD, or None/NaN.
+                
+                Returns:
+                    Market cap tier label, or np.nan if value is missing/zero.
+                """
+                if pd.isna(value) or not value:
+                    return np.nan
+                for label, threshold in MARKET_CAP_THRESHOLDS.items():
+                    if float(value) >= threshold:
+                        return label
+                return np.nan
+
+
+            def lookup_industry(row_industry: str, fd_industries: pd.DataFrame) -> Optional[str]:
+                """Map an exchange industry label to the FinanceDatabase equivalent.
+                
+                Args:
+                    row_industry: Raw industry string from the exchange data.
+                    fd_industries: Lookup DataFrame with FinanceDatabase industry names.
+                
+                Returns:
+                    Mapped industry string, or np.nan if not found.
+                """
+                try:
+                    result = fd_industries.loc[row_industry].iloc[0]
+                    return result.iloc[0] if isinstance(result, pd.Series) else result
+                except KeyError:
+                    return np.nan
+
+
+            def lookup_industry_group(industry: str, equities: pd.DataFrame) -> Optional[str]:
+                """Infer the most common industry group for a given industry.
+
+                Args:
+                    industry: FinanceDatabase industry string.
+                    equities: The equities reference DataFrame.
+
+                Returns:
+                    Most frequent industry_group value, or np.nan if not found.
+                """
+                if pd.isna(industry):
+                    return np.nan
+                subset = equities[equities['industry'] == industry]
+                return subset['industry_group'].mode()[0] if not subset.empty else np.nan
+
+
+            def lookup_sector(industry: str, industry_group: str, equities: pd.DataFrame) -> Optional[str]:
+                """Infer the most common sector for a given industry and industry group.
+
+                Args:
+                    industry: FinanceDatabase industry string.
+                    industry_group: FinanceDatabase industry_group string.
+                    equities: The equities reference DataFrame.
+
+                Returns:
+                    Most frequent sector value, or np.nan if not found.
+                """
+                if pd.isna(industry) or pd.isna(industry_group):
+                    return np.nan
+                subset = equities[
+                    (equities['industry_group'] == industry_group) &
+                    (equities['industry'] == industry)
+                ]
+                return subset['sector'].mode()[0] if not subset.empty else np.nan
+
+
+            def build_new_ticker(
+                index: str,
+                row: pd.Series,
+                fd_industries: pd.DataFrame,
+                equities: pd.DataFrame,
+                market_cap: Optional[str],
+                exchange_to_mic: dict,
+            ) -> dict:
+                """Build a new ticker entry for the equities database.
+
+                Args:
+                    index: Ticker symbol.
+                    row: Raw row from the exchange data.
+                    fd_industries: Lookup DataFrame for industries.
+                    equities: The equities reference DataFrame.
+                    market_cap: Pre-calculated market cap tier.
+
+                Returns:
+                    Dictionary with all required equity fields.
+                """
+                industry = lookup_industry(row['industry'], fd_industries)
+                industry_group = lookup_industry_group(industry, equities)
+                sector = lookup_sector(industry, industry_group, equities)
+
+                return {
+                    'name':            row['name'],
+                    'summary':         np.nan,
+                    'currency':        'USD',
+                    'industry':        industry,
+                    'industry_group':  industry_group,
+                    'sector':          sector,
+                    'exchange':        row['exchange'],
+                    'mic':             exchange_to_mic.get(row['exchange'], np.nan),
+                    'market':          row['market'],
+                    'country':         row['country'],
+                    'state':           np.nan,
+                    'city':            np.nan,
+                    'zipcode':         np.nan,
+                    'website':         np.nan,
+                    'market_cap':      market_cap,
+                    'isin':            np.nan,
+                    'cusip':           np.nan,
+                    'figi':            np.nan,
+                    'composite_figi':  np.nan,
+                    'shareclass_figi': np.nan,
+                    'delisted':      False,
+                }
+
+
+            # ---------------------------------------------------------------------------
+            # Data ingestion
+            # ---------------------------------------------------------------------------
+
+            # Collect NASDAQ data
+            nasdaq = pd.read_json("https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/nasdaq/nasdaq_full_tickers.json")
+            nasdaq = nasdaq.set_index('symbol')
+            nasdaq['exchange'] = 'NMS'
+            nasdaq['market'] = 'NASDAQ Global Select'
+
+            # Collect NYSE data
+            nyse = pd.read_json("https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/nyse/nyse_full_tickers.json")
+            nyse = nyse.set_index('symbol')
+            nyse['exchange'] = 'ASE'
+            nyse['market'] = 'NYSE MKT'
+
+            # Collect AMEX data (acquired by NYSE, same exchange/market)
+            amex = pd.read_json("https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/amex/amex_full_tickers.json")
+            amex = amex.set_index('symbol')
+            amex['exchange'] = 'ASE'
+            amex['market'] = 'NYSE MKT'
+
+            # Combine all exchange datasets
+            exchange_data = pd.concat([nasdaq, nyse, amex])
+
+            # ---------------------------------------------------------------------------
+            # Reference data
+            # ---------------------------------------------------------------------------
+
+            fd_categories_path = 'compression/categories/github_exchange_categories.xlsx'
+            fd_sectors         = pd.read_excel(fd_categories_path, sheet_name='sector',         index_col=1)
+            fd_industry_groups = pd.read_excel(fd_categories_path, sheet_name='industry_group', index_col=1)
+            fd_industries      = pd.read_excel(fd_categories_path, sheet_name='industry',       index_col=1)
+
+            # Read the equities database from per-exchange files
+            equities = pd.concat(
+                [pd.read_csv(f, index_col=0) for f in sorted(glob.glob('database/equities/*.csv'))],
+            )
+
+            # Derive the exchange -> ISO 10383 MIC map from the existing
+            # (ISO-validated, one-to-one) data; unknown codes stay blank.
+            exchange_to_mic = (
+                equities.dropna(subset=['mic'])
+                .drop_duplicates('exchange')
+                .set_index('exchange')['mic']
+                .to_dict()
+            )
+
+            # ---------------------------------------------------------------------------
+            # Main processing loop
+            # ---------------------------------------------------------------------------
+
+            ticker_dict: dict = {}
+
+            for index, row in exchange_data.iterrows():
+                market_cap = calculate_market_cap(row.get('marketCap'))
+
+                try:
+                    fd_data = equities.loc[index]
+
+                    # Update market_cap only when it has changed and the new value is valid
+                    if len(fd_data) == 0 and fd_data['market_cap'] != market_cap and pd.notna(market_cap):
+                        ticker_dict[index] = {'symbol': index, **fd_data.to_dict(), 'market_cap': market_cap}
+                    continue
+
+                except KeyError:
+                    # "NA" is parsed as NaN by pandas; normalise the index back to a string
+                    if pd.isna(index):
+                        index = "NA"
+
+                    ticker_dict[index] = build_new_ticker(index, row, fd_industries, equities, market_cap, exchange_to_mic)
+
+            # ---------------------------------------------------------------------------
+            # Merge results back into equities
+            # ---------------------------------------------------------------------------
+
+            updated_companies = pd.DataFrame.from_dict(ticker_dict, orient='index')
+            updated_companies.index.name = 'symbol'
+
+            # Drop accidental 'symbol' column that may surface from existing-row updates
+            updated_companies = updated_companies.drop(columns=['symbol'], errors='ignore')
+
+            print(f"There are {len(updated_companies)} new updates!")
+
+            if not updated_companies.empty:
+                # Update existing rows in-place
+                existing_indices = updated_companies.index.intersection(equities.index)
+                if not existing_indices.empty:
+                    equities.update(updated_companies.loc[existing_indices])
+
+                # Append completely new tickers
+                new_indices = updated_companies.index.difference(equities.index)
+                if not new_indices.empty:
+                    equities = pd.concat([equities, updated_companies.loc[new_indices]])
+                    
+                equities = equities[~equities.index.duplicated(keep='first')]
+                equities = equities[equities.index.notna()]
+
+                equities = (
+                    equities
+                    .sort_index()
+                    .loc[equities.index.notna()]   # drop NaN index entries
+                )
+
+                for f in glob.glob('database/equities/*.csv'):
+                    os.remove(f)
+                nan_mask = equities['exchange'].isna()
+                for exchange, group in equities[~nan_mask].groupby('exchange'):
+                    group.to_csv(f'database/equities/{exchange}.csv')
+                if nan_mask.any():
+                    equities[nan_mask].to_csv('database/equities/NAN.csv')
+      - name: Commit files and log
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add -A
+          git checkout main
+          git diff-index --quiet HEAD || git commit -am "Update database with new tickers"
+          git push
+      - name: Check run status
+        if: steps.run.outputs.status != '0'
+        run: exit "${{ steps.run.outputs.status }}"
+
+  Update-Compression-Files:
+    needs: Add-New-Ticker
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v6
+      - name: pull changes
+        run: git pull https://${{secrets.PAT}}@github.com/JerBouma/FinanceDatabase.git main
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+      - run: pip install "pandas[excel]" financedatabase
+      - name: Update Compressions
+        uses: jannekem/run-python-script-action@v1.8
+        with:
+          script: |
+            import glob
+            import financedatabase as fd
+            import pandas as pd
+
+            cryptos = pd.read_csv('database/cryptos.csv')
+            cryptos = cryptos.sort_values(cryptos.columns[0]).reset_index(drop=True)
+            cryptos.to_csv('compression/cryptos.bz2', index=False, compression='bz2')
+
+            currencies = pd.read_csv('database/currencies.csv')
+            currencies = currencies.sort_values(currencies.columns[0]).reset_index(drop=True)
+            currencies.to_csv('compression/currencies.bz2', index=False, compression='bz2')
+
+            equities = pd.concat([pd.read_csv(f) for f in sorted(glob.glob('database/equities/*.csv'))], ignore_index=True)
+            equities = equities.sort_values(equities.columns[0]).reset_index(drop=True)
+            equities.to_csv('compression/equities.bz2', index=False, compression='bz2')
+
+            etfs = pd.concat([pd.read_csv(f) for f in sorted(glob.glob('database/etfs/*.csv'))], ignore_index=True)
+            etfs = etfs.sort_values(etfs.columns[0]).reset_index(drop=True)
+            etfs.to_csv('compression/etfs.bz2', index=False, compression='bz2')
+
+            funds = pd.concat([pd.read_csv(f) for f in sorted(glob.glob('database/funds/*.csv'))], ignore_index=True)
+            funds = funds.sort_values(funds.columns[0]).reset_index(drop=True)
+            funds.to_csv('compression/funds.bz2', index=False, compression='bz2')
+
+            indices = pd.read_csv('database/indices.csv')
+            indices = indices.sort_values(indices.columns[0]).reset_index(drop=True)
+            indices.to_csv('compression/indices.bz2', index=False, compression='bz2')
+
+            moneymarkets = pd.read_csv('database/moneymarkets.csv')
+            moneymarkets = moneymarkets.sort_values(moneymarkets.columns[0]).reset_index(drop=True)
+            moneymarkets.to_csv('compression/moneymarkets.bz2', index=False, compression='bz2')
+      - name: Commit files and log
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add -A
+          git checkout main
+          git diff-index --quiet HEAD || git commit -am "Update Compression Files"
+          git push
+      - name: Check run status
+        if: steps.run.outputs.status != '0'
+        run: exit "${{ steps.run.outputs.status }}"
+
+  Update-Categorization-Files:
+      needs:  [Add-New-Ticker, Update-Compression-Files]
+      runs-on: ubuntu-latest
+      steps:
+        - name: checkout repo content
+          uses: actions/checkout@v6
+        - name: pull changes
+          run: git pull https://${{secrets.PAT}}@github.com/JerBouma/FinanceDatabase.git main
+        - name: setup python
+          uses: actions/setup-python@v6
+          with:
+            python-version: '3.10'
+        - run: pip install "pandas[excel]" financedatabase
+        - name: Update categories
+          uses: jannekem/run-python-script-action@v1.8
+          with:
+            script: |
+              import glob
+              import financedatabase as fd
+              import pandas as pd
+
+              cryptos = pd.read_csv("database/cryptos.csv", index_col=0)
+              cryptos_categories = {}
+              for column in cryptos:
+                  if column in ['name', 'summary']:
+                      continue
+                      
+                  cryptos_categories[column] = sorted(cryptos[column].dropna().unique(), key=str)
+                  
+              df_temp = pd.DataFrame.from_dict(cryptos_categories, orient='index').reset_index()
+              df_temp.to_csv('compression/categories/cryptos_categories.gzip', index=False, compression='gzip')
+                  
+              currencies = pd.read_csv("database/currencies.csv", index_col=0)
+              currencies_categories = {}
+              for column in currencies:
+                  if column in ['name']:
+                      continue
+
+                  currencies_categories[column] = sorted(currencies[column].dropna().unique(), key=str)
+
+              df_temp = pd.DataFrame.from_dict(currencies_categories, orient='index').reset_index()
+              df_temp.to_csv('compression/categories/currencies_categories.gzip', index=False, compression='gzip')
+                  
+              equities = pd.concat([pd.read_csv(f, index_col=0) for f in sorted(glob.glob('database/equities/*.csv'))])
+              equities_categories = {}
+              for column in equities:
+                  if column in ['name', 'summary', 'website', 'delisted']:
+                      continue
+                      
+                  equities_categories[column] = sorted(equities[column].dropna().unique(), key=str)
+                  
+              df_temp = pd.DataFrame.from_dict(equities_categories, orient='index').reset_index()
+              df_temp.to_csv('compression/categories/equities_categories.gzip', index=False, compression='gzip')
+                  
+              etfs = pd.concat([pd.read_csv(f, index_col=0) for f in sorted(glob.glob('database/etfs/*.csv'))])
+              etfs_categories = {}
+              for column in etfs:
+                  if column in ['name', 'summary']:
+                      continue
+                      
+                  etfs_categories[column] = sorted(etfs[column].dropna().unique(), key=str)
+
+              df_temp = pd.DataFrame.from_dict(etfs_categories, orient='index').reset_index()
+              df_temp.to_csv('compression/categories/etfs_categories.gzip', index=False, compression='gzip')
+                  
+              funds = pd.concat([pd.read_csv(f, index_col=0) for f in sorted(glob.glob('database/funds/*.csv'))])
+              funds_categories = {}
+              for column in funds:
+                  if column in ['name', 'summary', 'manager_name', 'manager_bio']:
+                      continue
+                      
+                  funds_categories[column] = sorted(funds[column].dropna().unique(), key=str)
+                  
+              df_temp = pd.DataFrame.from_dict(funds_categories, orient='index').reset_index()
+              df_temp.to_csv('compression/categories/funds_categories.gzip', index=False, compression='gzip')
+                  
+              indices = pd.read_csv("database/indices.csv", index_col=0)
+              indices_categories = {}
+              for column in indices:
+                  if column in ['name']:
+                      continue
+                      
+                  indices_categories[column] = sorted(indices[column].dropna().unique(), key=str)
+                  
+              df_temp = pd.DataFrame.from_dict(indices_categories, orient='index').reset_index()
+              df_temp.to_csv('compression/categories/indices_categories.gzip', index=False, compression='gzip')
+                  
+              moneymarkets = pd.read_csv("database/moneymarkets.csv", index_col=0)
+              moneymarkets_categories = {}
+              for column in moneymarkets:
+                  if column in ['name']:
+                      continue
+                      
+                  moneymarkets_categories[column] = sorted(moneymarkets[column].dropna().unique(), key=str)
+                  
+              df_temp = pd.DataFrame.from_dict(moneymarkets_categories, orient='index').reset_index()
+              df_temp.to_csv('compression/categories/moneymarkets_categories.gzip', index=False, compression='gzip')
+
+        - name: Commit files and log
+          run: |
+            git config --global user.name 'GitHub Action'
+            git config --global user.email 'action@github.com'
+            git add -A
+            git checkout main
+            git diff-index --quiet HEAD || git commit -am "Update Categorization Files"
+            git push
+        - name: Check run status
+          if: steps.run.outputs.status != '0'
+          run: exit "${{ steps.run.outputs.status }}"
+
+  Update-README-Statistics:
+    needs: [Add-New-Ticker, Update-Compression-Files, Update-Categorization-Files]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v6
+      - name: pull changes
+        run: git pull https://${{secrets.PAT}}@github.com/JerBouma/FinanceDatabase.git main
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: pip install pandas
+      - name: Refresh the statistics tables in README.md
+        uses: jannekem/run-python-script-action@v1.8
+        with:
+          script: |
+            import glob
+            import re
+            from pathlib import Path
+            import pandas as pd
+
+            def _n(x: int) -> str:
+                """Format an integer with a thousand-separator dot (e.g. 160.113)."""
+                return f"{x:,}".replace(",", ".")
+
+            # Table A: Equities — Quantity, Sectors, Industries, Countries, Exchanges
+            eq = pd.concat([pd.read_csv(f, dtype=str) for f in sorted(glob.glob('database/equities/*.csv'))], ignore_index=True)
+            table_a_row = (
+                "Equities",
+                _n(len(eq)),
+                _n(eq["sector"].nunique()),
+                _n(eq["industry"].nunique()),
+                _n(eq["country"].nunique()),
+                _n(eq["exchange"].nunique()),
+            )
+
+            # Table B: ETFs / Funds — Quantity, Families, Categories, Exchanges
+            # (no Countries column: ETF/Fund 'country' is semantically the investment
+            # scope, not a HQ — not derivable from listing exchange alone.)
+            table_b_rows = []
+            for asset in ("ETFs", "Funds"):
+                df = pd.concat([pd.read_csv(f, dtype=str) for f in sorted(glob.glob(f'database/{asset.lower()}/*.csv'))], ignore_index=True)
+                table_b_rows.append((
+                    asset,
+                    _n(len(df)),
+                    _n(df["family"].nunique()),
+                    _n(df["category"].nunique()),
+                    _n(df["exchange"].nunique()),
+                ))
+
+            # Table C: Currencies / Cryptocurrencies / Indices / Money Markets
+            table_c_rows = []
+            for asset, fname, col, label in [
+                ("Currencies",       "currencies.csv",   "quote_currency", "Currencies"),
+                ("Cryptocurrencies", "cryptos.csv",      "cryptocurrency", "Cryptocurrencies"),
+                ("Indices",          "indices.csv",      "exchange",       "Exchanges"),
+                ("Money Markets",    "moneymarkets.csv", "exchange",       "Exchanges"),
+            ]:
+                df = pd.read_csv(f"database/{fname}", dtype=str)
+                table_c_rows.append((asset, _n(len(df)), f"{_n(df[col].nunique())} {label}"))
+
+            def _fmt_table_a(row):
+                h = "| Product           | Quantity   | Sectors    | Industries    | Countries | Exchanges |\n"
+                h += "| ----------------- | ---------- | ---------- | ------------- | --------- | --------- |"
+                a, q, s, i, c, e = row
+                b = f"| {a:<17} | {q:<10} | {s:<10} | {i:<13} | {c:<9} | {e:<9} |"
+                return h + "\n" + b
+
+            def _fmt_table_b(rows):
+                h = "| Product           | Quantity   | Families   | Categories    | Exchanges |\n"
+                h += "| ----------------- | ---------- | ---------- | ------------- | --------- |"
+                b = "\n".join(
+                    f"| {a:<17} | {q:<10} | {f:<10} | {c:<13} | {e:<9} |"
+                    for (a, q, f, c, e) in rows
+                )
+                return h + "\n" + b
+
+            def _fmt_table_c(rows):
+                h = "| Product           | Quantity  | Category              |\n"
+                h += "| ----------------- | --------- | --------------------- |"
+                b = "\n".join(
+                    f"| {a:<17} | {q:<9} | {c:<21} |"
+                    for (a, q, c) in rows
+                )
+                return h + "\n" + b
+
+            readme = Path("README.md")
+            text = readme.read_text(encoding="utf-8")
+            # Refresh the Equities (A) and ETFs/Funds (B) statistics tables.
+            text = re.sub(
+                r"\| Product\s+\| Quantity\s+\| Sectors[^\n]*\| Industries[^\n]*\n"
+                r"\|[^\n]*\n\|[^\n]*\n\n"
+                r"\| Product\s+\| Quantity\s+\| Families[^\n]*\n\|[^\n]*\n(?:\|[^\n]*\n){2}",
+                _fmt_table_a(table_a_row) + "\n\n" + _fmt_table_b(table_b_rows) + "\n",
+                text,
+                count=1,
+            )
+            text = re.sub(
+                r"\| Product\s+\| Quantity\s+\| Category[^\n]*\n\|[^\n]*\n(?:\|[^\n]*\n){4}",
+                _fmt_table_c(table_c_rows) + "\n",
+                text,
+                count=1,
+            )
+            readme.write_text(text, encoding="utf-8")
+            print("README.md statistics tables refreshed.")
+      - name: Commit README update
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add README.md
+          git diff-index --quiet HEAD || git commit -m "Update README statistics"
+          git push
+
+  Check-GICS-Categorisation:
+    needs:  [Add-New-Ticker, Update-Compression-Files, Update-Categorization-Files, Update-README-Statistics]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v6
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+      - run: pip install "pandas[excel]" financedatabase
+      - name: Check GICS Categorisation
+        uses: jannekem/run-python-script-action@v1.8
+        with:
+          script: |
+            import glob
+            import pandas as pd
+            import json
+
+            invalid_rows = pd.DataFrame()
+            errors = []
+            gics = json.load(open("compression/categories/categories.json", "r"))
+            equities = pd.concat([pd.read_csv(f, index_col=0) for f in sorted(glob.glob('database/equities/*.csv'))])
+            filtered_data = equities[equities['sector'].notna() & equities['industry_group'].notna() & equities['industry'].notna()]
+
+            for index, row in filtered_data.iterrows():
+                sector, industry_group, industry = row['sector'], row['industry_group'], row['industry']
+
+                try:
+                    # Search whether it can find the combination
+                    gics[sector][industry_group][industry]
+                except KeyError as error:
+                    # If it can't, add to invalid_rows DataFrame
+                    row['error'] = error
+                    invalid_rows = pd.concat([invalid_rows, row], axis=1)
+
+
+            if not invalid_rows.empty:
+                invalid_rows = invalid_rows.T
+
+                print("Invalid Rows for:")
+                for index, row in invalid_rows.iterrows():
+                    print(f"{index}: {row['error']}")
+                
+                raise ValueError("There are invalid sector, industry groups and/or industries found. "
+                                 "Please check if it adheres to compression/categories/categories.json")

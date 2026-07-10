@@ -1,0 +1,50 @@
+{
+  "port": 9339,
+  "targetApis": [
+    "https://api.anthropic.com",
+    "https://api.openai.com"
+  ],
+  "languages": [
+    "typescript",
+    "javascript",
+    "python",
+    "go",
+    "java",
+    "csharp",
+    "ruby",
+    "rust"
+  ],
+  "mutationRules": [
+    {
+      "tokenType": "Variable",
+      "prefix": "_v"
+    },
+    {
+      "tokenType": "Function",
+      "prefix": "_fn"
+    },
+    {
+      "tokenType": "Class",
+      "prefix": "_cls"
+    },
+    {
+      "tokenType": "String"
+    },
+    {
+      "tokenType": "Comment",
+      "strip": true
+    },
+    {
+      "tokenType": "Import"
+    },
+    {
+      "tokenType": "Property",
+      "prefix": "_prop"
+    },
+    {
+      "tokenType": "Method",
+      "prefix": "_fn"
+    }
+  ],
+  "storePath": "/Users/jimmymalhan/Documents/FinanceDatabase-main/.pretense"
+}
