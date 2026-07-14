@@ -1,0 +1,110 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE DLP BENCHMARK DATA, NOT REAL",
+  "records": [
+    {
+      "id": "r2-iban-inline",
+      "kind": "iban",
+      "text": "Settlement account GB00 XXXX 9048 1571 4237 71 confirmed for the counterparty."
+    },
+    {
+      "id": "r2-email-inline",
+      "kind": "email",
+      "text": "Statements are delivered to noah.larsen44@example.com each month."
+    },
+    {
+      "id": "r2-log-inline",
+      "kind": "access_log",
+      "text": "2026-07-11T09:02:17Z INFO auth user=ava.carter32 password=NE8vjuSe6M result=ok"
+    },
+    {
+      "id": "r2-vat-inline",
+      "kind": "vat",
+      "text": "Supplier registration on file: DE166418105."
+    },
+    {
+      "id": "r2-dburl-inline",
+      "kind": "db_url",
+      "text": "Connection string postgres://user:REDACTEDT1o6ZH5rTdVh@db.internal.example.com:5432/appdb in the deploy note."
+    },
+    {
+      "id": "r2-iban-labeled",
+      "kind": "iban",
+      "text": "iban: DE00 XXXX 6649 7692 2979 20"
+    },
+    {
+      "id": "r2-nid-labeled",
+      "kind": "national_id",
+      "text": "national_id = 9041-7745-8035"
+    },
+    {
+      "id": "r2-passport-labeled",
+      "kind": "passport",
+      "text": "passport_no: E78981412"
+    },
+    {
+      "id": "r2-phone-eu-labeled",
+      "kind": "phone",
+      "text": "contact_phone: +44 (0)20 7946 0978"
+    },
+    {
+      "id": "r2-vat-labeled",
+      "kind": "vat",
+      "text": "VAT: FR727276969"
+    },
+    {
+      "id": "r2-iban-split",
+      "kind": "iban",
+      "text": "iban = \"FR00XXXX\" \"86494612003954\""
+    },
+    {
+      "id": "r2-email-split",
+      "kind": "email",
+      "text": "\"noah.larsen44\" \"@example.com\""
+    },
+    {
+      "id": "r2-phone-us-spaced",
+      "kind": "phone",
+      "text": "phone = (682) 555-0180"
+    },
+    {
+      "id": "r2-log-split",
+      "kind": "access_log",
+      "text": "entry = \"user=svc \" \"password=NE8vjuSe6M\""
+    },
+    {
+      "id": "r2-iban-b64",
+      "kind": "iban",
+      "text": "blob=R0IwMCBYWFhYIDkwNDggMTU3MSA0MjM3IDcx"
+    },
+    {
+      "id": "r2-email-b64",
+      "kind": "email",
+      "text": "blob=YXZhLmNhcnRlcjMyQGV4YW1wbGUuY29t"
+    },
+    {
+      "id": "r2-dburl-b64",
+      "kind": "db_url",
+      "text": "payload=cG9zdGdyZXM6Ly91c2VyOlJFREFDVEVEVDFvNlpINXJUZFZoQGRiLmludGVybmFsLmV4YW1wbGUuY29tOjU0MzIvYXBwZGI="
+    },
+    {
+      "id": "r2-pw-hex",
+      "kind": "access_log",
+      "text": "pw_blob=4e4538766a755365364d"
+    },
+    {
+      "id": "r2-iban-zw",
+      "kind": "iban",
+      "text": "acctFR00\u200bXXXX\u200b8649\u200b4612\u200b0039\u200b54ref"
+    },
+    {
+      "id": "r2-nid-zw",
+      "kind": "national_id",
+      "text": "id9\u200b041\u200b7745\u200b8035x"
+    },
+    {
+      "id": "r2-dburl-wrapped",
+      "kind": "db_url",
+      "text": "cfg=ZHNuPXBvc3RncmVzOi8vdXNlcjpSRURBQ1RFRFQxbzZaSDVyVGRWaEBkYi5pbnRlcm5hbC5leGFtcGxlLmNvbTo1NDMyL2FwcGRi"
+    }
+  ]
+}

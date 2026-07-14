@@ -1,0 +1,105 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE DLP BENCHMARK DATA, NOT REAL",
+  "records": [
+    {
+      "id": "r4-iban-plain",
+      "kind": "iban",
+      "text": "Settlement IBAN GB29EXMP60161331926819 on file for the clearing account."
+    },
+    {
+      "id": "r4-nid-plain",
+      "kind": "national_id",
+      "text": "National identifier recorded as 900-55-1234 in onboarding."
+    },
+    {
+      "id": "r4-ghtoken-plain",
+      "kind": "github_token",
+      "text": "ci deploy token ghp_EXAMPLE00000000000000000000000000000 was committed to the pipeline config."
+    },
+    {
+      "id": "r4-mrn-label",
+      "kind": "medical_record_number",
+      "text": "record_locator: MRN00042001"
+    },
+    {
+      "id": "r4-passport-field",
+      "kind": "passport",
+      "text": "passport = XA0000042"
+    },
+    {
+      "id": "r4-iban-spaced",
+      "kind": "iban",
+      "text": "IBAN: GB29 EXMP 6016 1331 9268 19 (SEPA)"
+    },
+    {
+      "id": "r4-apikey-split",
+      "kind": "api_key",
+      "text": "key = \"sk_test_ABCdef0123\" \"456789ABCdef01\""
+    },
+    {
+      "id": "r4-nid-b64",
+      "kind": "national_id",
+      "text": "payload blob=OTAwLTU1LTEyMzQ="
+    },
+    {
+      "id": "r4-iban-b64",
+      "kind": "iban",
+      "text": "remit blob=R0IyOUVYTVA2MDE2MTMzMTkyNjgxOQ=="
+    },
+    {
+      "id": "r4-ghtoken-b64",
+      "kind": "github_token",
+      "text": "secret blob=Z2hwX0VYQU1QTEUwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA=="
+    },
+    {
+      "id": "r4-apikey-b64",
+      "kind": "api_key",
+      "text": "env blob=c2tfdGVzdF9BQkNkZWYwMTIzNDU2Nzg5QUJDZGVmMDE="
+    },
+    {
+      "id": "r4-mrn-hex",
+      "kind": "medical_record_number",
+      "text": "chart blob=4d524e3030303432303031"
+    },
+    {
+      "id": "r4-passport-hex",
+      "kind": "passport",
+      "text": "doc blob=584130303030303432"
+    },
+    {
+      "id": "r4-nid-homoglyph",
+      "kind": "national_id",
+      "text": "national id \uff19\uff10\uff10-55-1234 on the intake form"
+    },
+    {
+      "id": "r4-mrn-homoglyph",
+      "kind": "medical_record_number",
+      "text": "mrn MRN\uff10\uff10\uff10\uff14\uff12\uff10\uff10\uff11 attached"
+    },
+    {
+      "id": "r4-nid-zw",
+      "kind": "national_id",
+      "text": "subject id 900\u200b55\u200b1234 flagged"
+    },
+    {
+      "id": "r4-iban-zw",
+      "kind": "iban",
+      "text": "acct G\u200bB\u200b2\u200b9\u200bE\u200bX\u200bM\u200bP\u200b6\u200b0\u200b1\u200b6\u200b1\u200b3\u200b3\u200b1\u200b9\u200b2\u200b6\u200b8\u200b1\u200b9 ref"
+    },
+    {
+      "id": "r4-mrn-zw",
+      "kind": "medical_record_number",
+      "text": "mrn M\u200bR\u200bN\u200b0\u200b0\u200b0\u200b4\u200b2\u200b0\u200b0\u200b1 on chart"
+    },
+    {
+      "id": "r4-passport-split",
+      "kind": "passport",
+      "text": "passport = \"XA00\" \"00042\""
+    },
+    {
+      "id": "r4-ghtoken-b64wrap",
+      "kind": "github_token",
+      "text": "envelope=dG9rZW49Z2hwX0VYQU1QTEUwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA=="
+    }
+  ]
+}

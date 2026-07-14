@@ -1,0 +1,95 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE DLP BENCHMARK DATA, NOT REAL",
+  "records": [
+    {
+      "id": "r5-pan-csv",
+      "kind": "pan",
+      "text": "AAPL,Apple Inc.,NMS,6927094477452718,EUR"
+    },
+    {
+      "id": "r5-iban-field",
+      "kind": "iban",
+      "text": "settlement_iban = GB00SYNT00379683385069"
+    },
+    {
+      "id": "r5-apikey-env",
+      "kind": "api_key",
+      "text": "STRIPE_API_KEY=sk_test_GOMpV7yVztfFBLRRKTyTGsB7"
+    },
+    {
+      "id": "r5-dburl-env",
+      "kind": "db_url",
+      "text": "DATABASE_URL=postgres://svc_reporting:test_pw_6042@warehouse-7.db.example.com:5432/analytics"
+    },
+    {
+      "id": "r5-mrn-field",
+      "kind": "health_record",
+      "text": "patient_mrn: MRN96818454"
+    },
+    {
+      "id": "r5-contract-cell",
+      "kind": "contract_number",
+      "text": "AMZN,Amazon.com, Inc.,NMS,CTR-2026-934216,USD"
+    },
+    {
+      "id": "r5-pan-json",
+      "kind": "pan",
+      "text": "{\"ticker\": \"AAPL\", \"card_on_file\": \"8404019738559751\", \"status\": \"active\"}"
+    },
+    {
+      "id": "r5-iban-spaced",
+      "kind": "iban",
+      "text": "IBAN DE00 TEST 8220 6756 726010"
+    },
+    {
+      "id": "r5-ssn-json",
+      "kind": "ssn",
+      "text": "{\"holder\": \"Ava Carter\", \"tax_id\": \"977-41-3072\", \"sector\": \"Financials\"}"
+    },
+    {
+      "id": "r5-dburl-log",
+      "kind": "db_url",
+      "text": "2026-07-11T09:12:03Z WARN pool connect dsn=postgres://svc_reporting:test_pw_8240@warehouse-8.db.example.com:5432/analytics retries=3"
+    },
+    {
+      "id": "r5-contract-log",
+      "kind": "contract_number",
+      "text": "2026-07-11T09:15:44Z INFO renew contract=CTR-2024-805123 portfolio=NMS"
+    },
+    {
+      "id": "r5-apikey-split",
+      "kind": "api_key",
+      "text": "key = \"sk_test_3tej\" + \"l4hK3jeb9PnR1rvriRx1\""
+    },
+    {
+      "id": "r5-ssn-homoglyph",
+      "kind": "ssn",
+      "text": "account_holder_ssn=\uff1938-48-1221"
+    },
+    {
+      "id": "r5-iban-json-b64",
+      "kind": "iban",
+      "text": "{\"acct\": \"brokerage\", \"iban_b64\": \"RlIwMFNZTlQ4ODQ1OTkxNTY4NjY3NA==\"}"
+    },
+    {
+      "id": "r5-email-log",
+      "kind": "email",
+      "text": "2026-07-11T09:20:10Z INFO statement_sent to=omar.carter52@example.com exch=XNAS"
+    },
+    {
+      "id": "r5-pan-zw-csv",
+      "kind": "pan",
+      "text": "GOOGL,Alphabet Inc.,NMS,1623\u200b5980\u200b8620\u200b2635,GBP"
+    },
+    {
+      "id": "r5-phone-hex-log",
+      "kind": "phone",
+      "text": "2026-07-11T09:31:02Z DEBUG contact raw=3536332d3535352d30313938 region=NYQ"
+    },
+    {
+      "id": "r5-iban-zw-field",
+      "kind": "iban",
+      "text": "beneficiary_iban:NL00TEST\u200b07092355933051"
+    }
+  ]
+}

@@ -1,0 +1,1184 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE DLP BENCHMARK DATA, NOT REAL \u2014 ground-truth labels for DLP recall scoring.",
+  "cases": [
+    {
+      "id": "t0-ssn",
+      "difficulty": 0,
+      "kind": "ssn",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "Member SSN on file: 900-55-1234.",
+      "expected": true
+    },
+    {
+      "id": "t0-pan",
+      "difficulty": 0,
+      "kind": "pan",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "Primary card 4485236017858297 charged $42.00.",
+      "expected": true
+    },
+    {
+      "id": "t0-apikey",
+      "difficulty": 0,
+      "kind": "api_key",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "stripe_api_key=sk_test_ABCdef0123456789ABCdef01",
+      "expected": true
+    },
+    {
+      "id": "t0-aws",
+      "difficulty": 0,
+      "kind": "aws_key",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "aws_access_key_id=AKIAIOSFODNN7EXAMPLE",
+      "expected": true
+    },
+    {
+      "id": "t0-jwt",
+      "difficulty": 0,
+      "kind": "jwt",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "session token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmYWtlIn0.c2lnbmF0dXJlX2Zha2U",
+      "expected": true
+    },
+    {
+      "id": "t0-email",
+      "difficulty": 0,
+      "kind": "email",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "Contact ava.carter7@example.com for statements.",
+      "expected": true
+    },
+    {
+      "id": "t0-phone",
+      "difficulty": 0,
+      "kind": "phone",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "Call center (415) 555-0142.",
+      "expected": true
+    },
+    {
+      "id": "t0-secret",
+      "difficulty": 0,
+      "kind": "secret",
+      "obfuscation": "inline",
+      "source_file": "corpus/tier0_plain.json",
+      "text": "jwt_signing_secret=hardcoded-not-rotated-secret",
+      "expected": true
+    },
+    {
+      "id": "t1-ssn-dot",
+      "difficulty": 1,
+      "kind": "ssn",
+      "obfuscation": "dot-separated",
+      "source_file": "corpus/tier1_labeled.csv",
+      "text": "tax_id: 900.55.1234",
+      "expected": true
+    },
+    {
+      "id": "t1-phone-dash",
+      "difficulty": 1,
+      "kind": "phone",
+      "obfuscation": "dashed",
+      "source_file": "corpus/tier1_labeled.csv",
+      "text": "phone: 415-555-0142",
+      "expected": true
+    },
+    {
+      "id": "t1-email-upper",
+      "difficulty": 1,
+      "kind": "email",
+      "obfuscation": "uppercase",
+      "source_file": "corpus/tier1_labeled.csv",
+      "text": "EMAIL: AVA.CARTER7@EXAMPLE.COM",
+      "expected": true
+    },
+    {
+      "id": "t1-pan-cell",
+      "difficulty": 1,
+      "kind": "pan",
+      "obfuscation": "csv-cell",
+      "source_file": "corpus/tier1_labeled.csv",
+      "text": "card_on_file,4485236017858297,active",
+      "expected": true
+    },
+    {
+      "id": "t1-aws-field",
+      "difficulty": 1,
+      "kind": "aws_key",
+      "obfuscation": "config-field",
+      "source_file": "corpus/tier1_labeled.csv",
+      "text": "access_key = AKIAIOSFODNN7EXAMPLE",
+      "expected": true
+    },
+    {
+      "id": "t1-apikey-field",
+      "difficulty": 1,
+      "kind": "api_key",
+      "obfuscation": "config-field",
+      "source_file": "corpus/tier1_labeled.csv",
+      "text": "stripe.key = sk_test_ABCdef0123456789ABCdef01",
+      "expected": true
+    },
+    {
+      "id": "t1-secret-field",
+      "difficulty": 1,
+      "kind": "secret",
+      "obfuscation": "config-field",
+      "source_file": "corpus/tier1_labeled.csv",
+      "text": "signing = hardcoded-not-rotated-secret",
+      "expected": true
+    },
+    {
+      "id": "t2-pan-spaced",
+      "difficulty": 2,
+      "kind": "pan",
+      "obfuscation": "space-grouped",
+      "source_file": "corpus/tier2_split.log",
+      "text": "Card: 4485 2360 1785 8297 exp 12/29",
+      "expected": true
+    },
+    {
+      "id": "t2-pan-dashed",
+      "difficulty": 2,
+      "kind": "pan",
+      "obfuscation": "dash-grouped",
+      "source_file": "corpus/tier2_split.log",
+      "text": "PAN=4485-2360-1785-8297",
+      "expected": true
+    },
+    {
+      "id": "t2-ssn-split",
+      "difficulty": 2,
+      "kind": "ssn",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/tier2_split.log",
+      "text": "ssn = \"900-55\" \"-1234\"",
+      "expected": true
+    },
+    {
+      "id": "t2-secret-concat",
+      "difficulty": 2,
+      "kind": "secret",
+      "obfuscation": "concatenated",
+      "source_file": "corpus/tier2_split.log",
+      "text": "signing = \"hardcoded-not-rotated\" + \"-secret\"",
+      "expected": true
+    },
+    {
+      "id": "t2-email-split",
+      "difficulty": 2,
+      "kind": "email",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/tier2_split.log",
+      "text": "\"ava.carter7\" \"@example.com\"",
+      "expected": true
+    },
+    {
+      "id": "t3-ssn-b64",
+      "difficulty": 3,
+      "kind": "ssn",
+      "obfuscation": "base64",
+      "source_file": "corpus/tier3_encoded.json",
+      "text": "blob=OTAwLTU1LTEyMzQ=",
+      "expected": true
+    },
+    {
+      "id": "t3-pan-b64",
+      "difficulty": 3,
+      "kind": "pan",
+      "obfuscation": "base64",
+      "source_file": "corpus/tier3_encoded.json",
+      "text": "blob=NDQ4NTIzNjAxNzg1ODI5Nw==",
+      "expected": true
+    },
+    {
+      "id": "t3-email-b64",
+      "difficulty": 3,
+      "kind": "email",
+      "obfuscation": "base64",
+      "source_file": "corpus/tier3_encoded.json",
+      "text": "blob=YXZhLmNhcnRlcjdAZXhhbXBsZS5jb20=",
+      "expected": true
+    },
+    {
+      "id": "t3-secret-hex",
+      "difficulty": 3,
+      "kind": "secret",
+      "obfuscation": "hex",
+      "source_file": "corpus/tier3_encoded.json",
+      "text": "blob=68617264636f6465642d6e6f742d726f74617465642d736563726574",
+      "expected": true
+    },
+    {
+      "id": "t3-ssn-homoglyph",
+      "difficulty": 3,
+      "kind": "ssn",
+      "obfuscation": "unicode-homoglyph",
+      "source_file": "corpus/tier3_encoded.json",
+      "text": "ssn=\uff1900-55-1234",
+      "expected": true
+    },
+    {
+      "id": "t4-pan-zw",
+      "difficulty": 4,
+      "kind": "pan",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/tier4_embedded_equities.csv",
+      "text": "acct4485\u200b2360\u200b1785\u200b8297ref",
+      "expected": true
+    },
+    {
+      "id": "t4-ssn-zw",
+      "difficulty": 4,
+      "kind": "ssn",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/tier4_embedded_equities.csv",
+      "text": "id900\u200b55\u200b1234x",
+      "expected": true
+    },
+    {
+      "id": "t4-jwt-b64",
+      "difficulty": 4,
+      "kind": "jwt",
+      "obfuscation": "base64-wrapped",
+      "source_file": "corpus/tier4_embedded_equities.csv",
+      "text": "payload=dG9rZW49ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKemRXSWlPaUptWVd0bEluMC5jMmxuYm1GMGRYSmxYMlpoYTJV",
+      "expected": true
+    },
+    {
+      "id": "t4-pan-hex",
+      "difficulty": 4,
+      "kind": "pan",
+      "obfuscation": "hex-digits",
+      "source_file": "corpus/tier4_embedded_equities.csv",
+      "text": "raw=34343835323336303137383538323937",
+      "expected": true
+    },
+    {
+      "id": "r1-mrn-inline",
+      "difficulty": 0,
+      "kind": "medical_record_number",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "Patient chart pulled under MRN76433971 ahead of the follow-up visit.",
+      "expected": true
+    },
+    {
+      "id": "r1-ghp-inline",
+      "difficulty": 0,
+      "kind": "github_token",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "CI pipeline authenticates with token ghp_Y8fBMD0gNuzKTPwtcInE6vbQSX72jerrYM31 before the build step.",
+      "expected": true
+    },
+    {
+      "id": "r1-icd-inline",
+      "difficulty": 0,
+      "kind": "icd10",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "Encounter closed with primary code F32.1 on the problem list.",
+      "expected": true
+    },
+    {
+      "id": "r1-health-inline",
+      "difficulty": 0,
+      "kind": "health_record",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "Ava Silva was seen today and diagnosed with Major depressive disorder, moderate.",
+      "expected": true
+    },
+    {
+      "id": "r1-member-field",
+      "difficulty": 1,
+      "kind": "insurance_member_id",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "member_id: RRF139047426",
+      "expected": true
+    },
+    {
+      "id": "r1-apikey-field",
+      "difficulty": 1,
+      "kind": "api_key",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "billing.stripe_key = sk_test_F5ecaqZUAbmmPaLncxquvngO",
+      "expected": true
+    },
+    {
+      "id": "r1-mrn-label",
+      "difficulty": 1,
+      "kind": "medical_record_number",
+      "obfuscation": "labeled",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "MRN: MRN60465234",
+      "expected": true
+    },
+    {
+      "id": "r1-ghp-field",
+      "difficulty": 1,
+      "kind": "github_token",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "github_access_token = ghp_7OElKOPSpJ4bCub1CTmzQMkuH6foYGPsuGm1",
+      "expected": true
+    },
+    {
+      "id": "r1-icd-label",
+      "difficulty": 1,
+      "kind": "icd10",
+      "obfuscation": "labeled",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "diagnosis_code = F32.1",
+      "expected": true
+    },
+    {
+      "id": "r1-mrn-spaced",
+      "difficulty": 2,
+      "kind": "medical_record_number",
+      "obfuscation": "space-grouped",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "chart no. MRN 28 75 09 13",
+      "expected": true
+    },
+    {
+      "id": "r1-member-split",
+      "difficulty": 2,
+      "kind": "insurance_member_id",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "member = \"OTQ\" \"678234461\"",
+      "expected": true
+    },
+    {
+      "id": "r1-ghp-concat",
+      "difficulty": 2,
+      "kind": "github_token",
+      "obfuscation": "concatenated",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "token = \"ghp_\" + \"v2hDJTHhm1bWuUKrKwsijCuoBNnbsd61lNFS\"",
+      "expected": true
+    },
+    {
+      "id": "r1-apikey-split",
+      "difficulty": 2,
+      "kind": "api_key",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "key = \"sk_test_\" \"6Z4bFfmTgPFos8P2LzE1bdGF\"",
+      "expected": true
+    },
+    {
+      "id": "r1-mrn-b64",
+      "difficulty": 3,
+      "kind": "medical_record_number",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "blob=TVJONzY0MzM5NzE=",
+      "expected": true
+    },
+    {
+      "id": "r1-member-hex",
+      "difficulty": 3,
+      "kind": "insurance_member_id",
+      "obfuscation": "hex",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "blob=525246313339303437343236",
+      "expected": true
+    },
+    {
+      "id": "r1-ghp-b64",
+      "difficulty": 3,
+      "kind": "github_token",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "payload=Z2hwX1k4ZkJNRDBnTnV6S1RQd3RjSW5FNnZiUVNYNzJqZXJyWU0zMQ==",
+      "expected": true
+    },
+    {
+      "id": "r1-icd-homoglyph",
+      "difficulty": 3,
+      "kind": "icd10",
+      "obfuscation": "unicode-homoglyph",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "code=B\uff110",
+      "expected": true
+    },
+    {
+      "id": "r1-ghp-zw",
+      "difficulty": 4,
+      "kind": "github_token",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "gh\u200bp_Y\u200b8\u200bf\u200bB\u200bM\u200bD\u200b0\u200bg\u200bN\u200bu\u200bz\u200bK\u200bT\u200bP\u200bw\u200bt\u200bc\u200bI\u200bn\u200bE\u200b6\u200bv\u200bb\u200bQ\u200bS\u200bX\u200b7\u200b2\u200bj\u200be\u200br\u200br\u200bY\u200bM\u200b3\u200b1",
+      "expected": true
+    },
+    {
+      "id": "r1-mrn-zw",
+      "difficulty": 4,
+      "kind": "medical_record_number",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "ref M\u200bR\u200bN\u200b60\u200b46\u200b52\u200b34end",
+      "expected": true
+    },
+    {
+      "id": "r1-health-embedded",
+      "difficulty": 4,
+      "kind": "health_record",
+      "obfuscation": "embedded",
+      "source_file": "corpus/blended_regulated_01.json",
+      "text": "note::Diego Patel|dx=Major depressive disorder, moderate|call (111) 555-0139|diego.patel81@example.com::eof",
+      "expected": true
+    },
+    {
+      "id": "r2-iban-inline",
+      "difficulty": 0,
+      "kind": "iban",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "Settlement account GB00 XXXX 9048 1571 4237 71 confirmed for the counterparty.",
+      "expected": true
+    },
+    {
+      "id": "r2-email-inline",
+      "difficulty": 0,
+      "kind": "email",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "Statements are delivered to noah.larsen44@example.com each month.",
+      "expected": true
+    },
+    {
+      "id": "r2-log-inline",
+      "difficulty": 0,
+      "kind": "access_log",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "2026-07-11T09:02:17Z INFO auth user=ava.carter32 password=NE8vjuSe6M result=ok",
+      "expected": true
+    },
+    {
+      "id": "r2-vat-inline",
+      "difficulty": 0,
+      "kind": "vat",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "Supplier registration on file: DE166418105.",
+      "expected": true
+    },
+    {
+      "id": "r2-dburl-inline",
+      "difficulty": 0,
+      "kind": "db_url",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "Connection string postgres://user:REDACTEDT1o6ZH5rTdVh@db.internal.example.com:5432/appdb in the deploy note.",
+      "expected": true
+    },
+    {
+      "id": "r2-iban-labeled",
+      "difficulty": 1,
+      "kind": "iban",
+      "obfuscation": "labeled-field",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "iban: DE00 XXXX 6649 7692 2979 20",
+      "expected": true
+    },
+    {
+      "id": "r2-nid-labeled",
+      "difficulty": 1,
+      "kind": "national_id",
+      "obfuscation": "labeled-field",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "national_id = 9041-7745-8035",
+      "expected": true
+    },
+    {
+      "id": "r2-passport-labeled",
+      "difficulty": 1,
+      "kind": "passport",
+      "obfuscation": "labeled-field",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "passport_no: E78981412",
+      "expected": true
+    },
+    {
+      "id": "r2-phone-eu-labeled",
+      "difficulty": 1,
+      "kind": "phone",
+      "obfuscation": "labeled-field",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "contact_phone: +44 (0)20 7946 0978",
+      "expected": true
+    },
+    {
+      "id": "r2-vat-labeled",
+      "difficulty": 1,
+      "kind": "vat",
+      "obfuscation": "labeled-field",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "VAT: FR727276969",
+      "expected": true
+    },
+    {
+      "id": "r2-iban-split",
+      "difficulty": 2,
+      "kind": "iban",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "iban = \"FR00XXXX\" \"86494612003954\"",
+      "expected": true
+    },
+    {
+      "id": "r2-email-split",
+      "difficulty": 2,
+      "kind": "email",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "\"noah.larsen44\" \"@example.com\"",
+      "expected": true
+    },
+    {
+      "id": "r2-phone-us-spaced",
+      "difficulty": 2,
+      "kind": "phone",
+      "obfuscation": "spaced",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "phone = (682) 555-0180",
+      "expected": true
+    },
+    {
+      "id": "r2-log-split",
+      "difficulty": 2,
+      "kind": "access_log",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "entry = \"user=svc \" \"password=NE8vjuSe6M\"",
+      "expected": true
+    },
+    {
+      "id": "r2-iban-b64",
+      "difficulty": 3,
+      "kind": "iban",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "blob=R0IwMCBYWFhYIDkwNDggMTU3MSA0MjM3IDcx",
+      "expected": true
+    },
+    {
+      "id": "r2-email-b64",
+      "difficulty": 3,
+      "kind": "email",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "blob=YXZhLmNhcnRlcjMyQGV4YW1wbGUuY29t",
+      "expected": true
+    },
+    {
+      "id": "r2-dburl-b64",
+      "difficulty": 3,
+      "kind": "db_url",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "payload=cG9zdGdyZXM6Ly91c2VyOlJFREFDVEVEVDFvNlpINXJUZFZoQGRiLmludGVybmFsLmV4YW1wbGUuY29tOjU0MzIvYXBwZGI=",
+      "expected": true
+    },
+    {
+      "id": "r2-pw-hex",
+      "difficulty": 3,
+      "kind": "access_log",
+      "obfuscation": "hex",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "pw_blob=4e4538766a755365364d",
+      "expected": true
+    },
+    {
+      "id": "r2-iban-zw",
+      "difficulty": 4,
+      "kind": "iban",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "acctFR00\u200bXXXX\u200b8649\u200b4612\u200b0039\u200b54ref",
+      "expected": true
+    },
+    {
+      "id": "r2-nid-zw",
+      "difficulty": 4,
+      "kind": "national_id",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "id9\u200b041\u200b7745\u200b8035x",
+      "expected": true
+    },
+    {
+      "id": "r2-dburl-wrapped",
+      "difficulty": 4,
+      "kind": "db_url",
+      "obfuscation": "base64-wrapped",
+      "source_file": "corpus/blended_regulated_02.json",
+      "text": "cfg=ZHNuPXBvc3RncmVzOi8vdXNlcjpSRURBQ1RFRFQxbzZaSDVyVGRWaEBkYi5pbnRlcm5hbC5leGFtcGxlLmNvbTo1NDMyL2FwcGRi",
+      "expected": true
+    },
+    {
+      "id": "r3-contract-plain",
+      "difficulty": 0,
+      "kind": "contract_number",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "Award reference CT-2025-270565 is on file for the build lot.",
+      "expected": true
+    },
+    {
+      "id": "r3-part-plain",
+      "difficulty": 0,
+      "kind": "part_number",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "Ship the assembly for part PN-9FRUDT to the depot.",
+      "expected": true
+    },
+    {
+      "id": "r3-program-plain",
+      "difficulty": 0,
+      "kind": "internal_program_code",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "Milestone review scheduled under PRG-1B3ZEK next quarter.",
+      "expected": true
+    },
+    {
+      "id": "r3-jwt-plain",
+      "difficulty": 0,
+      "kind": "jwt",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "Service bearer token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YU16UmNuam1zZ3BTRzVHcFgy.YnEzcjlOV1RlODJrOGloUFROa2Y3eHRK rotates nightly.",
+      "expected": true
+    },
+    {
+      "id": "r3-dburl-plain",
+      "difficulty": 0,
+      "kind": "db_url",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "Primary datastore mysql://svc_user:fakepw_778wzalggy@db.example.com:3306/orders handles order writes.",
+      "expected": true
+    },
+    {
+      "id": "r3-gcpkey-plain",
+      "difficulty": 0,
+      "kind": "gcp_key",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "Maps client configured with key AIzaNGaIb-mSlyFGKPeFjHQG3c6DbY4Bm6V5I3I.",
+      "expected": true
+    },
+    {
+      "id": "r3-ssn-plain",
+      "difficulty": 0,
+      "kind": "ssn",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "Vendor contact SSN on record: 906-17-8866.",
+      "expected": true
+    },
+    {
+      "id": "r3-contract-field",
+      "difficulty": 1,
+      "kind": "contract_number",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "contract_no = CT-2025-270565",
+      "expected": true
+    },
+    {
+      "id": "r3-part-csv",
+      "difficulty": 1,
+      "kind": "part_number",
+      "obfuscation": "csv-cell",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "line_item,PN-9FRUDT,qty=12,active",
+      "expected": true
+    },
+    {
+      "id": "r3-gcpkey-field",
+      "difficulty": 1,
+      "kind": "gcp_key",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "GOOGLE_MAPS_KEY: AIzaNGaIb-mSlyFGKPeFjHQG3c6DbY4Bm6V5I3I",
+      "expected": true
+    },
+    {
+      "id": "r3-dburl-field",
+      "difficulty": 1,
+      "kind": "db_url",
+      "obfuscation": "env-field",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "DATABASE_URL=mysql://svc_user:fakepw_778wzalggy@db.example.com:3306/orders",
+      "expected": true
+    },
+    {
+      "id": "r3-phone-field",
+      "difficulty": 1,
+      "kind": "phone",
+      "obfuscation": "labeled",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "program_poc_phone: (882) 555-0137",
+      "expected": true
+    },
+    {
+      "id": "r3-email-field",
+      "difficulty": 1,
+      "kind": "email",
+      "obfuscation": "labeled",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "poc_email = dana.okoro35@example.com",
+      "expected": true
+    },
+    {
+      "id": "r3-contract-split",
+      "difficulty": 2,
+      "kind": "contract_number",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "contract = \"CT-2025\" \"-270565\"",
+      "expected": true
+    },
+    {
+      "id": "r3-program-spaced",
+      "difficulty": 2,
+      "kind": "internal_program_code",
+      "obfuscation": "spaced",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "code = P R G - 1 B 3 Z E K",
+      "expected": true
+    },
+    {
+      "id": "r3-gcpkey-concat",
+      "difficulty": 2,
+      "kind": "gcp_key",
+      "obfuscation": "concatenated",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "key = \"AIzaNGaIb-mSlyFGKPeF\" + \"jHQG3c6DbY4Bm6V5I3I\"",
+      "expected": true
+    },
+    {
+      "id": "r3-jwt-b64",
+      "difficulty": 3,
+      "kind": "jwt",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "payload=dG9rZW49ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LllVMTZVbU51YW0xelozQlRSelZIY0ZneS5ZbkV6Y2psT1YxUmxPREpyT0dsb1VGUk9hMlkzZUhSSw==",
+      "expected": true
+    },
+    {
+      "id": "r3-contract-b64",
+      "difficulty": 3,
+      "kind": "contract_number",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "blob=Q1QtMjAyNS0yNzA1NjU=",
+      "expected": true
+    },
+    {
+      "id": "r3-gcpkey-hex",
+      "difficulty": 3,
+      "kind": "gcp_key",
+      "obfuscation": "hex",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "blob=41497a614e476149622d6d536c7946474b5065466a48514733633644625934426d365635493349",
+      "expected": true
+    },
+    {
+      "id": "r3-contract-homoglyph",
+      "difficulty": 3,
+      "kind": "contract_number",
+      "obfuscation": "unicode-homoglyph",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "ref=CT-\uff12\uff10\uff12\uff15-\uff12\uff17\uff10\uff15\uff16\uff15",
+      "expected": true
+    },
+    {
+      "id": "r3-part-zw",
+      "difficulty": 4,
+      "kind": "part_number",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "pn\u200b9F\u200bRUDTref",
+      "expected": true
+    },
+    {
+      "id": "r3-dburl-b64wrapped",
+      "difficulty": 4,
+      "kind": "db_url",
+      "obfuscation": "base64-wrapped",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "conn=dXJsPW15c3FsOi8vc3ZjX3VzZXI6ZmFrZXB3Xzc3OHd6YWxnZ3lAZGIuZXhhbXBsZS5jb206MzMwNi9vcmRlcnM=",
+      "expected": true
+    },
+    {
+      "id": "r3-gcpkey-hexwrapped",
+      "difficulty": 4,
+      "kind": "gcp_key",
+      "obfuscation": "hex-wrapped",
+      "source_file": "corpus/blended_regulated_03.json",
+      "text": "raw=41497a612d7072656669783a3a41497a614e476149622d6d536c7946474b5065466a48514733633644625934426d365635493349",
+      "expected": true
+    },
+    {
+      "id": "r4-iban-plain",
+      "difficulty": 0,
+      "kind": "iban",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "Settlement IBAN GB29EXMP60161331926819 on file for the clearing account.",
+      "expected": true
+    },
+    {
+      "id": "r4-nid-plain",
+      "difficulty": 0,
+      "kind": "national_id",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "National identifier recorded as 900-55-1234 in onboarding.",
+      "expected": true
+    },
+    {
+      "id": "r4-ghtoken-plain",
+      "difficulty": 0,
+      "kind": "github_token",
+      "obfuscation": "inline",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "ci deploy token ghp_EXAMPLE00000000000000000000000000000 was committed to the pipeline config.",
+      "expected": true
+    },
+    {
+      "id": "r4-mrn-label",
+      "difficulty": 1,
+      "kind": "medical_record_number",
+      "obfuscation": "labeled",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "record_locator: MRN00042001",
+      "expected": true
+    },
+    {
+      "id": "r4-passport-field",
+      "difficulty": 1,
+      "kind": "passport",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "passport = XA0000042",
+      "expected": true
+    },
+    {
+      "id": "r4-iban-spaced",
+      "difficulty": 2,
+      "kind": "iban",
+      "obfuscation": "space-grouped",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "IBAN: GB29 EXMP 6016 1331 9268 19 (SEPA)",
+      "expected": true
+    },
+    {
+      "id": "r4-apikey-split",
+      "difficulty": 2,
+      "kind": "api_key",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "key = \"sk_test_ABCdef0123\" \"456789ABCdef01\"",
+      "expected": true
+    },
+    {
+      "id": "r4-nid-b64",
+      "difficulty": 3,
+      "kind": "national_id",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "payload blob=OTAwLTU1LTEyMzQ=",
+      "expected": true
+    },
+    {
+      "id": "r4-iban-b64",
+      "difficulty": 3,
+      "kind": "iban",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "remit blob=R0IyOUVYTVA2MDE2MTMzMTkyNjgxOQ==",
+      "expected": true
+    },
+    {
+      "id": "r4-ghtoken-b64",
+      "difficulty": 3,
+      "kind": "github_token",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "secret blob=Z2hwX0VYQU1QTEUwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA==",
+      "expected": true
+    },
+    {
+      "id": "r4-apikey-b64",
+      "difficulty": 3,
+      "kind": "api_key",
+      "obfuscation": "base64",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "env blob=c2tfdGVzdF9BQkNkZWYwMTIzNDU2Nzg5QUJDZGVmMDE=",
+      "expected": true
+    },
+    {
+      "id": "r4-mrn-hex",
+      "difficulty": 3,
+      "kind": "medical_record_number",
+      "obfuscation": "hex",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "chart blob=4d524e3030303432303031",
+      "expected": true
+    },
+    {
+      "id": "r4-passport-hex",
+      "difficulty": 3,
+      "kind": "passport",
+      "obfuscation": "hex",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "doc blob=584130303030303432",
+      "expected": true
+    },
+    {
+      "id": "r4-nid-homoglyph",
+      "difficulty": 3,
+      "kind": "national_id",
+      "obfuscation": "unicode-homoglyph",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "national id \uff19\uff10\uff10-55-1234 on the intake form",
+      "expected": true
+    },
+    {
+      "id": "r4-mrn-homoglyph",
+      "difficulty": 3,
+      "kind": "medical_record_number",
+      "obfuscation": "unicode-homoglyph",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "mrn MRN\uff10\uff10\uff10\uff14\uff12\uff10\uff10\uff11 attached",
+      "expected": true
+    },
+    {
+      "id": "r4-nid-zw",
+      "difficulty": 4,
+      "kind": "national_id",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "subject id 900\u200b55\u200b1234 flagged",
+      "expected": true
+    },
+    {
+      "id": "r4-iban-zw",
+      "difficulty": 4,
+      "kind": "iban",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "acct G\u200bB\u200b2\u200b9\u200bE\u200bX\u200bM\u200bP\u200b6\u200b0\u200b1\u200b6\u200b1\u200b3\u200b3\u200b1\u200b9\u200b2\u200b6\u200b8\u200b1\u200b9 ref",
+      "expected": true
+    },
+    {
+      "id": "r4-mrn-zw",
+      "difficulty": 4,
+      "kind": "medical_record_number",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "mrn M\u200bR\u200bN\u200b0\u200b0\u200b0\u200b4\u200b2\u200b0\u200b0\u200b1 on chart",
+      "expected": true
+    },
+    {
+      "id": "r4-passport-split",
+      "difficulty": 4,
+      "kind": "passport",
+      "obfuscation": "split-literals",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "passport = \"XA00\" \"00042\"",
+      "expected": true
+    },
+    {
+      "id": "r4-ghtoken-b64wrap",
+      "difficulty": 4,
+      "kind": "github_token",
+      "obfuscation": "base64-wrapped",
+      "source_file": "corpus/blended_regulated_04.json",
+      "text": "envelope=dG9rZW49Z2hwX0VYQU1QTEUwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA==",
+      "expected": true
+    },
+    {
+      "id": "r5-pan-csv",
+      "difficulty": 1,
+      "kind": "pan",
+      "obfuscation": "csv-cell",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "AAPL,Apple Inc.,NMS,6927094477452718,EUR",
+      "expected": true
+    },
+    {
+      "id": "r5-iban-field",
+      "difficulty": 1,
+      "kind": "iban",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "settlement_iban = GB00SYNT00379683385069",
+      "expected": true
+    },
+    {
+      "id": "r5-apikey-env",
+      "difficulty": 1,
+      "kind": "api_key",
+      "obfuscation": "env-field",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "STRIPE_API_KEY=sk_test_GOMpV7yVztfFBLRRKTyTGsB7",
+      "expected": true
+    },
+    {
+      "id": "r5-dburl-env",
+      "difficulty": 1,
+      "kind": "db_url",
+      "obfuscation": "env-field",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "DATABASE_URL=postgres://svc_reporting:test_pw_6042@warehouse-7.db.example.com:5432/analytics",
+      "expected": true
+    },
+    {
+      "id": "r5-mrn-field",
+      "difficulty": 1,
+      "kind": "health_record",
+      "obfuscation": "config-field",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "patient_mrn: MRN96818454",
+      "expected": true
+    },
+    {
+      "id": "r5-contract-cell",
+      "difficulty": 1,
+      "kind": "contract_number",
+      "obfuscation": "csv-cell",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "AMZN,Amazon.com, Inc.,NMS,CTR-2026-934216,USD",
+      "expected": true
+    },
+    {
+      "id": "r5-pan-json",
+      "difficulty": 2,
+      "kind": "pan",
+      "obfuscation": "json-fragment",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "{\"ticker\": \"AAPL\", \"card_on_file\": \"8404019738559751\", \"status\": \"active\"}",
+      "expected": true
+    },
+    {
+      "id": "r5-iban-spaced",
+      "difficulty": 2,
+      "kind": "iban",
+      "obfuscation": "space-grouped",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "IBAN DE00 TEST 8220 6756 726010",
+      "expected": true
+    },
+    {
+      "id": "r5-ssn-json",
+      "difficulty": 2,
+      "kind": "ssn",
+      "obfuscation": "json-fragment",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "{\"holder\": \"Ava Carter\", \"tax_id\": \"977-41-3072\", \"sector\": \"Financials\"}",
+      "expected": true
+    },
+    {
+      "id": "r5-dburl-log",
+      "difficulty": 2,
+      "kind": "db_url",
+      "obfuscation": "log-line",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "2026-07-11T09:12:03Z WARN pool connect dsn=postgres://svc_reporting:test_pw_8240@warehouse-8.db.example.com:5432/analytics retries=3",
+      "expected": true
+    },
+    {
+      "id": "r5-contract-log",
+      "difficulty": 2,
+      "kind": "contract_number",
+      "obfuscation": "log-line",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "2026-07-11T09:15:44Z INFO renew contract=CTR-2024-805123 portfolio=NMS",
+      "expected": true
+    },
+    {
+      "id": "r5-apikey-split",
+      "difficulty": 3,
+      "kind": "api_key",
+      "obfuscation": "concatenated",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "key = \"sk_test_3tej\" + \"l4hK3jeb9PnR1rvriRx1\"",
+      "expected": true
+    },
+    {
+      "id": "r5-ssn-homoglyph",
+      "difficulty": 3,
+      "kind": "ssn",
+      "obfuscation": "unicode-homoglyph",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "account_holder_ssn=\uff1938-48-1221",
+      "expected": true
+    },
+    {
+      "id": "r5-iban-json-b64",
+      "difficulty": 3,
+      "kind": "iban",
+      "obfuscation": "base64-in-json",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "{\"acct\": \"brokerage\", \"iban_b64\": \"RlIwMFNZTlQ4ODQ1OTkxNTY4NjY3NA==\"}",
+      "expected": true
+    },
+    {
+      "id": "r5-email-log",
+      "difficulty": 3,
+      "kind": "email",
+      "obfuscation": "log-line",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "2026-07-11T09:20:10Z INFO statement_sent to=omar.carter52@example.com exch=XNAS",
+      "expected": true
+    },
+    {
+      "id": "r5-pan-zw-csv",
+      "difficulty": 4,
+      "kind": "pan",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "GOOGL,Alphabet Inc.,NMS,1623\u200b5980\u200b8620\u200b2635,GBP",
+      "expected": true
+    },
+    {
+      "id": "r5-phone-hex-log",
+      "difficulty": 4,
+      "kind": "phone",
+      "obfuscation": "hex-encoded",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "2026-07-11T09:31:02Z DEBUG contact raw=3536332d3535352d30313938 region=NYQ",
+      "expected": true
+    },
+    {
+      "id": "r5-iban-zw-field",
+      "difficulty": 4,
+      "kind": "iban",
+      "obfuscation": "zero-width",
+      "source_file": "corpus/blended_regulated_05.json",
+      "text": "beneficiary_iban:NL00TEST\u200b07092355933051",
+      "expected": true
+    }
+  ]
+}

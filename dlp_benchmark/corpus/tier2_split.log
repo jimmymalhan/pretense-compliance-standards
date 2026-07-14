@@ -1,0 +1,6 @@
+# SYNTHETIC — FAKE DLP BENCHMARK DATA, NOT REAL
+TIER2 t2-pan-spaced kind=pan :: Card: 4485 2360 1785 8297 exp 12/29
+TIER2 t2-pan-dashed kind=pan :: PAN=4485-2360-1785-8297
+TIER2 t2-ssn-split kind=ssn :: ssn = "900-55" "-1234"
+TIER2 t2-secret-concat kind=secret :: signing = "hardcoded-not-rotated" + "-secret"
+TIER2 t2-email-split kind=email :: "ava.carter7" "@example.com"

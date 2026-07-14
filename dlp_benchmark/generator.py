@@ -1,21 +1,28 @@
 """
-sensitive_data_samples.py
+generator.py
 
-SYNTHETIC test-data generator for compliance/DLP scanner testing.
+SYNTHETIC test-data generator for DLP / PII / PHI / secret-scanner benchmarking.
+(Refactored from the original top-level ``sensitive_data_samples.py``.)
 
 Every value produced here is FAKE and randomly generated. No record maps to a
 real person, account, or medical file. The purpose is to exercise data-loss-
 prevention (DLP) tools, PII/PHI classifiers, and secret scanners with records
-that *look* like violations of:
+that *look* like violations of PII, PHI/HIPAA, PCI, NIST and SOC 2 controls.
 
-    - PII      (names, SSN, DOB, address, email, phone, driver's license, passport)
-    - PHI      (patient records, MRN, diagnosis/ICD-10, insurance, medications)
-    - HIPAA    (18 identifiers combined with health info)
-    - NIST     (hardcoded credentials, API keys, weak hashing)
-    - SOC 2    (plaintext passwords in logs, unmasked cardholder data)
+To keep the fakeness *provable*, every value is drawn from a reserved / example
+range:
+    - SSN         -> 9xx-xx-xxxx  (the 900 range is NEVER issued)
+    - phone       -> (xxx) 555-01xx  (555-01xx is reserved for fiction/testing)
+    - email       -> ...@example.com  (RFC 2606 reserved domain)
+    - AWS key     -> AKIAIOSFODNN7EXAMPLE  (AWS's own documentation example)
+    - card (PAN)  -> Luhn-valid but random -> not a real account
+    - API key     -> sk_test_...  (test-mode prefix)
+
+Records are given a *finance-domain* flavor (tickers, exchanges, sectors drawn
+from this repository's own data) so the corpus reads as representative of this
+project — but they remain 100% synthetic.
 
 Do NOT put real production data in this file. Do NOT commit real secrets.
-Run:  python sensitive_data_samples.py   ->   writes sample_violations.json
 """
 
 from __future__ import annotations
@@ -23,9 +30,10 @@ from __future__ import annotations
 import json
 import random
 import string
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass
 from datetime import date, timedelta
 
+from . import BANNER
 
 # Seed so the "generated" data is reproducible for test assertions.
 random.seed(42)
@@ -48,6 +56,19 @@ DIAGNOSES = [
 MEDICATIONS = ["Metformin 500mg", "Lisinopril 10mg", "Sertraline 50mg",
                "Albuterol HFA", "Atorvastatin 20mg"]
 INSURERS = ["BlueCross Synthetic", "UnitedFake Health", "Aetna-Test", "Cigna-Demo"]
+
+# --- Finance-domain flavor, drawn from this repo's own entities (fake pairing) ---
+TICKERS = [
+    ("AAPL", "Apple Inc.", "NMS", "XNAS"),
+    ("MSFT", "Microsoft Corporation", "NMS", "XNAS"),
+    ("NVDA", "NVIDIA Corporation", "NMS", "XNAS"),
+    ("AMZN", "Amazon.com, Inc.", "NMS", "XNAS"),
+    ("TSLA", "Tesla, Inc.", "NMS", "XNAS"),
+    ("GOOGL", "Alphabet Inc.", "NMS", "XNAS"),
+]
+SECTORS = ["Information Technology", "Financials", "Health Care",
+           "Consumer Discretionary", "Communication Services", "Energy"]
+CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD"]
 
 
 def _digits(n: int) -> str:
@@ -113,6 +134,12 @@ class SubjectRecord:
     medication: str
     insurance_provider: str
     insurance_member_id: str
+    # --- finance-domain flavor (fake brokerage account) ---
+    brokerage_ticker: str
+    brokerage_exchange: str
+    brokerage_mic: str
+    account_currency: str
+    sector: str
 
 
 def generate_subject(i: int) -> SubjectRecord:
@@ -120,6 +147,7 @@ def generate_subject(i: int) -> SubjectRecord:
     last = random.choice(LAST_NAMES)
     city, st, zc = random.choice(CITIES)
     icd, dx = random.choice(DIAGNOSES)
+    ticker, _company, exch, mic = random.choice(TICKERS)
     return SubjectRecord(
         record_id=f"REC-{1000 + i}",
         full_name=f"{first} {last}",
@@ -139,6 +167,11 @@ def generate_subject(i: int) -> SubjectRecord:
         medication=random.choice(MEDICATIONS),
         insurance_provider=random.choice(INSURERS),
         insurance_member_id=f"{random.choice(string.ascii_uppercase)*3}{_digits(9)}",
+        brokerage_ticker=ticker,
+        brokerage_exchange=exch,
+        brokerage_mic=mic,
+        account_currency=random.choice(CURRENCIES),
+        sector=random.choice(SECTORS),
     )
 
 
@@ -165,7 +198,7 @@ INSECURE_LOG_LINES = [
 
 def build_dataset(n_subjects: int = 10) -> dict:
     return {
-        "_notice": "SYNTHETIC TEST DATA — all values are fake/generated.",
+        "_notice": BANNER + " — all values are fake/generated.",
         "subjects": [asdict(generate_subject(i)) for i in range(n_subjects)],
         "insecure_config": INSECURE_CONFIG,
         "insecure_logs": INSECURE_LOG_LINES,
@@ -178,4 +211,4 @@ if __name__ == "__main__":
     with open(out_path, "w") as fh:
         json.dump(data, fh, indent=2)
     print(f"Wrote {len(data['subjects'])} synthetic subject records to {out_path}")
-    print("Reminder: this is FAKE data for DLP/PII/PHI scanner testing only.")
+    print(f"Reminder: {BANNER}. For DLP/PII/PHI scanner testing only.")

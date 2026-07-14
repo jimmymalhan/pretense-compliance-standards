@@ -1,0 +1,105 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE DLP BENCHMARK DATA, NOT REAL",
+  "records": [
+    {
+      "id": "r1-mrn-inline",
+      "kind": "medical_record_number",
+      "text": "Patient chart pulled under MRN76433971 ahead of the follow-up visit."
+    },
+    {
+      "id": "r1-ghp-inline",
+      "kind": "github_token",
+      "text": "CI pipeline authenticates with token ghp_Y8fBMD0gNuzKTPwtcInE6vbQSX72jerrYM31 before the build step."
+    },
+    {
+      "id": "r1-icd-inline",
+      "kind": "icd10",
+      "text": "Encounter closed with primary code F32.1 on the problem list."
+    },
+    {
+      "id": "r1-health-inline",
+      "kind": "health_record",
+      "text": "Ava Silva was seen today and diagnosed with Major depressive disorder, moderate."
+    },
+    {
+      "id": "r1-member-field",
+      "kind": "insurance_member_id",
+      "text": "member_id: RRF139047426"
+    },
+    {
+      "id": "r1-apikey-field",
+      "kind": "api_key",
+      "text": "billing.stripe_key = sk_test_F5ecaqZUAbmmPaLncxquvngO"
+    },
+    {
+      "id": "r1-mrn-label",
+      "kind": "medical_record_number",
+      "text": "MRN: MRN60465234"
+    },
+    {
+      "id": "r1-ghp-field",
+      "kind": "github_token",
+      "text": "github_access_token = ghp_7OElKOPSpJ4bCub1CTmzQMkuH6foYGPsuGm1"
+    },
+    {
+      "id": "r1-icd-label",
+      "kind": "icd10",
+      "text": "diagnosis_code = F32.1"
+    },
+    {
+      "id": "r1-mrn-spaced",
+      "kind": "medical_record_number",
+      "text": "chart no. MRN 28 75 09 13"
+    },
+    {
+      "id": "r1-member-split",
+      "kind": "insurance_member_id",
+      "text": "member = \"OTQ\" \"678234461\""
+    },
+    {
+      "id": "r1-ghp-concat",
+      "kind": "github_token",
+      "text": "token = \"ghp_\" + \"v2hDJTHhm1bWuUKrKwsijCuoBNnbsd61lNFS\""
+    },
+    {
+      "id": "r1-apikey-split",
+      "kind": "api_key",
+      "text": "key = \"sk_test_\" \"6Z4bFfmTgPFos8P2LzE1bdGF\""
+    },
+    {
+      "id": "r1-mrn-b64",
+      "kind": "medical_record_number",
+      "text": "blob=TVJONzY0MzM5NzE="
+    },
+    {
+      "id": "r1-member-hex",
+      "kind": "insurance_member_id",
+      "text": "blob=525246313339303437343236"
+    },
+    {
+      "id": "r1-ghp-b64",
+      "kind": "github_token",
+      "text": "payload=Z2hwX1k4ZkJNRDBnTnV6S1RQd3RjSW5FNnZiUVNYNzJqZXJyWU0zMQ=="
+    },
+    {
+      "id": "r1-icd-homoglyph",
+      "kind": "icd10",
+      "text": "code=B\uff110"
+    },
+    {
+      "id": "r1-ghp-zw",
+      "kind": "github_token",
+      "text": "gh\u200bp_Y\u200b8\u200bf\u200bB\u200bM\u200bD\u200b0\u200bg\u200bN\u200bu\u200bz\u200bK\u200bT\u200bP\u200bw\u200bt\u200bc\u200bI\u200bn\u200bE\u200b6\u200bv\u200bb\u200bQ\u200bS\u200bX\u200b7\u200b2\u200bj\u200be\u200br\u200br\u200bY\u200bM\u200b3\u200b1"
+    },
+    {
+      "id": "r1-mrn-zw",
+      "kind": "medical_record_number",
+      "text": "ref M\u200bR\u200bN\u200b60\u200b46\u200b52\u200b34end"
+    },
+    {
+      "id": "r1-health-embedded",
+      "kind": "health_record",
+      "text": "note::Diego Patel|dx=Major depressive disorder, moderate|call (111) 555-0139|diego.patel81@example.com::eof"
+    }
+  ]
+}
