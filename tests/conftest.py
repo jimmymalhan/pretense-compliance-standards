@@ -64,8 +64,10 @@ def _regenerate_compression_artifacts() -> None:
         for column in indexed.columns:
             if column in skip_cols:
                 continue
-            vals = indexed[column].dropna().unique()
-            vals.sort()
+            # .unique() returns a pandas ExtensionArray (e.g. StringArray) on
+            # modern pandas, which has no in-place .sort(); tolist()+sorted()
+            # works across pandas versions and yields the same ordering.
+            vals = sorted(indexed[column].dropna().unique().tolist())
             categories[column] = vals
         cat_df = pd.DataFrame.from_dict(categories, orient="index").reset_index()
         cat_df.to_csv(

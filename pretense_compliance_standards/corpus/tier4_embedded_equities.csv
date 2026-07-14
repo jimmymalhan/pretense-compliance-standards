@@ -1,0 +1,6 @@
+# SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
+id,kind,payload
+t4-pan-zw,pan,acct4485​2360​1785​8297ref
+t4-ssn-zw,ssn,id900​55​1234x
+t4-jwt-b64,jwt,payload=dG9rZW49ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKemRXSWlPaUptWVd0bEluMC5jMmxuYm1GMGRYSmxYMlpoYTJV
+t4-pan-hex,pan,raw=34343835323336303137383538323937

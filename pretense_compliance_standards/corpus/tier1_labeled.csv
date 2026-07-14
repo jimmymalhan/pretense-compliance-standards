@@ -1,0 +1,9 @@
+# SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
+id,kind,payload
+t1-ssn-dot,ssn,tax_id: 900.55.1234
+t1-phone-dash,phone,phone: 415-555-0142
+t1-email-upper,email,EMAIL: AVA.CARTER7@EXAMPLE.COM
+t1-pan-cell,pan,"card_on_file,4485236017858297,active"
+t1-aws-field,aws_key,access_key = AKIAIOSFODNN7EXAMPLE
+t1-apikey-field,api_key,stripe.key = sk_test_ABCdef0123456789ABCdef01
+t1-secret-field,secret,signing = hardcoded-not-rotated-secret

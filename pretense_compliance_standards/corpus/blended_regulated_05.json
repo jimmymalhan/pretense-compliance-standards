@@ -1,0 +1,100 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE COMPLIANCE TEST DATA, NOT REAL",
+  "records": [
+    {
+      "id": "r5-pan-csv",
+      "kind": "pan",
+      "text": "MSFT,Microsoft Corporation,NMS,7094477452711205,USD"
+    },
+    {
+      "id": "r5-iban-field",
+      "kind": "iban",
+      "text": "settlement_iban = GB00SYNT66857670244990"
+    },
+    {
+      "id": "r5-apikey-env",
+      "kind": "api_key",
+      "text": "STRIPE_API_KEY=sk_test_cS7aJEtEbCE3ejCWqyF75LI9"
+    },
+    {
+      "id": "r5-dburl-env",
+      "kind": "db_url",
+      "text": "DATABASE_URL=postgres://svc_reporting:test_pw_1299@warehouse-3.db.example.com:5432/analytics"
+    },
+    {
+      "id": "r5-health-json",
+      "kind": "health_record",
+      "text": "{\"account\": \"brokerage\", \"ticker\": \"AAPL\", \"chart_note\": \"MRN84548885 Unspecified asthma, uncomplicated, started Lisinopril 10mg\"}"
+    },
+    {
+      "id": "r5-contract-cell",
+      "kind": "contract_number",
+      "text": "AAPL,Apple Inc.,NMS,CTR-2021-836729,USD"
+    },
+    {
+      "id": "r5-pan-json",
+      "kind": "pan",
+      "text": "{\"ticker\": \"AAPL\", \"card_on_file\": \"9738559754340698\", \"status\": \"active\"}"
+    },
+    {
+      "id": "r5-iban-spaced",
+      "kind": "iban",
+      "text": "IBAN DE00 TEST 2636 5727 069763"
+    },
+    {
+      "id": "r5-ssn-json",
+      "kind": "ssn",
+      "text": "{\"holder\": \"Ava Carter\", \"tax_id\": \"943-79-6418\", \"sector\": \"Financials\"}"
+    },
+    {
+      "id": "r5-dburl-log",
+      "kind": "db_url",
+      "text": "2026-07-11T09:12:03Z WARN pool connect dsn=postgres://svc_reporting:test_pw_4805@warehouse-3.db.example.com:5432/analytics retries=3"
+    },
+    {
+      "id": "r5-contract-log",
+      "kind": "contract_number",
+      "text": "2026-07-11T09:15:44Z INFO renew contract=CTR-2021-238301 portfolio=NMS"
+    },
+    {
+      "id": "r5-health-log",
+      "kind": "health_record",
+      "text": "2026-07-11T09:18:27Z INFO ehr_export patient=REC-1042 dx=\"I10 Essential (primary) hypertension\" rx=\"Lisinopril 10mg\" exch=XNAS"
+    },
+    {
+      "id": "r5-apikey-split",
+      "kind": "api_key",
+      "text": "key = \"sk_test_4hK3\" + \"jeb9PnR1rvriRx1w1A3m\""
+    },
+    {
+      "id": "r5-ssn-homoglyph",
+      "kind": "ssn",
+      "text": "account_holder_ssn=\uff1922-18-8459"
+    },
+    {
+      "id": "r5-iban-json-b64",
+      "kind": "iban",
+      "text": "{\"acct\": \"brokerage\", \"iban_b64\": \"RlIwMFNZTlQ5MTU2ODY2NzQ4MTExMw==\"}"
+    },
+    {
+      "id": "r5-email-log",
+      "kind": "email",
+      "text": "2026-07-11T09:20:10Z INFO statement_sent to=diego.carter68@example.com exch=XNAS"
+    },
+    {
+      "id": "r5-pan-zw-csv",
+      "kind": "pan",
+      "text": "AAPL,Apple Inc.,NMS,6202\u200b6359\u200b9531\u200b1707,GBP"
+    },
+    {
+      "id": "r5-phone-hex-log",
+      "kind": "phone",
+      "text": "2026-07-11T09:31:02Z DEBUG contact raw=3839342d3535352d30313839 region=NYQ"
+    },
+    {
+      "id": "r5-iban-zw-field",
+      "kind": "iban",
+      "text": "beneficiary_iban:NL00TEST\u200b45567646980731"
+    }
+  ]
+}

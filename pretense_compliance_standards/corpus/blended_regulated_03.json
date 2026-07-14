@@ -1,0 +1,120 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE COMPLIANCE TEST DATA, NOT REAL",
+  "records": [
+    {
+      "id": "r3-contract-plain",
+      "kind": "contract_number",
+      "text": "Award reference CTR-2025-270565 is on file for the build lot."
+    },
+    {
+      "id": "r3-part-plain",
+      "kind": "part_number",
+      "text": "Ship the assembly for part PN-9FRUDT to the depot."
+    },
+    {
+      "id": "r3-program-plain",
+      "kind": "internal_program_code",
+      "text": "Milestone review scheduled under PRG-1B3ZEK next quarter."
+    },
+    {
+      "id": "r3-jwt-plain",
+      "kind": "jwt",
+      "text": "Service bearer token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YU16UmNuam1zZ3BTRzVHcFgy.YnEzcjlOV1RlODJrOGloUFROa2Y3eHRK rotates nightly."
+    },
+    {
+      "id": "r3-dburl-plain",
+      "kind": "db_url",
+      "text": "Primary datastore mysql://user:fakepw_778wzalggy@db.example.com:3306/svc handles order writes."
+    },
+    {
+      "id": "r3-gcpkey-plain",
+      "kind": "gcp_key",
+      "text": "Maps client configured with key AIzaNGaIb-mSlyFGKPeFjHQG3c6DbY4Bm6V5I3I."
+    },
+    {
+      "id": "r3-ssn-plain",
+      "kind": "ssn",
+      "text": "Vendor contact SSN on record: 906-17-8866."
+    },
+    {
+      "id": "r3-contract-field",
+      "kind": "contract_number",
+      "text": "contract_no = CTR-2025-270565"
+    },
+    {
+      "id": "r3-part-csv",
+      "kind": "part_number",
+      "text": "line_item,PN-9FRUDT,qty=12,active"
+    },
+    {
+      "id": "r3-gcpkey-field",
+      "kind": "gcp_key",
+      "text": "GOOGLE_MAPS_KEY: AIzaNGaIb-mSlyFGKPeFjHQG3c6DbY4Bm6V5I3I"
+    },
+    {
+      "id": "r3-dburl-field",
+      "kind": "db_url",
+      "text": "DATABASE_URL=mysql://user:fakepw_778wzalggy@db.example.com:3306/svc"
+    },
+    {
+      "id": "r3-phone-field",
+      "kind": "phone",
+      "text": "program_poc_phone: (882) 555-0137"
+    },
+    {
+      "id": "r3-email-field",
+      "kind": "email",
+      "text": "poc_email = dana.okoro35@example.com"
+    },
+    {
+      "id": "r3-contract-split",
+      "kind": "contract_number",
+      "text": "contract = \"CTR-202\" \"5-270565\""
+    },
+    {
+      "id": "r3-program-spaced",
+      "kind": "internal_program_code",
+      "text": "code = P R G - 1 B 3 Z E K"
+    },
+    {
+      "id": "r3-gcpkey-concat",
+      "kind": "gcp_key",
+      "text": "key = \"AIzaNGaIb-mSlyFGKPeF\" + \"jHQG3c6DbY4Bm6V5I3I\""
+    },
+    {
+      "id": "r3-jwt-b64",
+      "kind": "jwt",
+      "text": "payload=dG9rZW49ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LllVMTZVbU51YW0xelozQlRSelZIY0ZneS5ZbkV6Y2psT1YxUmxPREpyT0dsb1VGUk9hMlkzZUhSSw=="
+    },
+    {
+      "id": "r3-contract-b64",
+      "kind": "contract_number",
+      "text": "blob=Q1RSLTIwMjUtMjcwNTY1"
+    },
+    {
+      "id": "r3-gcpkey-hex",
+      "kind": "gcp_key",
+      "text": "blob=41497a614e476149622d6d536c7946474b5065466a48514733633644625934426d365635493349"
+    },
+    {
+      "id": "r3-contract-homoglyph",
+      "kind": "contract_number",
+      "text": "ref=CTR-\uff12\uff10\uff12\uff15-\uff12\uff17\uff10\uff15\uff16\uff15"
+    },
+    {
+      "id": "r3-part-zw",
+      "kind": "part_number",
+      "text": "pn\u200b9F\u200bRUDTref"
+    },
+    {
+      "id": "r3-dburl-b64wrapped",
+      "kind": "db_url",
+      "text": "conn=dXJsPW15c3FsOi8vdXNlcjpmYWtlcHdfNzc4d3phbGdneUBkYi5leGFtcGxlLmNvbTozMzA2L3N2Yw=="
+    },
+    {
+      "id": "r3-gcpkey-hexwrapped",
+      "kind": "gcp_key",
+      "text": "raw=41497a612d7072656669783a3a41497a614e476149622d6d536c7946474b5065466a48514733633644625934426d365635493349"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE COMPLIANCE TEST DATA, NOT REAL",
+  "records": [
+    {
+      "id": "t3-ssn-b64",
+      "kind": "ssn",
+      "text": "blob=OTAwLTU1LTEyMzQ="
+    },
+    {
+      "id": "t3-pan-b64",
+      "kind": "pan",
+      "text": "blob=NDQ4NTIzNjAxNzg1ODI5Nw=="
+    },
+    {
+      "id": "t3-email-b64",
+      "kind": "email",
+      "text": "blob=YXZhLmNhcnRlcjdAZXhhbXBsZS5jb20="
+    },
+    {
+      "id": "t3-secret-hex",
+      "kind": "secret",
+      "text": "blob=68617264636f6465642d6e6f742d726f74617465642d736563726574"
+    },
+    {
+      "id": "t3-ssn-homoglyph",
+      "kind": "ssn",
+      "text": "ssn=\uff1900-55-1234"
+    }
+  ]
+}
