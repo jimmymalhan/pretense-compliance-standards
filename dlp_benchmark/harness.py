@@ -19,6 +19,7 @@ import json
 import pathlib
 import sys
 
+from .compliance import FRAMEWORKS, frameworks_for
 from .detector import detect
 
 CORPUS_DIR = pathlib.Path(__file__).parent / "corpus"
@@ -40,6 +41,24 @@ def score(cases: list[dict]) -> dict:
             hit = c["kind"] in detect(c["text"], mode)
             for key in (tier, "all"):
                 b = buckets.setdefault(key, {"hit": 0, "total": 0})
+                b["total"] += 1
+                b["hit"] += int(hit)
+    return result
+
+
+def score_frameworks(cases: list[dict]) -> dict:
+    """Return {mode: {framework: {"hit": int, "total": int}}}.
+
+    A case is counted under EVERY framework its `kind` exercises (the mapping is
+    many-to-many), so per-framework totals overlap and need not sum to len(cases).
+    """
+    result = {m: {} for m in MODES}
+    for mode in MODES:
+        buckets = result[mode]
+        for c in cases:
+            hit = c["kind"] in detect(c["text"], mode)
+            for fw in frameworks_for(c["kind"]):
+                b = buckets.setdefault(fw, {"hit": 0, "total": 0})
                 b["total"] += 1
                 b["hit"] += int(hit)
     return result
@@ -67,6 +86,21 @@ def format_report(cases: list[dict], result: dict) -> str:
     return "\n".join(lines)
 
 
+def format_framework_report(fw_result: dict) -> str:
+    """Per-compliance-framework recall, alongside the per-tier table."""
+    empty = {"hit": 0, "total": 0}
+    lines = ["recall by compliance framework",
+             "(each case counted under every framework its kind exercises)", ""]
+    header = f"{'framework':<11}{'n':>4}   " + "".join(f"{m:>12}" for m in MODES)
+    lines.append(header)
+    lines.append("-" * len(header))
+    for fw in FRAMEWORKS:
+        n = fw_result[MODES[0]].get(fw, empty)["total"]
+        cells = "".join(f"{_recall(fw_result[m].get(fw, empty)):>11.0%} " for m in MODES)
+        lines.append(f"{fw:<11}{n:>4}   {cells}")
+    return "\n".join(lines)
+
+
 def missed(cases: list[dict], mode: str) -> list[str]:
     return [f"{c['id']} ({c['obfuscation']})"
             for c in cases if c["kind"] not in detect(c["text"], mode)]
@@ -85,6 +119,8 @@ def main() -> int:
     cases = load_cases()
     result = score(cases)
     print(format_report(cases, result))
+    print()
+    print(format_framework_report(score_frameworks(cases)))
     print()
     print("naive misses (normalization gaps hardened mode closes):")
     for item in missed(cases, "naive"):

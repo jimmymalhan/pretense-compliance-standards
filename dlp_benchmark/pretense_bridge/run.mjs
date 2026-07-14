@@ -45,6 +45,9 @@ const ENGINE_FILES = [
 // Corpus lives one directory up from this bridge.
 const CORPUS_PATH = join(HERE, "..", "corpus", "cases.json");
 
+// Compliance taxonomy (kind -> frameworks) lives alongside the corpus.
+const COMPLIANCE_PATH = join(HERE, "..", "compliance_map.json");
+
 /**
  * Copy the engine files into a fresh temp dir and rewrite relative `.js`
  * import specifiers to `.ts` so Node's TS loader can resolve them.
@@ -85,9 +88,20 @@ async function main() {
   const corpus = JSON.parse(readFileSync(CORPUS_PATH, "utf8"));
   const cases = corpus.cases ?? [];
 
+  // Compliance taxonomy: ordered framework list + kind -> frameworks map.
+  const compliance = JSON.parse(readFileSync(COMPLIANCE_PATH, "utf8"));
+  const frameworks = compliance.frameworks ?? [];
+  const kindFrameworks = compliance.kind_frameworks ?? {};
+
   // tier -> { n, identify, mutate }
   const tiers = new Map();
   const overall = { n: 0, identify: 0, mutate: 0 };
+
+  // framework -> { n, identify, mutate } (a case counts toward every
+  // framework its `kind` maps to; kinds may map to more than one).
+  const fw = new Map(
+    frameworks.map((name) => [name, { n: 0, identify: 0, mutate: 0 }]),
+  );
 
   for (const c of cases) {
     const text = c.text ?? "";
@@ -112,6 +126,14 @@ async function main() {
       t.mutate += 1;
       overall.mutate += 1;
     }
+
+    for (const name of kindFrameworks[c.kind] ?? []) {
+      const f = fw.get(name);
+      if (!f) continue; // kind maps to a framework not in the ordered list
+      f.n += 1;
+      if (identified) f.identify += 1;
+      if (mutated) f.mutate += 1;
+    }
   }
 
   console.log("Pretense identify + mutate coverage over synthetic DLP corpus");
@@ -134,6 +156,22 @@ async function main() {
       overall.n,
     )} | ${pct(overall.mutate, overall.n)}`,
   );
+
+  // Per-framework coverage: how well pretense protects each compliance
+  // framework's data, over the cases whose `kind` maps to that framework.
+  console.log("\nPer-framework coverage (cases whose kind maps to the framework)");
+  console.log("framework  |   n | identify | mutate");
+  console.log("-----------+-----+----------+-------");
+  for (const name of frameworks) {
+    const f = fw.get(name);
+    console.log(
+      `${name.padEnd(10)} | ${String(f.n).padStart(3)} |   ${pct(
+        f.identify,
+        f.n,
+      )} | ${pct(f.mutate, f.n)}`,
+    );
+  }
+  console.log("-----------+-----+----------+-------");
 
   process.exit(0);
 }

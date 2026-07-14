@@ -8,7 +8,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "Member SSN on file: 900-55-1234.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t0-pan",
@@ -17,7 +21,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "Primary card 4485236017858297 charged $42.00.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "t0-apikey",
@@ -26,7 +33,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "stripe_api_key=sk_test_ABCdef0123456789ABCdef01",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t0-aws",
@@ -35,7 +46,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "aws_access_key_id=AKIAIOSFODNN7EXAMPLE",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t0-jwt",
@@ -44,7 +59,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "session token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmYWtlIn0.c2lnbmF0dXJlX2Zha2U",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t0-email",
@@ -53,7 +72,12 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "Contact ava.carter7@example.com for statements.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t0-phone",
@@ -62,7 +86,12 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "Call center (415) 555-0142.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t0-secret",
@@ -71,7 +100,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/tier0_plain.json",
       "text": "jwt_signing_secret=hardcoded-not-rotated-secret",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t1-ssn-dot",
@@ -80,7 +113,11 @@
       "obfuscation": "dot-separated",
       "source_file": "corpus/tier1_labeled.csv",
       "text": "tax_id: 900.55.1234",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t1-phone-dash",
@@ -89,7 +126,12 @@
       "obfuscation": "dashed",
       "source_file": "corpus/tier1_labeled.csv",
       "text": "phone: 415-555-0142",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t1-email-upper",
@@ -98,7 +140,12 @@
       "obfuscation": "uppercase",
       "source_file": "corpus/tier1_labeled.csv",
       "text": "EMAIL: AVA.CARTER7@EXAMPLE.COM",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t1-pan-cell",
@@ -107,7 +154,10 @@
       "obfuscation": "csv-cell",
       "source_file": "corpus/tier1_labeled.csv",
       "text": "card_on_file,4485236017858297,active",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "t1-aws-field",
@@ -116,7 +166,11 @@
       "obfuscation": "config-field",
       "source_file": "corpus/tier1_labeled.csv",
       "text": "access_key = AKIAIOSFODNN7EXAMPLE",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t1-apikey-field",
@@ -125,7 +179,11 @@
       "obfuscation": "config-field",
       "source_file": "corpus/tier1_labeled.csv",
       "text": "stripe.key = sk_test_ABCdef0123456789ABCdef01",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t1-secret-field",
@@ -134,7 +192,11 @@
       "obfuscation": "config-field",
       "source_file": "corpus/tier1_labeled.csv",
       "text": "signing = hardcoded-not-rotated-secret",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t2-pan-spaced",
@@ -143,7 +205,10 @@
       "obfuscation": "space-grouped",
       "source_file": "corpus/tier2_split.log",
       "text": "Card: 4485 2360 1785 8297 exp 12/29",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "t2-pan-dashed",
@@ -152,7 +217,10 @@
       "obfuscation": "dash-grouped",
       "source_file": "corpus/tier2_split.log",
       "text": "PAN=4485-2360-1785-8297",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "t2-ssn-split",
@@ -161,7 +229,11 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/tier2_split.log",
       "text": "ssn = \"900-55\" \"-1234\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t2-secret-concat",
@@ -170,7 +242,11 @@
       "obfuscation": "concatenated",
       "source_file": "corpus/tier2_split.log",
       "text": "signing = \"hardcoded-not-rotated\" + \"-secret\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t2-email-split",
@@ -179,7 +255,12 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/tier2_split.log",
       "text": "\"ava.carter7\" \"@example.com\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t3-ssn-b64",
@@ -188,7 +269,11 @@
       "obfuscation": "base64",
       "source_file": "corpus/tier3_encoded.json",
       "text": "blob=OTAwLTU1LTEyMzQ=",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t3-pan-b64",
@@ -197,7 +282,10 @@
       "obfuscation": "base64",
       "source_file": "corpus/tier3_encoded.json",
       "text": "blob=NDQ4NTIzNjAxNzg1ODI5Nw==",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "t3-email-b64",
@@ -206,7 +294,12 @@
       "obfuscation": "base64",
       "source_file": "corpus/tier3_encoded.json",
       "text": "blob=YXZhLmNhcnRlcjdAZXhhbXBsZS5jb20=",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t3-secret-hex",
@@ -215,7 +308,11 @@
       "obfuscation": "hex",
       "source_file": "corpus/tier3_encoded.json",
       "text": "blob=68617264636f6465642d6e6f742d726f74617465642d736563726574",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t3-ssn-homoglyph",
@@ -224,7 +321,11 @@
       "obfuscation": "unicode-homoglyph",
       "source_file": "corpus/tier3_encoded.json",
       "text": "ssn=\uff1900-55-1234",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t4-pan-zw",
@@ -233,7 +334,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/tier4_embedded_equities.csv",
       "text": "acct4485\u200b2360\u200b1785\u200b8297ref",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "t4-ssn-zw",
@@ -242,7 +346,11 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/tier4_embedded_equities.csv",
       "text": "id900\u200b55\u200b1234x",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t4-jwt-b64",
@@ -251,7 +359,11 @@
       "obfuscation": "base64-wrapped",
       "source_file": "corpus/tier4_embedded_equities.csv",
       "text": "payload=dG9rZW49ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKemRXSWlPaUptWVd0bEluMC5jMmxuYm1GMGRYSmxYMlpoYTJV",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "t4-pan-hex",
@@ -260,7 +372,10 @@
       "obfuscation": "hex-digits",
       "source_file": "corpus/tier4_embedded_equities.csv",
       "text": "raw=34343835323336303137383538323937",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "r1-mrn-inline",
@@ -269,7 +384,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "Patient chart pulled under MRN33971604 ahead of the follow-up visit.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-ghp-inline",
@@ -278,7 +396,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "CI pipeline authenticates with token ghp_BMD0gNuzKTPwtcInE6vbQSX72jerrYM317OE before the build step.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r1-icd-inline",
@@ -287,7 +409,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "Encounter closed with primary code I10 on the problem list.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-health-inline",
@@ -296,7 +421,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "Liam Nguyen was seen today and diagnosed with Essential (primary) hypertension [I10].",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-member-field",
@@ -305,7 +433,10 @@
       "obfuscation": "config-field",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "member_id: DJY047426576",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-apikey-field",
@@ -314,7 +445,11 @@
       "obfuscation": "config-field",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "billing.stripe_key = sk_test_caqZUAbmmPaLncxquvngO6Z4",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r1-mrn-label",
@@ -323,7 +458,10 @@
       "obfuscation": "labeled",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "MRN: MRN65234287",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-ghp-field",
@@ -332,7 +470,11 @@
       "obfuscation": "config-field",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "github_access_token = ghp_lKOPSpJ4bCub1CTmzQMkuH6foYGPsuGm1v2h",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r1-icd-label",
@@ -341,7 +483,10 @@
       "obfuscation": "labeled",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "diagnosis_code = I10",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-mrn-spaced",
@@ -350,7 +495,10 @@
       "obfuscation": "space-grouped",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "chart no. MRN 50 91 36 62",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-member-split",
@@ -359,7 +507,10 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "member = \"RTV\" \"234461890\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-ghp-concat",
@@ -368,7 +519,11 @@
       "obfuscation": "concatenated",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "token = \"ghp_\" + \"DJTHhm1bWuUKrKwsijCuoBNnbsd61lNFSF5e\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r1-apikey-split",
@@ -377,7 +532,11 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "key = \"sk_test_\" \"bFfmTgPFos8P2LzE1bdGFtMD\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r1-mrn-b64",
@@ -386,7 +545,10 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "blob=TVJOMzM5NzE2MDQ=",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-member-hex",
@@ -395,7 +557,10 @@
       "obfuscation": "hex",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "blob=444a59303437343236353736",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-ghp-b64",
@@ -404,7 +569,11 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "payload=Z2hwX0JNRDBnTnV6S1RQd3RjSW5FNnZiUVNYNzJqZXJyWU0zMTdPRQ==",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r1-icd-homoglyph",
@@ -413,7 +582,10 @@
       "obfuscation": "unicode-homoglyph",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "code=I\uff110",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-ghp-zw",
@@ -422,7 +594,11 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "gh\u200bp_B\u200bM\u200bD\u200b0\u200bg\u200bN\u200bu\u200bz\u200bK\u200bT\u200bP\u200bw\u200bt\u200bc\u200bI\u200bn\u200bE\u200b6\u200bv\u200bb\u200bQ\u200bS\u200bX\u200b7\u200b2\u200bj\u200be\u200br\u200br\u200bY\u200bM\u200b3\u200b1\u200b7\u200bO\u200bE",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r1-mrn-zw",
@@ -431,7 +607,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "ref M\u200bR\u200bN\u200b65\u200b23\u200b42\u200b87end",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r1-health-embedded",
@@ -440,7 +619,10 @@
       "obfuscation": "embedded",
       "source_file": "corpus/blended_regulated_01.json",
       "text": "note::Lucas Kim|dx=Essential (primary) hypertension I10|call (949) 555-0104|lucas.kim8@example.com::eof",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r2-iban-inline",
@@ -449,7 +631,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "Settlement account GB00 XXXX 1571 4237 7166 49 confirmed for the counterparty.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r2-email-inline",
@@ -458,7 +643,12 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "Statements are delivered to ava.carter32@example.com each month.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-log-inline",
@@ -467,7 +657,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "2026-07-11T09:02:17Z INFO auth user=liam.patel79 password=8vjuSe6MzJ result=ok",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-vat-inline",
@@ -476,7 +670,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "Supplier registration on file: DE903718247.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r2-dburl-inline",
@@ -485,7 +682,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "Connection string postgres://user:REDACTEDo6ZH5rTdVhNE@db.internal.example.com:5432/appdb in the deploy note.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-iban-labeled",
@@ -494,7 +695,10 @@
       "obfuscation": "labeled-field",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "iban: DE00 XXXX 7692 2979 2086 49",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r2-nid-labeled",
@@ -503,7 +707,11 @@
       "obfuscation": "labeled-field",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "national_id = 9368-2130-1347",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-passport-labeled",
@@ -512,7 +720,11 @@
       "obfuscation": "labeled-field",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "passport_no: EV8141268",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-phone-eu-labeled",
@@ -521,7 +733,12 @@
       "obfuscation": "labeled-field",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "contact_phone: +44 (0)20 7946 0878",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-vat-labeled",
@@ -530,7 +747,10 @@
       "obfuscation": "labeled-field",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "VAT: FR401118894",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r2-iban-split",
@@ -539,7 +759,10 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "iban = \"FR00XXXX\" \"46120039541579\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r2-email-split",
@@ -548,7 +771,12 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "\"ava.carter32\" \"@example.com\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-phone-us-spaced",
@@ -557,7 +785,12 @@
       "obfuscation": "spaced",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "phone = (280) 555-0197",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-log-split",
@@ -566,7 +799,11 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "entry = \"user=svc \" \"password=8vjuSe6MzJ\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-iban-b64",
@@ -575,7 +812,10 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "blob=R0IwMCBYWFhYIDE1NzEgNDIzNyA3MTY2IDQ5",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r2-email-b64",
@@ -584,7 +824,12 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "blob=bGlhbS5wYXRlbDc5QGV4YW1wbGUuY29t",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-dburl-b64",
@@ -593,7 +838,11 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "payload=cG9zdGdyZXM6Ly91c2VyOlJFREFDVEVEbzZaSDVyVGRWaE5FQGRiLmludGVybmFsLmV4YW1wbGUuY29tOjU0MzIvYXBwZGI=",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-pw-hex",
@@ -602,7 +851,11 @@
       "obfuscation": "hex",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "pw_blob=70617373776f72643d38766a755365364d7a4a",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-iban-zw",
@@ -611,7 +864,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "acct FR00\u200bXXXX\u200b4612\u200b0039\u200b5415\u200b79 ref",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r2-nid-zw",
@@ -620,7 +876,11 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "id9\u200b368\u200b2130\u200b1347x",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r2-dburl-wrapped",
@@ -629,7 +889,11 @@
       "obfuscation": "base64-wrapped",
       "source_file": "corpus/blended_regulated_02.json",
       "text": "cfg=ZHNuPXBvc3RncmVzOi8vdXNlcjpSRURBQ1RFRG82Wkg1clRkVmhORUBkYi5pbnRlcm5hbC5leGFtcGxlLmNvbTo1NDMyL2FwcGRi",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-contract-plain",
@@ -638,7 +902,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "Award reference CTR-2025-270565 is on file for the build lot.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-part-plain",
@@ -647,7 +914,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "Ship the assembly for part PN-9FRUDT to the depot.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-program-plain",
@@ -656,7 +926,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "Milestone review scheduled under PRG-1B3ZEK next quarter.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-jwt-plain",
@@ -665,7 +938,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "Service bearer token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YU16UmNuam1zZ3BTRzVHcFgy.YnEzcjlOV1RlODJrOGloUFROa2Y3eHRK rotates nightly.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-dburl-plain",
@@ -674,7 +951,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "Primary datastore mysql://user:fakepw_778wzalggy@db.example.com:3306/svc handles order writes.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-gcpkey-plain",
@@ -683,7 +964,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "Maps client configured with key AIzaNGaIb-mSlyFGKPeFjHQG3c6DbY4Bm6V5I3I.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-ssn-plain",
@@ -692,7 +977,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "Vendor contact SSN on record: 906-17-8866.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-contract-field",
@@ -701,7 +990,10 @@
       "obfuscation": "config-field",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "contract_no = CTR-2025-270565",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-part-csv",
@@ -710,7 +1002,10 @@
       "obfuscation": "csv-cell",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "line_item,PN-9FRUDT,qty=12,active",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-gcpkey-field",
@@ -719,7 +1014,11 @@
       "obfuscation": "config-field",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "GOOGLE_MAPS_KEY: AIzaNGaIb-mSlyFGKPeFjHQG3c6DbY4Bm6V5I3I",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-dburl-field",
@@ -728,7 +1027,11 @@
       "obfuscation": "env-field",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "DATABASE_URL=mysql://user:fakepw_778wzalggy@db.example.com:3306/svc",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-phone-field",
@@ -737,7 +1040,12 @@
       "obfuscation": "labeled",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "program_poc_phone: (882) 555-0137",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-email-field",
@@ -746,7 +1054,12 @@
       "obfuscation": "labeled",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "poc_email = dana.okoro35@example.com",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-contract-split",
@@ -755,7 +1068,10 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "contract = \"CTR-202\" \"5-270565\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-program-spaced",
@@ -764,7 +1080,10 @@
       "obfuscation": "spaced",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "code = P R G - 1 B 3 Z E K",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-gcpkey-concat",
@@ -773,7 +1092,11 @@
       "obfuscation": "concatenated",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "key = \"AIzaNGaIb-mSlyFGKPeF\" + \"jHQG3c6DbY4Bm6V5I3I\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-jwt-b64",
@@ -782,7 +1105,11 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "payload=dG9rZW49ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LllVMTZVbU51YW0xelozQlRSelZIY0ZneS5ZbkV6Y2psT1YxUmxPREpyT0dsb1VGUk9hMlkzZUhSSw==",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-contract-b64",
@@ -791,7 +1118,10 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "blob=Q1RSLTIwMjUtMjcwNTY1",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-gcpkey-hex",
@@ -800,7 +1130,11 @@
       "obfuscation": "hex",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "blob=41497a614e476149622d6d536c7946474b5065466a48514733633644625934426d365635493349",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-contract-homoglyph",
@@ -809,7 +1143,10 @@
       "obfuscation": "unicode-homoglyph",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "ref=CTR-\uff12\uff10\uff12\uff15-\uff12\uff17\uff10\uff15\uff16\uff15",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-part-zw",
@@ -818,7 +1155,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "pn\u200b9F\u200bRUDTref",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r3-dburl-b64wrapped",
@@ -827,7 +1167,11 @@
       "obfuscation": "base64-wrapped",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "conn=dXJsPW15c3FsOi8vdXNlcjpmYWtlcHdfNzc4d3phbGdneUBkYi5leGFtcGxlLmNvbTozMzA2L3N2Yw==",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r3-gcpkey-hexwrapped",
@@ -836,7 +1180,11 @@
       "obfuscation": "hex-wrapped",
       "source_file": "corpus/blended_regulated_03.json",
       "text": "raw=41497a612d7072656669783a3a41497a614e476149622d6d536c7946474b5065466a48514733633644625934426d365635493349",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-iban-plain",
@@ -845,7 +1193,10 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "Settlement IBAN GB00EXMP6016EXMP1331EXMP9268 on file for the clearing account.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r4-nid-plain",
@@ -854,7 +1205,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "National identifier recorded as 9000-4200-0001 in onboarding.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-ghtoken-plain",
@@ -863,7 +1218,11 @@
       "obfuscation": "inline",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "ci deploy token ghp_EXAMPLEEXAMPLEEXAMPLEEXAMPLE00000000 was committed to the pipeline config.",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-mrn-label",
@@ -872,7 +1231,10 @@
       "obfuscation": "labeled",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "record_locator: MRN00042001",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r4-passport-field",
@@ -881,7 +1243,11 @@
       "obfuscation": "config-field",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "passport = XA0000042",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-iban-spaced",
@@ -890,7 +1256,10 @@
       "obfuscation": "space-grouped",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "IBAN: GB00 EXMP 6016 EXMP 1331 EXMP 9268 (SEPA)",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r4-apikey-split",
@@ -899,7 +1268,11 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "key = \"sk_test_ABCdef01ABCd\" \"ef23ABCdef45\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-nid-b64",
@@ -908,7 +1281,11 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "payload blob=OTAwMC00MjAwLTAwMDE=",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-iban-b64",
@@ -917,7 +1294,10 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "remit blob=R0IwMEVYTVA2MDE2RVhNUDEzMzFFWE1QOTI2OA==",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r4-ghtoken-b64",
@@ -926,7 +1306,11 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "secret blob=Z2hwX0VYQU1QTEVFWEFNUExFRVhBTVBMRUVYQU1QTEUwMDAwMDAwMA==",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-apikey-b64",
@@ -935,7 +1319,11 @@
       "obfuscation": "base64",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "env blob=c2tfdGVzdF9BQkNkZWYwMUFCQ2RlZjIzQUJDZGVmNDU=",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-mrn-hex",
@@ -944,7 +1332,10 @@
       "obfuscation": "hex",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "chart blob=4d524e3030303432303031",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r4-passport-hex",
@@ -953,7 +1344,11 @@
       "obfuscation": "hex",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "doc blob=584130303030303432",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-nid-homoglyph",
@@ -962,7 +1357,11 @@
       "obfuscation": "unicode-homoglyph",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "national id \uff19\uff10\uff10\uff10-\uff14\uff12\uff10\uff10-\uff10\uff10\uff10\uff11 on the intake form",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-mrn-homoglyph",
@@ -971,7 +1370,10 @@
       "obfuscation": "unicode-homoglyph",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "mrn MRN\uff10\uff10\uff10\uff14\uff12\uff10\uff10\uff11 attached",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r4-nid-zw",
@@ -980,7 +1382,11 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "subject id 9\u200b0\u200b0\u200b0\u200b-\u200b4\u200b2\u200b0\u200b0\u200b-\u200b0\u200b0\u200b0\u200b1 flagged",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-iban-zw",
@@ -989,7 +1395,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "acct G\u200bB\u200b0\u200b0\u200bE\u200bX\u200bM\u200bP\u200b6\u200b0\u200b1\u200b6\u200bE\u200bX\u200bM\u200bP\u200b1\u200b3\u200b3\u200b1\u200bE\u200bX\u200bM\u200bP\u200b9\u200b2\u200b6\u200b8 ref",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r4-mrn-zw",
@@ -998,7 +1407,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "mrn M\u200bR\u200bN\u200b0\u200b0\u200b0\u200b4\u200b2\u200b0\u200b0\u200b1 on chart",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r4-passport-split",
@@ -1007,7 +1419,11 @@
       "obfuscation": "split-literals",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "passport = \"XA00\" \"00042\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r4-ghtoken-b64wrap",
@@ -1016,7 +1432,11 @@
       "obfuscation": "base64-wrapped",
       "source_file": "corpus/blended_regulated_04.json",
       "text": "envelope=dG9rZW49Z2hwX0VYQU1QTEVFWEFNUExFRVhBTVBMRUVYQU1QTEUwMDAwMDAwMA==",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-pan-csv",
@@ -1025,7 +1445,10 @@
       "obfuscation": "csv-cell",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "MSFT,Microsoft Corporation,NMS,7094477452711205,USD",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "r5-iban-field",
@@ -1034,7 +1457,10 @@
       "obfuscation": "config-field",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "settlement_iban = GB00SYNT66857670244990",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r5-apikey-env",
@@ -1043,7 +1469,11 @@
       "obfuscation": "env-field",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "STRIPE_API_KEY=sk_test_cS7aJEtEbCE3ejCWqyF75LI9",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-dburl-env",
@@ -1052,7 +1482,11 @@
       "obfuscation": "env-field",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "DATABASE_URL=postgres://svc_reporting:test_pw_1299@warehouse-3.db.example.com:5432/analytics",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-health-json",
@@ -1061,7 +1495,10 @@
       "obfuscation": "json-fragment",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "{\"account\": \"brokerage\", \"ticker\": \"AAPL\", \"chart_note\": \"MRN84548885 Unspecified asthma, uncomplicated, started Lisinopril 10mg\"}",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r5-contract-cell",
@@ -1070,7 +1507,10 @@
       "obfuscation": "csv-cell",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "AAPL,Apple Inc.,NMS,CTR-2021-836729,USD",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r5-pan-json",
@@ -1079,7 +1519,10 @@
       "obfuscation": "json-fragment",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "{\"ticker\": \"AAPL\", \"card_on_file\": \"9738559754340698\", \"status\": \"active\"}",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "r5-iban-spaced",
@@ -1088,7 +1531,10 @@
       "obfuscation": "space-grouped",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "IBAN DE00 TEST 2636 5727 069763",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r5-ssn-json",
@@ -1097,7 +1543,11 @@
       "obfuscation": "json-fragment",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "{\"holder\": \"Ava Carter\", \"tax_id\": \"943-79-6418\", \"sector\": \"Financials\"}",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-dburl-log",
@@ -1106,7 +1556,11 @@
       "obfuscation": "log-line",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "2026-07-11T09:12:03Z WARN pool connect dsn=postgres://svc_reporting:test_pw_4805@warehouse-3.db.example.com:5432/analytics retries=3",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-contract-log",
@@ -1115,7 +1569,10 @@
       "obfuscation": "log-line",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "2026-07-11T09:15:44Z INFO renew contract=CTR-2021-238301 portfolio=NMS",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "CMMC_L2"
+      ]
     },
     {
       "id": "r5-health-log",
@@ -1124,7 +1581,10 @@
       "obfuscation": "log-line",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "2026-07-11T09:18:27Z INFO ehr_export patient=REC-1042 dx=\"I10 Essential (primary) hypertension\" rx=\"Lisinopril 10mg\" exch=XNAS",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA"
+      ]
     },
     {
       "id": "r5-apikey-split",
@@ -1133,7 +1593,11 @@
       "obfuscation": "concatenated",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "key = \"sk_test_4hK3\" + \"jeb9PnR1rvriRx1w1A3m\"",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "SOC2",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-ssn-homoglyph",
@@ -1142,7 +1606,11 @@
       "obfuscation": "unicode-homoglyph",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "account_holder_ssn=\uff1922-18-8459",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-iban-json-b64",
@@ -1151,7 +1619,10 @@
       "obfuscation": "base64-in-json",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "{\"acct\": \"brokerage\", \"iban_b64\": \"RlIwMFNZTlQ5MTU2ODY2NzQ4MTExMw==\"}",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     },
     {
       "id": "r5-email-log",
@@ -1160,7 +1631,12 @@
       "obfuscation": "log-line",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "2026-07-11T09:20:10Z INFO statement_sent to=diego.carter68@example.com exch=XNAS",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-pan-zw-csv",
@@ -1169,7 +1645,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "AAPL,Apple Inc.,NMS,6202\u200b6359\u200b9531\u200b1707,GBP",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "PCI_DSS"
+      ]
     },
     {
       "id": "r5-phone-hex-log",
@@ -1178,7 +1657,12 @@
       "obfuscation": "hex-encoded",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "2026-07-11T09:31:02Z DEBUG contact raw=3839342d3535352d30313839 region=NYQ",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "HIPAA",
+        "GDPR",
+        "ISO_27001"
+      ]
     },
     {
       "id": "r5-iban-zw-field",
@@ -1187,7 +1671,10 @@
       "obfuscation": "zero-width",
       "source_file": "corpus/blended_regulated_05.json",
       "text": "beneficiary_iban:NL00TEST\u200b45567646980731",
-      "expected": true
+      "expected": true,
+      "compliance": [
+        "GDPR"
+      ]
     }
   ]
 }

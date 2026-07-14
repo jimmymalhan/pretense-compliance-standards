@@ -22,13 +22,16 @@ import unicodedata
 import pytest
 
 from dlp_benchmark import BANNER, corpus_builder, harness
+from dlp_benchmark.compliance import FRAMEWORKS, frameworks_for
 from dlp_benchmark.detector import detect
 
-# Framework-token guardrail: the corpus must never name a compliance framework.
-# Covers the full forbidden set; the short ambiguous acronyms are word-anchored so
-# they don't false-match real words (e.g. "military", "morphine", "biscuit").
+# Framework-name guardrail: a compliance framework may be NAMED in a case's
+# ``compliance`` metadata field (the new categorization layer), but must NEVER
+# leak into the scanned ``text`` payload, which stays clean synthetic data.
+# This is the specific set of framework brand names (SOC 2, HIPAA, GDPR, CMMC,
+# ISO 27001, PCI) — distinct from the broad acronym guard the old test used.
 _FRAMEWORK_RE = re.compile(
-    r"soc ?2|hipaa|hi?ppaa|\bcmmc\b|\bgdpr\b|\bitar\b|\bcui\b|\bpii\b|\bphi\b",
+    r"soc.?2|hipaa|gdpr|cmmc|iso.?27001|pci",
     re.IGNORECASE,
 )
 # Any SSN-shaped value must be in the never-issued 900-range (provably fake).
@@ -125,20 +128,19 @@ def test_all_corpus_files_carry_banner(cases):
     assert _has_banner(manifest.read_text(encoding="utf-8"))
 
 
-def test_no_framework_tokens_in_any_case(cases):
-    """No case names a compliance framework in ANY string field (neutral only).
+def test_no_framework_names_in_payload_text(cases):
+    """No compliance-framework name leaks into a case's scanned ``text`` payload.
 
-    The stated guarantee covers ``text``/``kind``, but a framework token is just
-    as leaky if it hides in an ``id``, ``obfuscation`` label, or ``source_file``
-    added by a future regulated data module — so every string-valued field is
-    scanned, not only text/kind.
+    With the new compliance-categorization layer, a framework name (SOC 2, HIPAA,
+    GDPR, CMMC, ISO 27001, PCI) is ALLOWED in the per-case ``compliance`` metadata
+    field — that field is the taxonomy tag, not scanned content. The guardrail is
+    now scoped precisely: only the ``text`` payload (the bytes a scanner sees) is
+    checked, and the ``compliance`` field is deliberately NOT scanned. This
+    replaces the older guard that forbade framework tokens in *every* string field.
     """
     for c in cases:
-        for field, value in c.items():
-            if not isinstance(value, str):
-                continue
-            match = _FRAMEWORK_RE.search(value)
-            assert match is None, f"{c['id']} {field}: {match.group() if match else ''}"
+        match = _FRAMEWORK_RE.search(c["text"])
+        assert match is None, f"{c['id']} text: {match.group() if match else ''}"
 
 
 def test_all_ssn_shaped_values_are_fake(cases):
@@ -212,4 +214,57 @@ def test_every_kind_detected_hardened_on_non_exotic_cases(cases):
     assert not missed, (
         "hardened mode missed non-exotic cases for these kinds "
         f"(detector/kind drift): { {k: sorted(v) for k, v in sorted(missed.items())} }"
+    )
+
+
+# --- compliance-categorization layer: taxonomy coverage & per-framework recall ---
+#
+# ISOLATION NOTE (applies to the two tests below): these rely ONLY on the
+# ``frameworks_for`` / ``FRAMEWORKS`` taxonomy (present at baseline) and the
+# detector — never on a case's ``compliance`` field. Unit 1 adds that field to
+# cases in corpus_builder, but it is absent in this isolated worktree; deriving
+# each case's frameworks from ``frameworks_for(c["kind"])`` keeps these tests
+# correct both pre- and post-integration.
+
+
+def test_every_kind_maps_to_a_framework(cases):
+    """The taxonomy fully covers the corpus, in both directions.
+
+    * Every distinct ``kind`` present in the corpus maps to at least one
+      framework via ``frameworks_for`` (no kind is silently un-categorized).
+    * Every framework in ``FRAMEWORKS`` is exercised by at least one corpus case
+      (no framework is declared but never covered by regulated data).
+    """
+    kinds = sorted({c["kind"] for c in cases})
+    assert kinds, "expected a non-empty corpus"
+
+    unmapped = [kind for kind in kinds if not frameworks_for(kind)]
+    assert not unmapped, f"corpus kinds with no framework mapping: {unmapped}"
+
+    covered = {fw for kind in kinds for fw in frameworks_for(kind)}
+    uncovered = [fw for fw in FRAMEWORKS if fw not in covered]
+    assert not uncovered, f"frameworks with no corpus case: {uncovered}"
+
+
+def test_per_framework_hardened_coverage(cases):
+    """Per-framework recall guard: hardened mode protects every framework's data.
+
+    For each framework, every NON-EXOTIC (difficulty tier 0-3) case whose ``kind``
+    maps to that framework must be detected by hardened mode (its ``kind`` appears
+    in ``detect(text, "hardened")``). Organizing the check per framework turns a
+    detector/taxonomy gap into a named, per-framework signal and reports the exact
+    offending case ids. Tier-4 "exotic" cases are excluded as the acknowledged
+    open frontier, matching the per-kind coverage contract.
+    """
+    missed: dict[str, list[str]] = {}
+    for c in cases:
+        if c["difficulty"] >= _EXOTIC_TIER:
+            continue
+        if c["kind"] in detect(c["text"], "hardened"):
+            continue
+        for fw in frameworks_for(c["kind"]):
+            missed.setdefault(fw, []).append(c["id"])
+    assert not missed, (
+        "hardened mode missed non-exotic cases, leaving these frameworks "
+        f"under-protected: { {k: sorted(v) for k, v in sorted(missed.items())} }"
     )

@@ -17,13 +17,42 @@ The bridge prints a per-tier table plus an overall row:
 ```
 tier |   n | identify | mutate
 -----+-----+----------+-------
-   0 |  27 |    59.3% |  22.2%
+   0 |  27 |    55.6% |  25.9%
    ...
- all | 131 |    36.6% |  12.2%
+ all | 132 |    35.6% |  12.1%
 ```
 
+## Per-framework report
+
+The bridge also reports how well pretense protects **each compliance
+framework's** data. It reads the taxonomy in `dlp_benchmark/compliance_map.json`
+(`{ "frameworks": [...], "kind_frameworks": { "<kind>": ["<fw>", ...] } }`) and,
+for every framework, aggregates identify% and mutate% over the corpus cases
+whose `kind` maps to that framework. Because a single `kind` can map to more
+than one framework (e.g. `email` → HIPAA, GDPR, ISO_27001), one case counts
+toward every framework it belongs to, so the per-framework `n` values overlap
+and do not sum to the corpus size. Frameworks are printed in the fixed order
+declared in `compliance_map.json`:
+
+```
+Per-framework coverage (cases whose kind maps to the framework)
+framework  |   n | identify | mutate
+-----------+-----+----------+-------
+SOC2       |  42 |    64.3% |  11.9%
+HIPAA      |  43 |    30.2% |  20.9%
+GDPR       |  40 |    25.0% |  15.0%
+CMMC_L2    |  12 |     0.0% |   8.3%
+ISO_27001  |  76 |    51.3% |  14.5%
+PCI_DSS    |  10 |    60.0% |  10.0%
+-----------+-----+----------+-------
+```
+
+A framework with no matching cases shows `n/a`. Kinds that map to a framework
+absent from the ordered `frameworks` list are ignored.
+
 All corpus input is **synthetic, fake, and banner-marked**. This tool only
-*reads* the corpus and the pretense source; it never modifies corpus data.
+*reads* the corpus, the compliance map, and the pretense source; it never
+modifies corpus data.
 
 ## Requirements
 

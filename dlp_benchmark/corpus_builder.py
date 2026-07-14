@@ -29,6 +29,7 @@ import json
 import pathlib
 
 from . import BANNER
+from .compliance import frameworks_for
 from .regulated import collect_regulated_cases
 
 CORPUS_DIR = pathlib.Path(__file__).parent / "corpus"
@@ -128,6 +129,12 @@ def build_cases() -> list[dict]:
     # Additional regulated-data categories, auto-discovered from the
     # `regulated/` package. Safe no-op ([]) until data modules are present.
     C.extend(collect_regulated_cases())
+
+    # Tag every case (base + regulated) with the compliance framework(s) its
+    # data `kind` exercises, so the benchmark can report coverage per framework.
+    # Framework names live only in this metadata field, never in `text`.
+    for c in C:
+        c["compliance"] = frameworks_for(c["kind"])
 
     return C
 
