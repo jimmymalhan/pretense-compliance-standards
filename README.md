@@ -1,3 +1,9 @@
+> **⚙️ This is a customized fork — [Pretense Compliance Standards](PRETENSE_COMPLIANCE_STANDARDS.md).**
+> A fully synthetic compliance/DLP testbed for **pretense.ai** lives in [`pretense_compliance_standards/`](pretense_compliance_standards/README.md).
+> The original **FinanceDatabase** project by Jeroen Bouma (MIT, preserved — see `LICENSE`/`NOTICE`) is retained below as the codebase under test.
+
+---
+
 <img src="https://user-images.githubusercontent.com/46355364/220746807-669cdbc1-ac67-404c-b0bb-4a3d67d9931f.jpg" alt="Logo">
 
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor_this_Project-grey?logo=github)](https://github.com/sponsors/JerBouma)
