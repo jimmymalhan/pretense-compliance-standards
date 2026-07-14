@@ -116,6 +116,49 @@ _DB_URL = re.compile(
 # Cloud API key, e.g. "AIza...".
 _GCP_KEY = re.compile(r"AIza[A-Za-z0-9_\-]{35}")
 
+# --- Extended kinds (deepened coverage: card, financial, extra PII, network, vendor keys) ---
+# CVV/CVC labeled 3-4 digit card verification code (PCI).
+_CARD_CVV = re.compile(r"\b(?:cvv|cvc|cvv2|cid)\b\s*[:=#]?\s*\d{3,4}\b", re.IGNORECASE)
+# Bank account number, labeled 8-17 digits.
+_BANK_ACCOUNT = re.compile(
+    r"\b(?:bank[\s_-]?account|acct(?:[\s_-]?(?:no|num|number))?|account[\s_-]?(?:no|number))\b\s*[:=#]?\s*\d{8,17}\b",
+    re.IGNORECASE,
+)
+# ABA routing number, labeled 9 digits.
+_ROUTING = re.compile(r"\b(?:routing|aba)\b\s*(?:no|number|#)?\s*[:=#]?\s*\d{9}\b", re.IGNORECASE)
+# US Employer Identification Number XX-XXXXXXX.
+_EIN = re.compile(r"\b\d{2}-\d{7}\b")
+# Driver's license, labeled letter + 6-8 digits.
+_DRIVERS_LICENSE = re.compile(
+    r"\b(?:dl|driver'?s?[\s_-]?licen[sc]e)\b\s*(?:no|number|#)?\s*[:=#]?\s*[A-Z]\d{6,8}\b",
+    re.IGNORECASE,
+)
+# Date of birth, labeled ISO or slashed date.
+_DOB = re.compile(
+    r"\b(?:dob|date[\s_-]?of[\s_-]?birth|birth[\s_-]?date)\b\s*[:=#]?\s*(?:\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4})",
+    re.IGNORECASE,
+)
+# IPv4 address (valid octets).
+_IP_ADDRESS = re.compile(
+    r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b"
+)
+# IPv6 address (incl. :: compression).
+_IPV6 = re.compile(
+    r"\b(?:[0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}\b|\b(?:[0-9a-fA-F]{1,4}:)+:[0-9a-fA-F:]*\b"
+)
+# National Provider Identifier (health), labeled 10 digits.
+_NPI = re.compile(r"\bnpi\b\s*[:=#]?\s*\d{10}\b", re.IGNORECASE)
+# OpenAI-style key `sk-...` (excludes `sk-ant-`, handled separately).
+_OPENAI_KEY = re.compile(r"\bsk-(?!ant-)(?:proj-)?[A-Za-z0-9_-]{20,}\b")
+# Anthropic key `sk-ant-...`.
+_ANTHROPIC_KEY = re.compile(r"\bsk-ant-(?:api\d{2}-)?[A-Za-z0-9_-]{16,}\b")
+# Azure storage `AccountKey=...`.
+_AZURE_KEY = re.compile(r"AccountKey=[A-Za-z0-9+/=]{40,}", re.IGNORECASE)
+# SendGrid API key `SG.xxx.yyy`.
+_SENDGRID_KEY = re.compile(r"\bSG\.[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}\b")
+# Twilio key `SK` + 32 hex.
+_TWILIO_KEY = re.compile(r"\bSK[a-f0-9]{32}\b")
+
 # Non-ASCII homoglyph digits, in case NFKC leaves any. Intentionally does NOT
 # remap ASCII letters (O/l/I): doing so corrupts ordinary text like "example".
 _HOMOGLYPHS = str.maketrans(
@@ -256,6 +299,34 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
             found.add("access_log")
         if _HEALTH_RECORD.search(view):
             found.add("health_record")
+        if _CARD_CVV.search(view):
+            found.add("card_cvv")
+        if _BANK_ACCOUNT.search(view):
+            found.add("bank_account")
+        if _ROUTING.search(view):
+            found.add("routing_number")
+        if _EIN.search(view):
+            found.add("ein")
+        if _DRIVERS_LICENSE.search(view):
+            found.add("drivers_license")
+        if _DOB.search(view):
+            found.add("date_of_birth")
+        if _IP_ADDRESS.search(view):
+            found.add("ip_address")
+        if _IPV6.search(view):
+            found.add("ipv6")
+        if _NPI.search(view):
+            found.add("npi")
+        if _OPENAI_KEY.search(view):
+            found.add("openai_key")
+        if _ANTHROPIC_KEY.search(view):
+            found.add("anthropic_key")
+        if _AZURE_KEY.search(view):
+            found.add("azure_key")
+        if _SENDGRID_KEY.search(view):
+            found.add("sendgrid_key")
+        if _TWILIO_KEY.search(view):
+            found.add("twilio_key")
         # Deterministic-hashing denylist check.
         for tok in _tokens(view):
             if hashlib.sha256(tok.encode()).hexdigest() in _DENYLIST_HASHES:
