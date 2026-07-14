@@ -95,6 +95,70 @@ def test_hardened_improves_on_obfuscated_tiers(result):
     )
 
 
+def test_tier5_layered_obfuscation(cases):
+    """Tier-5 layered/nested encodings: hardened recovers them, naive cannot.
+
+    Tier 5 sits above the tier-4 exotic frontier — the value is wrapped in
+    base64-of-base64, gzip+base64, full percent-encoding, or ROT13, none of which
+    a single-pass scan reverses. The detector's bounded multi-pass decoder must
+    recover every one; the naive scan (which sees only the encoded blob) recovers
+    none.
+    """
+    t5 = [c for c in cases if c["difficulty"] == 5]
+    assert len(t5) >= 12, "expected a populated tier-5 layered corpus"
+    for c in t5:
+        assert c["kind"] in detect(c["text"], "hardened"), f"hardened missed {c['id']}"
+    naive_hits = [c["id"] for c in t5 if c["kind"] in detect(c["text"], "naive")]
+    assert not naive_hits, f"naive unexpectedly caught tier-5 cases: {naive_hits}"
+
+
+def test_multipass_decoder_recovers_layers():
+    """The multi-pass decoder unwinds each layered encoding back to the value."""
+    import base64
+    import gzip
+
+    value = "Member SSN 900-55-1234 on file"
+    double_b64 = "blob=" + base64.b64encode(base64.b64encode(value.encode())).decode()
+    gzip_b64 = "z=" + base64.b64encode(gzip.compress(value.encode())).decode()
+    percent = "".join(f"%{b:02x}" for b in value.encode())
+
+    assert "ssn" in detect(double_b64, "hardened")
+    assert "ssn" in detect(gzip_b64, "hardened")
+    assert "ssn" in detect(percent, "hardened")
+    # The layered forms defeat the naive single-pass scan.
+    assert "ssn" not in detect(double_b64, "naive")
+    assert "ssn" not in detect(gzip_b64, "naive")
+    assert "ssn" not in detect(percent, "naive")
+
+
+def test_hardened_decode_is_dos_safe():
+    """The bounded multi-pass decoder must not blow up on hostile input.
+
+    A large wall of base64 tokens and a compression-bomb payload both used to hang
+    hardened detect() for tens of seconds; the input/size/token/total caps must
+    keep them fast (and correct: no spurious detection)."""
+    import base64
+    import gzip
+    import time
+
+    big_b64 = " ".join("QUJDREVGR0hJSktMTU5PUFFSU1Q=" for _ in range(4000))  # ~110KB
+    bomb = "gz=" + base64.b64encode(gzip.compress(b"a" * 90000)).decode()
+    # A large paste of benign-shaped text (spaced card-like digit groups) exercises
+    # the always-on base-view regex scan, which the scan-length cap must bound.
+    big_digits = "1234567890123456 " * 40000  # ~680KB
+    for payload in (big_b64, bomb, big_digits):
+        start = time.perf_counter()
+        detect(payload, "hardened")
+        assert time.perf_counter() - start < 2.0, "hardened detect too slow (DoS)"
+
+
+def test_rot13_view_is_not_scanned():
+    """ROT13 is not a decode layer, so benign text that ROT13s onto a denylisted
+    secret must NOT be flagged (the false positive the M2 review caught)."""
+    # codecs.encode('P@ssw0rd123','rot_13') == 'C@ffj0eq123'
+    assert detect("the codename C@ffj0eq123 was assigned", "hardened") == set()
+
+
 def test_every_case_expected_and_detected_hardened(cases):
     # Ground truth: all cases are should-be-flagged; hardened mode should find them.
     for c in cases:

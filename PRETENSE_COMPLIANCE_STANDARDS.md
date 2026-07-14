@@ -13,8 +13,8 @@ under test*. The testbed itself lives in **[`pretense_compliance_standards/`](pr
 
 ## What it does
 
-- A **graded corpus** of 132 synthetic sensitive-data cases across 5 obfuscation
-  tiers (easy → hard: inline → labeled → split → encoded → zero-width/embedded).
+- A **graded corpus** of 470+ synthetic sensitive-data cases across 6 obfuscation
+  tiers (easy → hard: inline → labeled → split → encoded → zero-width → layered/nested).
 - A reference **deterministic-hashing detector** (naive vs. hardened) that scores
   **recall per difficulty tier** and **per compliance framework**.
 - A **pretense bridge** that runs the real pretense engine over the corpus and

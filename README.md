@@ -14,8 +14,8 @@
 
 The testbed lives in **[`pretense_compliance_standards/`](pretense_compliance_standards/README.md)**:
 
-- A **graded corpus** of 450+ synthetic sensitive-data cases across 5 obfuscation tiers
-  (inline → labeled → split → encoded → zero-width/embedded), covering 38 data kinds.
+- A **graded corpus** of 470+ synthetic sensitive-data cases across 6 obfuscation tiers
+  (inline → labeled → split → encoded → zero-width → layered/nested), covering 38 data kinds.
 - A reference **deterministic-hashing detector** (naive vs. hardened) scoring **recall
   per difficulty tier** and **per compliance framework**.
 - A **pretense bridge** that runs the real pretense.ai engine over the corpus and reports

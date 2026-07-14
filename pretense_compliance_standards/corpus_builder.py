@@ -10,7 +10,9 @@ Difficulty gradient (easy -> hard to catch):
     tier 1  labeled    labeled CSV/config fields, canonical-reachable variants
     tier 2  structural value split across quotes/lines; spaced/grouped digits
     tier 3  encoded    base64 / hex / Unicode-homoglyph forms
-    tier 4  exotic     zero-width separators, layered/embedded encodings
+    tier 4  exotic     zero-width separators, single embedded encodings
+    tier 5  layered    nested encodings (base64-of-base64, gzip+base64, full
+                       percent-encoding, ROT13) that need a multi-pass decode
 
 EVERY value is synthetic and provably fake (900-range SSNs, 555-01xx phones,
 @example.com, AWS example key, Luhn-valid-but-random PANs). Each case is labeled
