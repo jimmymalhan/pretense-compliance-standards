@@ -38,14 +38,47 @@ from . import BANNER
 # Seed so the "generated" data is reproducible for test assertions.
 random.seed(42)
 
-FIRST_NAMES = ["Ava", "Liam", "Noah", "Mia", "Ethan", "Sofia", "Lucas", "Isla",
-               "Mason", "Zoe", "Elena", "Omar", "Priya", "Diego", "Hana"]
-LAST_NAMES = ["Carter", "Nguyen", "Patel", "Garcia", "Rossi", "Kim", "Okafor",
-              "Silva", "Haddad", "Larsen", "Ivanov", "Mensah", "Costa", "Wong"]
+FIRST_NAMES = [
+    "Ava",
+    "Liam",
+    "Noah",
+    "Mia",
+    "Ethan",
+    "Sofia",
+    "Lucas",
+    "Isla",
+    "Mason",
+    "Zoe",
+    "Elena",
+    "Omar",
+    "Priya",
+    "Diego",
+    "Hana",
+]
+LAST_NAMES = [
+    "Carter",
+    "Nguyen",
+    "Patel",
+    "Garcia",
+    "Rossi",
+    "Kim",
+    "Okafor",
+    "Silva",
+    "Haddad",
+    "Larsen",
+    "Ivanov",
+    "Mensah",
+    "Costa",
+    "Wong",
+]
 STREETS = ["Maple Ave", "Oak St", "Cedar Ln", "Birch Rd", "Elm Ct", "Pine Way"]
-CITIES = [("Austin", "TX", "78701"), ("Denver", "CO", "80202"),
-          ("Portland", "OR", "97201"), ("Tampa", "FL", "33602"),
-          ("Reno", "NV", "89501")]
+CITIES = [
+    ("Austin", "TX", "78701"),
+    ("Denver", "CO", "80202"),
+    ("Portland", "OR", "97201"),
+    ("Tampa", "FL", "33602"),
+    ("Reno", "NV", "89501"),
+]
 DIAGNOSES = [
     ("E11.9", "Type 2 diabetes mellitus without complications"),
     ("I10", "Essential (primary) hypertension"),
@@ -53,8 +86,13 @@ DIAGNOSES = [
     ("J45.909", "Unspecified asthma, uncomplicated"),
     ("B20", "Human immunodeficiency virus [HIV] disease"),
 ]
-MEDICATIONS = ["Metformin 500mg", "Lisinopril 10mg", "Sertraline 50mg",
-               "Albuterol HFA", "Atorvastatin 20mg"]
+MEDICATIONS = [
+    "Metformin 500mg",
+    "Lisinopril 10mg",
+    "Sertraline 50mg",
+    "Albuterol HFA",
+    "Atorvastatin 20mg",
+]
 INSURERS = ["BlueCross Synthetic", "UnitedFake Health", "Aetna-Test", "Cigna-Demo"]
 
 # --- Finance-domain flavor, drawn from this repo's own entities (fake pairing) ---
@@ -66,8 +104,14 @@ TICKERS = [
     ("TSLA", "Tesla, Inc.", "NMS", "XNAS"),
     ("GOOGL", "Alphabet Inc.", "NMS", "XNAS"),
 ]
-SECTORS = ["Information Technology", "Financials", "Health Care",
-           "Consumer Discretionary", "Communication Services", "Energy"]
+SECTORS = [
+    "Information Technology",
+    "Financials",
+    "Health Care",
+    "Consumer Discretionary",
+    "Communication Services",
+    "Energy",
+]
 CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD"]
 
 
@@ -109,24 +153,27 @@ def _fake_phone() -> str:
 
 
 def _api_key() -> str:
-    return "sk_test_" + "".join(random.choices(string.ascii_letters + string.digits, k=24))
+    return "sk_test_" + "".join(
+        random.choices(string.ascii_letters + string.digits, k=24)
+    )
 
 
 @dataclass
 class SubjectRecord:
     """A single synthetic person combining PII + PHI (HIPAA-style violation)."""
+
     record_id: str
     full_name: str
-    ssn: str                    # PII
-    date_of_birth: str          # PII / HIPAA identifier
-    email: str                  # PII
-    phone: str                  # PII
-    street_address: str         # PII
-    city_state_zip: str         # PII
-    drivers_license: str        # PII
-    passport_number: str        # PII
-    credit_card: str            # PCI / SOC 2 (unmasked PAN)
-    card_cvv: str               # PCI (must never be stored)
+    ssn: str  # PII
+    date_of_birth: str  # PII / HIPAA identifier
+    email: str  # PII
+    phone: str  # PII
+    street_address: str  # PII
+    city_state_zip: str  # PII
+    drivers_license: str  # PII
+    passport_number: str  # PII
+    credit_card: str  # PCI / SOC 2 (unmasked PAN)
+    card_cvv: str  # PCI (must never be stored)
     # --- PHI / HIPAA ---
     medical_record_number: str
     icd10_code: str
@@ -179,13 +226,13 @@ def generate_subject(i: int) -> SubjectRecord:
 # (Intentionally "bad" so secret scanners have something to flag.)
 INSECURE_CONFIG = {
     "db_connection": "postgres://admin:P@ssw0rd123@db.internal.example.com:5432/prod",
-    "aws_access_key_id": "AKIAIOSFODNN7EXAMPLE",              # AWS example key
+    "aws_access_key_id": "AKIAIOSFODNN7EXAMPLE",  # AWS example key
     "aws_secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
     "stripe_api_key": _api_key(),
     "jwt_signing_secret": "hardcoded-not-rotated-secret",
-    "password_hash_algorithm": "md5",                          # NIST: weak hash
-    "tls_min_version": "1.0",                                  # NIST: deprecated
-    "encryption_at_rest": False,                               # SOC 2 gap
+    "password_hash_algorithm": "md5",  # NIST: weak hash
+    "tls_min_version": "1.0",  # NIST: deprecated
+    "encryption_at_rest": False,  # SOC 2 gap
 }
 
 # SOC 2 anti-pattern: plaintext credentials landing in application logs.

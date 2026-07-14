@@ -55,6 +55,7 @@ random.seed(505)
 
 # --- provably-fake value helpers ---------------------------------------------
 
+
 def _digits(n: int) -> str:
     return "".join(random.choices(string.digits, k=n))
 
@@ -83,7 +84,9 @@ def _fake_email() -> str:
 
 
 def _api_key() -> str:
-    return "sk_test_" + "".join(random.choices(string.ascii_letters + string.digits, k=24))
+    return "sk_test_" + "".join(
+        random.choices(string.ascii_letters + string.digits, k=24)
+    )
 
 
 def _db_url() -> str:
@@ -110,20 +113,23 @@ def _ticker_row(value: str) -> str:
 
 # --- case construction --------------------------------------------------------
 
+
 def build_cases() -> list[dict]:
     """Return this unit's ground-truth case list (blended, un-annotated)."""
     C: list[dict] = []
 
     def add(cid, difficulty, kind, obfuscation, text):
-        C.append({
-            "id": cid,
-            "difficulty": difficulty,
-            "kind": kind,
-            "obfuscation": obfuscation,
-            "source_file": SOURCE_FILE,
-            "text": text,
-            "expected": True,
-        })
+        C.append(
+            {
+                "id": cid,
+                "difficulty": difficulty,
+                "kind": kind,
+                "obfuscation": obfuscation,
+                "source_file": SOURCE_FILE,
+                "text": text,
+                "expected": True,
+            }
+        )
 
     # --- tier 1: labeled fields, canonical-reachable but wrapped in context ---
     add("r5-pan-csv", 1, "pan", "csv-cell", _ticker_row(_luhn_card()))
@@ -133,56 +139,137 @@ def build_cases() -> list[dict]:
     # health_record: a FREE-TEXT diagnosis that also carries an MRN anchor,
     # wrapped in a realistic EHR-export JSON fragment (finance-entity flavored).
     _icd_h1, dx_h1 = random.choice(DIAGNOSES)
-    add("r5-health-json", 1, "health_record", "json-fragment",
-        json.dumps({"account": "brokerage", "ticker": "AAPL",
-                    "chart_note": f"{_mrn()} {dx_h1}, started {random.choice(MEDICATIONS)}"}))
-    add("r5-contract-cell", 1, "contract_number", "csv-cell",
-        _ticker_row(_contract_no()))
+    add(
+        "r5-health-json",
+        1,
+        "health_record",
+        "json-fragment",
+        json.dumps(
+            {
+                "account": "brokerage",
+                "ticker": "AAPL",
+                "chart_note": f"{_mrn()} {dx_h1}, started {random.choice(MEDICATIONS)}",
+            }
+        ),
+    )
+    add(
+        "r5-contract-cell",
+        1,
+        "contract_number",
+        "csv-cell",
+        _ticker_row(_contract_no()),
+    )
 
     # --- tier 2: structural — value split / grouped / inside a JSON fragment ---
     pan2 = _luhn_card()
-    add("r5-pan-json", 2, "pan", "json-fragment",
-        json.dumps({"ticker": "AAPL", "card_on_file": pan2, "status": "active"}))
+    add(
+        "r5-pan-json",
+        2,
+        "pan",
+        "json-fragment",
+        json.dumps({"ticker": "AAPL", "card_on_file": pan2, "status": "active"}),
+    )
     iban2 = _fake_iban("DE", "TEST")
-    add("r5-iban-spaced", 2, "iban", "space-grouped",
-        f"IBAN {iban2[0:4]} {iban2[4:8]} {iban2[8:12]} {iban2[12:16]} {iban2[16:]}")
-    add("r5-ssn-json", 2, "ssn", "json-fragment",
-        json.dumps({"holder": "Ava Carter", "tax_id": _fake_ssn(), "sector": "Financials"}))
-    add("r5-dburl-log", 2, "db_url", "log-line",
-        f"2026-07-11T09:12:03Z WARN pool connect dsn={_db_url()} retries=3")
-    add("r5-contract-log", 2, "contract_number", "log-line",
-        f"2026-07-11T09:15:44Z INFO renew contract={_contract_no()} portfolio=NMS")
+    add(
+        "r5-iban-spaced",
+        2,
+        "iban",
+        "space-grouped",
+        f"IBAN {iban2[0:4]} {iban2[4:8]} {iban2[8:12]} {iban2[12:16]} {iban2[16:]}",
+    )
+    add(
+        "r5-ssn-json",
+        2,
+        "ssn",
+        "json-fragment",
+        json.dumps(
+            {"holder": "Ava Carter", "tax_id": _fake_ssn(), "sector": "Financials"}
+        ),
+    )
+    add(
+        "r5-dburl-log",
+        2,
+        "db_url",
+        "log-line",
+        f"2026-07-11T09:12:03Z WARN pool connect dsn={_db_url()} retries=3",
+    )
+    add(
+        "r5-contract-log",
+        2,
+        "contract_number",
+        "log-line",
+        f"2026-07-11T09:15:44Z INFO renew contract={_contract_no()} portfolio=NMS",
+    )
     # health_record: free-text diagnosis anchored by an ICD code, in a log line.
     icd_h2, dx_h2 = random.choice(DIAGNOSES)
-    add("r5-health-log", 2, "health_record", "log-line",
-        f'2026-07-11T09:18:27Z INFO ehr_export patient=REC-1042 '
-        f'dx="{icd_h2} {dx_h2}" rx="{random.choice(MEDICATIONS)}" exch=XNAS')
+    add(
+        "r5-health-log",
+        2,
+        "health_record",
+        "log-line",
+        f"2026-07-11T09:18:27Z INFO ehr_export patient=REC-1042 "
+        f'dx="{icd_h2} {dx_h2}" rx="{random.choice(MEDICATIONS)}" exch=XNAS',
+    )
 
     # --- tier 3: exotic — encoded / concatenated / homoglyph in a container ---
     api3 = _api_key()
-    add("r5-apikey-split", 3, "api_key", "concatenated",
-        f'key = "{api3[:12]}" + "{api3[12:]}"')
+    add(
+        "r5-apikey-split",
+        3,
+        "api_key",
+        "concatenated",
+        f'key = "{api3[:12]}" + "{api3[12:]}"',
+    )
     ssn3 = _fake_ssn()
-    add("r5-ssn-homoglyph", 3, "ssn", "unicode-homoglyph",
-        f"account_holder_ssn=９{ssn3[1:]}")  # fullwidth leading 9
+    add(
+        "r5-ssn-homoglyph",
+        3,
+        "ssn",
+        "unicode-homoglyph",
+        f"account_holder_ssn=９{ssn3[1:]}",
+    )  # fullwidth leading 9
     iban3 = _fake_iban("FR", "SYNT")
-    add("r5-iban-json-b64", 3, "iban", "base64-in-json",
-        json.dumps({"acct": "brokerage",
-                    "iban_b64": corpus_builder._b64(iban3)}))
-    add("r5-email-log", 3, "email", "log-line",
-        f"2026-07-11T09:20:10Z INFO statement_sent to={_fake_email()} exch=XNAS")
+    add(
+        "r5-iban-json-b64",
+        3,
+        "iban",
+        "base64-in-json",
+        json.dumps({"acct": "brokerage", "iban_b64": corpus_builder._b64(iban3)}),
+    )
+    add(
+        "r5-email-log",
+        3,
+        "email",
+        "log-line",
+        f"2026-07-11T09:20:10Z INFO statement_sent to={_fake_email()} exch=XNAS",
+    )
 
     # --- tier 4: layered / zero-width inside realistic finance rows -----------
     zw = corpus_builder.ZW
     pan4 = _luhn_card()
-    add("r5-pan-zw-csv", 4, "pan", "zero-width",
-        _ticker_row(f"{pan4[:4]}{zw}{pan4[4:8]}{zw}{pan4[8:12]}{zw}{pan4[12:]}"))
+    add(
+        "r5-pan-zw-csv",
+        4,
+        "pan",
+        "zero-width",
+        _ticker_row(f"{pan4[:4]}{zw}{pan4[4:8]}{zw}{pan4[8:12]}{zw}{pan4[12:]}"),
+    )
     phone4 = _fake_phone_dashed()
-    add("r5-phone-hex-log", 4, "phone", "hex-encoded",
-        f"2026-07-11T09:31:02Z DEBUG contact raw={phone4.encode().hex()} region=NYQ")
+    add(
+        "r5-phone-hex-log",
+        4,
+        "phone",
+        "hex-encoded",
+        f"2026-07-11T09:31:02Z DEBUG contact raw={phone4.encode().hex()} region=NYQ",
+    )
     iban4 = _fake_iban("NL", "TEST")
-    add("r5-iban-zw-field", 4, "iban", "zero-width",
-        f"beneficiary_iban:{iban4[:8]}{zw}{iban4[8:]}")
+    add(
+        "r5-iban-zw-field",
+        4,
+        "iban",
+        "zero-width",
+        f"beneficiary_iban:{iban4[:8]}{zw}{iban4[8:]}",
+    )
 
     return C
 
@@ -225,13 +312,18 @@ def _validate(cases: list[dict], payload_text: str) -> None:
             assert "@example.com" in text, f"{c['id']}: email not @example.com"
         if c["kind"] == "iban" and c["obfuscation"] in ("config-field", "csv-cell"):
             # Country code + '00' check digits, un-obfuscated forms only.
-            assert re.search(r"[A-Z]{2}00", text), f"{c['id']}: IBAN check digits not 00"
+            assert re.search(
+                r"[A-Z]{2}00", text
+            ), f"{c['id']}: IBAN check digits not 00"
         if c["kind"] == "health_record":
             # Contract: free-text dx that also carries an MRN or ICD anchor.
-            assert _MRN_ANCHOR_RE.search(text) or _ICD_ANCHOR_RE.search(text), \
-                f"{c['id']}: health_record missing MRN/ICD anchor"
+            assert _MRN_ANCHOR_RE.search(text) or _ICD_ANCHOR_RE.search(
+                text
+            ), f"{c['id']}: health_record missing MRN/ICD anchor"
         if c["kind"] == "contract_number":
-            assert _CTR_RE.search(text), f"{c['id']}: contract_number not CTR-YYYY-NNNNNN"
+            assert _CTR_RE.search(
+                text
+            ), f"{c['id']}: contract_number not CTR-YYYY-NNNNNN"
         if c["kind"] == "api_key":
             assert "sk_test_" in text, f"{c['id']}: api_key missing sk_test_ prefix"
         if c["kind"] == "db_url":

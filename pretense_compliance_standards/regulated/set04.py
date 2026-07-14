@@ -83,7 +83,7 @@ def _zw(s: str) -> str:
 
 def _spaced(s: str) -> str:
     """Space-group a value into 4-char blocks (defeated by separator-collapse)."""
-    return " ".join(s[i:i + 4] for i in range(0, len(s), 4))
+    return " ".join(s[i : i + 4] for i in range(0, len(s), 4))
 
 
 def build_cases() -> list[dict]:
@@ -91,57 +91,109 @@ def build_cases() -> list[dict]:
     C: list[dict] = []
 
     def add(cid, difficulty, kind, obfuscation, text):
-        C.append({
-            "id": cid, "difficulty": difficulty, "kind": kind,
-            "obfuscation": obfuscation, "source_file": SOURCE_FILE,
-            "text": text, "expected": True,
-        })
+        C.append(
+            {
+                "id": cid,
+                "difficulty": difficulty,
+                "kind": kind,
+                "obfuscation": obfuscation,
+                "source_file": SOURCE_FILE,
+                "text": text,
+                "expected": True,
+            }
+        )
 
     # --- a few tier 0-2 baselines (canonical / structural) ---
-    add("r4-iban-plain", 0, "iban", "inline",
-        f"Settlement IBAN {IBAN} on file for the clearing account.")
-    add("r4-nid-plain", 0, "national_id", "inline",
-        f"National identifier recorded as {NATIONAL_ID} in onboarding.")
-    add("r4-ghtoken-plain", 0, "github_token", "inline",
-        f"ci deploy token {GITHUB_TOKEN} was committed to the pipeline config.")
-    add("r4-mrn-label", 1, "medical_record_number", "labeled",
-        f"record_locator: {MRN}")
-    add("r4-passport-field", 1, "passport", "config-field",
-        f"passport = {PASSPORT}")
-    add("r4-iban-spaced", 2, "iban", "space-grouped",
-        f"IBAN: {_spaced(IBAN)} (SEPA)")
-    add("r4-apikey-split", 2, "api_key", "split-literals",
-        f'key = "{API_KEY[:20]}" "{API_KEY[20:]}"')
+    add(
+        "r4-iban-plain",
+        0,
+        "iban",
+        "inline",
+        f"Settlement IBAN {IBAN} on file for the clearing account.",
+    )
+    add(
+        "r4-nid-plain",
+        0,
+        "national_id",
+        "inline",
+        f"National identifier recorded as {NATIONAL_ID} in onboarding.",
+    )
+    add(
+        "r4-ghtoken-plain",
+        0,
+        "github_token",
+        "inline",
+        f"ci deploy token {GITHUB_TOKEN} was committed to the pipeline config.",
+    )
+    add("r4-mrn-label", 1, "medical_record_number", "labeled", f"record_locator: {MRN}")
+    add("r4-passport-field", 1, "passport", "config-field", f"passport = {PASSPORT}")
+    add("r4-iban-spaced", 2, "iban", "space-grouped", f"IBAN: {_spaced(IBAN)} (SEPA)")
+    add(
+        "r4-apikey-split",
+        2,
+        "api_key",
+        "split-literals",
+        f'key = "{API_KEY[:20]}" "{API_KEY[20:]}"',
+    )
 
     # --- tier 3: encoded (base64 / hex / unicode-homoglyph) ---
-    add("r4-nid-b64", 3, "national_id", "base64",
-        f"payload blob={_b64(NATIONAL_ID)}")
-    add("r4-iban-b64", 3, "iban", "base64",
-        f"remit blob={_b64(IBAN)}")
-    add("r4-ghtoken-b64", 3, "github_token", "base64",
-        f"secret blob={_b64(GITHUB_TOKEN)}")
-    add("r4-apikey-b64", 3, "api_key", "base64",
-        f"env blob={_b64(API_KEY)}")
-    add("r4-mrn-hex", 3, "medical_record_number", "hex",
-        f"chart blob={_hex(MRN)}")
-    add("r4-passport-hex", 3, "passport", "hex",
-        f"doc blob={_hex(PASSPORT)}")
-    add("r4-nid-homoglyph", 3, "national_id", "unicode-homoglyph",
-        f"national id {_fullwidth(NATIONAL_ID)} on the intake form")
-    add("r4-mrn-homoglyph", 3, "medical_record_number", "unicode-homoglyph",
-        f"mrn MRN{_fullwidth(MRN[3:])} attached")
+    add("r4-nid-b64", 3, "national_id", "base64", f"payload blob={_b64(NATIONAL_ID)}")
+    add("r4-iban-b64", 3, "iban", "base64", f"remit blob={_b64(IBAN)}")
+    add(
+        "r4-ghtoken-b64",
+        3,
+        "github_token",
+        "base64",
+        f"secret blob={_b64(GITHUB_TOKEN)}",
+    )
+    add("r4-apikey-b64", 3, "api_key", "base64", f"env blob={_b64(API_KEY)}")
+    add("r4-mrn-hex", 3, "medical_record_number", "hex", f"chart blob={_hex(MRN)}")
+    add("r4-passport-hex", 3, "passport", "hex", f"doc blob={_hex(PASSPORT)}")
+    add(
+        "r4-nid-homoglyph",
+        3,
+        "national_id",
+        "unicode-homoglyph",
+        f"national id {_fullwidth(NATIONAL_ID)} on the intake form",
+    )
+    add(
+        "r4-mrn-homoglyph",
+        3,
+        "medical_record_number",
+        "unicode-homoglyph",
+        f"mrn MRN{_fullwidth(MRN[3:])} attached",
+    )
 
     # --- tier 4: exotic (zero-width separators, split literals, layered) ---
-    add("r4-nid-zw", 4, "national_id", "zero-width",
-        f"subject id {_zw(NATIONAL_ID)} flagged")
-    add("r4-iban-zw", 4, "iban", "zero-width",
-        f"acct {_zw(IBAN)} ref")
-    add("r4-mrn-zw", 4, "medical_record_number", "zero-width",
-        f"mrn {_zw(MRN)} on chart")
-    add("r4-passport-split", 4, "passport", "split-literals",
-        f'passport = "{PASSPORT[:4]}" "{PASSPORT[4:]}"')
-    add("r4-ghtoken-b64wrap", 4, "github_token", "base64-wrapped",
-        f"envelope={_b64('token=' + GITHUB_TOKEN)}")
+    add(
+        "r4-nid-zw",
+        4,
+        "national_id",
+        "zero-width",
+        f"subject id {_zw(NATIONAL_ID)} flagged",
+    )
+    add("r4-iban-zw", 4, "iban", "zero-width", f"acct {_zw(IBAN)} ref")
+    add(
+        "r4-mrn-zw",
+        4,
+        "medical_record_number",
+        "zero-width",
+        f"mrn {_zw(MRN)} on chart",
+    )
+    add(
+        "r4-passport-split",
+        4,
+        "passport",
+        "split-literals",
+        f'passport = "{PASSPORT[:4]}" "{PASSPORT[4:]}"',
+    )
+    add(
+        "r4-ghtoken-b64wrap",
+        4,
+        "github_token",
+        "base64-wrapped",
+        f"envelope={_b64('token=' + GITHUB_TOKEN)}",
+    )
 
     return C
 
@@ -175,8 +227,8 @@ def _recovered_views(text: str):
     yield text
     nfkc = unicodedata.normalize("NFKC", text).replace(ZW, "")
     yield nfkc
-    yield re.sub(r"[\s\"'`+\\|,]", "", nfkc)   # fragment-join (split literals)
-    yield re.sub(r"[\s\-._]", "", nfkc)          # separator-collapse (spaced groups)
+    yield re.sub(r"[\s\"'`+\\|,]", "", nfkc)  # fragment-join (split literals)
+    yield re.sub(r"[\s\-._]", "", nfkc)  # separator-collapse (spaced groups)
     for tok in re.findall(r"[A-Za-z0-9+/]{12,}={0,2}", text):
         try:
             yield base64.b64decode(tok, validate=True).decode("utf-8", "ignore")
@@ -192,18 +244,26 @@ def _recovered_views(text: str):
 
 def _assert_fake_ranges() -> None:
     """Every canonical constant is provably synthetic and contract-shaped."""
-    assert IBAN[:2].isalpha() and IBAN[2:4] == "00" and "EXMP" in IBAN, \
-        "iban must be 2 letters + 00 check digits + EXMP example marker"
-    assert re.fullmatch(r"\d{4}-\d{4}-\d{4}", NATIONAL_ID) and NATIONAL_ID[0] == "9", \
-        "national_id must be \\d{4}-\\d{4}-\\d{4} in the 9000-range"
-    assert (GITHUB_TOKEN.startswith("ghp_")
-            and re.fullmatch(r"[A-Za-z0-9]{36}", GITHUB_TOKEN[4:])
-            and "EXAMPLE" in GITHUB_TOKEN), "github_token must be ghp_ + 36 example alnum"
-    assert re.fullmatch(r"MRN\d{8}", MRN), "medical_record_number must be MRN + 8 digits"
-    assert re.fullmatch(r"[A-Za-z]{2}\d{7}", PASSPORT), "passport must be 2 letters + 7 digits"
-    assert (API_KEY.startswith("sk_test_")
-            and re.fullmatch(r"[A-Za-z0-9]{24}", API_KEY[8:])), \
-        "api_key must be sk_test_ + 24 alnum"
+    assert (
+        IBAN[:2].isalpha() and IBAN[2:4] == "00" and "EXMP" in IBAN
+    ), "iban must be 2 letters + 00 check digits + EXMP example marker"
+    assert (
+        re.fullmatch(r"\d{4}-\d{4}-\d{4}", NATIONAL_ID) and NATIONAL_ID[0] == "9"
+    ), "national_id must be \\d{4}-\\d{4}-\\d{4} in the 9000-range"
+    assert (
+        GITHUB_TOKEN.startswith("ghp_")
+        and re.fullmatch(r"[A-Za-z0-9]{36}", GITHUB_TOKEN[4:])
+        and "EXAMPLE" in GITHUB_TOKEN
+    ), "github_token must be ghp_ + 36 example alnum"
+    assert re.fullmatch(
+        r"MRN\d{8}", MRN
+    ), "medical_record_number must be MRN + 8 digits"
+    assert re.fullmatch(
+        r"[A-Za-z]{2}\d{7}", PASSPORT
+    ), "passport must be 2 letters + 7 digits"
+    assert API_KEY.startswith("sk_test_") and re.fullmatch(
+        r"[A-Za-z0-9]{24}", API_KEY[8:]
+    ), "api_key must be sk_test_ + 24 alnum"
 
 
 def validate(cases: list[dict], file_text: str) -> None:
@@ -227,19 +287,24 @@ def validate(cases: list[dict], file_text: str) -> None:
         # Reversibility: the obfuscation must reduce to the contract-canonical
         # value under normalization the hardened detector performs. This also
         # proves the only sensitive token embedded is the known-fake literal.
-        assert any(canon in v for v in views), \
-            f"{c['id']} does not recover canonical {canon!r}"
+        assert any(
+            canon in v for v in views
+        ), f"{c['id']} does not recover canonical {canon!r}"
 
         for view in views:
             # Any separator-bearing SSN shape (raw or decoded) must be 9-range.
             for m in _SEP_SSN.finditer(view):
                 digits = re.sub(r"\D", "", m.group())
-                assert digits.startswith("9"), f"non-900 SSN shape in {c['id']}: {m.group()!r}"
+                assert digits.startswith(
+                    "9"
+                ), f"non-900 SSN shape in {c['id']}: {m.group()!r}"
             # Any phone must be reserved 555-01xx; any email @example.com.
             for m in re.finditer(r"555[-.\s]?(\d\d)", view):
                 assert m.group(1) == "01", f"non-reserved phone in {c['id']}"
             for m in re.finditer(r"@([A-Za-z0-9.-]+)", view):
-                assert m.group(1).lower().startswith("example.com"), f"non-example email in {c['id']}"
+                assert (
+                    m.group(1).lower().startswith("example.com")
+                ), f"non-example email in {c['id']}"
 
 
 def main() -> None:

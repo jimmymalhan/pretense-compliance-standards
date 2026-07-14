@@ -35,10 +35,10 @@ from .generator import DIAGNOSES, INSECURE_CONFIG
 # Deterministic-hashing denylist: sha256 of known-sensitive literal tokens.
 # ---------------------------------------------------------------------------
 _DENYLIST_LITERALS = {
-    INSECURE_CONFIG["jwt_signing_secret"],          # "hardcoded-not-rotated-secret"
+    INSECURE_CONFIG["jwt_signing_secret"],  # "hardcoded-not-rotated-secret"
     INSECURE_CONFIG["aws_secret_access_key"],
-    "P@ssw0rd123",                                   # db password from db_connection
-    "hunter2",                                       # password leaked into logs
+    "P@ssw0rd123",  # db password from db_connection
+    "hunter2",  # password leaked into logs
 }
 _DENYLIST_HASHES = {hashlib.sha256(s.encode()).hexdigest() for s in _DENYLIST_LITERALS}
 
@@ -118,10 +118,20 @@ _GCP_KEY = re.compile(r"AIza[A-Za-z0-9_\-]{35}")
 
 # Non-ASCII homoglyph digits, in case NFKC leaves any. Intentionally does NOT
 # remap ASCII letters (O/l/I): doing so corrupts ordinary text like "example".
-_HOMOGLYPHS = str.maketrans({
-    "①": "1", "②": "2", "③": "3", "④": "4", "⑤": "5",   # circled digits
-    "０": "0", "１": "1", "２": "2", "３": "3", "９": "9",   # fullwidth
-})
+_HOMOGLYPHS = str.maketrans(
+    {
+        "①": "1",
+        "②": "2",
+        "③": "3",
+        "④": "4",
+        "⑤": "5",  # circled digits
+        "０": "0",
+        "１": "1",
+        "２": "2",
+        "３": "3",
+        "９": "9",  # fullwidth
+    }
+)
 
 # Zero-width / invisible separators used to break up canonical values.
 _ZERO_WIDTH = re.compile(r"[​‌‍⁠﻿]")

@@ -32,7 +32,12 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
     from pretense_compliance_standards import BANNER
     from pretense_compliance_standards.corpus_builder import _write_json
-    from pretense_compliance_standards.generator import _digits, _fake_email, _fake_phone, _fake_ssn
+    from pretense_compliance_standards.generator import (
+        _digits,
+        _fake_email,
+        _fake_phone,
+        _fake_ssn,
+    )
 else:
     from .. import BANNER
     from ..corpus_builder import _write_json
@@ -47,6 +52,7 @@ _OUT_PATH = pathlib.Path(__file__).resolve().parents[1] / SOURCE_FILE
 
 
 # --- invented, provably-synthetic controlled-program / technical identifiers ---
+
 
 def _contract_number() -> str:
     # e.g. CTR-2029-004417 — invented contract series, not a real award number.
@@ -70,6 +76,7 @@ def _fake_jwt() -> str:
     def seg(n: int) -> str:
         raw = "".join(random.choices(string.ascii_letters + string.digits, k=n))
         return base64.urlsafe_b64encode(raw.encode()).decode().rstrip("=")
+
     header = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"  # {"alg":"HS256","typ":"JWT"}
     return f"{header}.{seg(18)}.{seg(24)}"
 
@@ -108,9 +115,18 @@ def _hex(s: str) -> str:
 
 def _homoglyph_digits(s: str) -> str:
     """Swap leading ASCII digits for fullwidth homoglyphs (NFKC-recoverable)."""
-    table = {"0": "０", "1": "１", "2": "２", "3": "３",
-             "4": "４", "5": "５", "6": "６", "7": "７",
-             "8": "８", "9": "９"}
+    table = {
+        "0": "０",
+        "1": "１",
+        "2": "２",
+        "3": "３",
+        "4": "４",
+        "5": "５",
+        "6": "６",
+        "7": "７",
+        "8": "８",
+        "9": "９",
+    }
     return "".join(table.get(c, c) for c in s)
 
 
@@ -119,64 +135,134 @@ def build_cases() -> list[dict]:
     C: list[dict] = []
 
     def add(cid, difficulty, kind, obfuscation, text):
-        C.append({
-            "id": cid, "difficulty": difficulty, "kind": kind,
-            "obfuscation": obfuscation, "source_file": SOURCE_FILE,
-            "text": text, "expected": True,
-        })
+        C.append(
+            {
+                "id": cid,
+                "difficulty": difficulty,
+                "kind": kind,
+                "obfuscation": obfuscation,
+                "source_file": SOURCE_FILE,
+                "text": text,
+                "expected": True,
+            }
+        )
 
     # tier 0 — plain, canonical, inline in prose
-    add("r3-contract-plain", 0, "contract_number", "inline",
-        f"Award reference {CONTRACT} is on file for the build lot.")
-    add("r3-part-plain", 0, "part_number", "inline",
-        f"Ship the assembly for part {PART} to the depot.")
-    add("r3-program-plain", 0, "internal_program_code", "inline",
-        f"Milestone review scheduled under {PROGRAM} next quarter.")
-    add("r3-jwt-plain", 0, "jwt", "inline",
-        f"Service bearer token {JWT} rotates nightly.")
-    add("r3-dburl-plain", 0, "db_url", "inline",
-        f"Primary datastore {DB_URL} handles order writes.")
-    add("r3-gcpkey-plain", 0, "gcp_key", "inline",
-        f"Maps client configured with key {GCP_KEY}.")
-    add("r3-ssn-plain", 0, "ssn", "inline",
-        f"Vendor contact SSN on record: {SSN}.")
+    add(
+        "r3-contract-plain",
+        0,
+        "contract_number",
+        "inline",
+        f"Award reference {CONTRACT} is on file for the build lot.",
+    )
+    add(
+        "r3-part-plain",
+        0,
+        "part_number",
+        "inline",
+        f"Ship the assembly for part {PART} to the depot.",
+    )
+    add(
+        "r3-program-plain",
+        0,
+        "internal_program_code",
+        "inline",
+        f"Milestone review scheduled under {PROGRAM} next quarter.",
+    )
+    add(
+        "r3-jwt-plain",
+        0,
+        "jwt",
+        "inline",
+        f"Service bearer token {JWT} rotates nightly.",
+    )
+    add(
+        "r3-dburl-plain",
+        0,
+        "db_url",
+        "inline",
+        f"Primary datastore {DB_URL} handles order writes.",
+    )
+    add(
+        "r3-gcpkey-plain",
+        0,
+        "gcp_key",
+        "inline",
+        f"Maps client configured with key {GCP_KEY}.",
+    )
+    add("r3-ssn-plain", 0, "ssn", "inline", f"Vendor contact SSN on record: {SSN}.")
 
     # tier 1 — labeled config / CSV fields
-    add("r3-contract-field", 1, "contract_number", "config-field",
-        f"contract_no = {CONTRACT}")
-    add("r3-part-csv", 1, "part_number", "csv-cell",
-        f"line_item,{PART},qty=12,active")
-    add("r3-gcpkey-field", 1, "gcp_key", "config-field",
-        f"GOOGLE_MAPS_KEY: {GCP_KEY}")
-    add("r3-dburl-field", 1, "db_url", "env-field",
-        f"DATABASE_URL={DB_URL}")
-    add("r3-phone-field", 1, "phone", "labeled",
-        f"program_poc_phone: {PHONE}")
-    add("r3-email-field", 1, "email", "labeled",
-        f"poc_email = {EMAIL}")
+    add(
+        "r3-contract-field",
+        1,
+        "contract_number",
+        "config-field",
+        f"contract_no = {CONTRACT}",
+    )
+    add("r3-part-csv", 1, "part_number", "csv-cell", f"line_item,{PART},qty=12,active")
+    add("r3-gcpkey-field", 1, "gcp_key", "config-field", f"GOOGLE_MAPS_KEY: {GCP_KEY}")
+    add("r3-dburl-field", 1, "db_url", "env-field", f"DATABASE_URL={DB_URL}")
+    add("r3-phone-field", 1, "phone", "labeled", f"program_poc_phone: {PHONE}")
+    add("r3-email-field", 1, "email", "labeled", f"poc_email = {EMAIL}")
 
     # tier 2 — structural: split across quotes / lines, spaced / grouped
-    add("r3-contract-split", 2, "contract_number", "split-literals",
-        f'contract = "{CONTRACT[:7]}" "{CONTRACT[7:]}"')
-    add("r3-program-spaced", 2, "internal_program_code", "spaced",
-        "code = " + " ".join(PROGRAM))
-    add("r3-gcpkey-concat", 2, "gcp_key", "concatenated",
-        f'key = "{GCP_KEY[:20]}" + "{GCP_KEY[20:]}"')
+    add(
+        "r3-contract-split",
+        2,
+        "contract_number",
+        "split-literals",
+        f'contract = "{CONTRACT[:7]}" "{CONTRACT[7:]}"',
+    )
+    add(
+        "r3-program-spaced",
+        2,
+        "internal_program_code",
+        "spaced",
+        "code = " + " ".join(PROGRAM),
+    )
+    add(
+        "r3-gcpkey-concat",
+        2,
+        "gcp_key",
+        "concatenated",
+        f'key = "{GCP_KEY[:20]}" + "{GCP_KEY[20:]}"',
+    )
 
     # tier 3 — encoded: base64 / hex / homoglyph
     add("r3-jwt-b64", 3, "jwt", "base64", f"payload={_b64('token=' + JWT)}")
     add("r3-contract-b64", 3, "contract_number", "base64", f"blob={_b64(CONTRACT)}")
     add("r3-gcpkey-hex", 3, "gcp_key", "hex", f"blob={_hex(GCP_KEY)}")
-    add("r3-contract-homoglyph", 3, "contract_number", "unicode-homoglyph",
-        f"ref={_homoglyph_digits(CONTRACT)}")
+    add(
+        "r3-contract-homoglyph",
+        3,
+        "contract_number",
+        "unicode-homoglyph",
+        f"ref={_homoglyph_digits(CONTRACT)}",
+    )
 
     # tier 4 — exotic: zero-width separators, layered encoding
-    add("r3-part-zw", 4, "part_number", "zero-width",
-        f"pn{ZW}{PART[3:5]}{ZW}{PART[5:]}ref")
-    add("r3-dburl-b64wrapped", 4, "db_url", "base64-wrapped",
-        f"conn={_b64('url=' + DB_URL)}")
-    add("r3-gcpkey-hexwrapped", 4, "gcp_key", "hex-wrapped",
-        f"raw={_hex('AIza-prefix::' + GCP_KEY)}")
+    add(
+        "r3-part-zw",
+        4,
+        "part_number",
+        "zero-width",
+        f"pn{ZW}{PART[3:5]}{ZW}{PART[5:]}ref",
+    )
+    add(
+        "r3-dburl-b64wrapped",
+        4,
+        "db_url",
+        "base64-wrapped",
+        f"conn={_b64('url=' + DB_URL)}",
+    )
+    add(
+        "r3-gcpkey-hexwrapped",
+        4,
+        "gcp_key",
+        "hex-wrapped",
+        f"raw={_hex('AIza-prefix::' + GCP_KEY)}",
+    )
 
     return C
 
@@ -234,10 +320,14 @@ def main() -> None:
     tiers = sorted({c["difficulty"] for c in cases})
     kinds = sorted({c["kind"] for c in cases})
     print(f"[{BANNER}]")
-    print(f"Wrote {len(cases)} blended set-03 cases across tiers {tiers} to {_OUT_PATH}")
+    print(
+        f"Wrote {len(cases)} blended set-03 cases across tiers {tiers} to {_OUT_PATH}"
+    )
     print(f"Kinds: {', '.join(kinds)}")
-    print("Self-validation OK: banner present; SSNs 900-range; phones 555-01xx; "
-          "emails @example.com; no framework tokens.")
+    print(
+        "Self-validation OK: banner present; SSNs 900-range; phones 555-01xx; "
+        "emails @example.com; no framework tokens."
+    )
 
 
 if __name__ == "__main__":

@@ -70,8 +70,11 @@ def _recall(b: dict) -> float:
 
 def format_report(cases: list[dict], result: dict) -> str:
     tiers = sorted({c["difficulty"] for c in cases})
-    lines = ["DLP recall benchmark — recall by difficulty tier",
-             "(all data SYNTHETIC; every case is expected-to-be-flagged)", ""]
+    lines = [
+        "DLP recall benchmark — recall by difficulty tier",
+        "(all data SYNTHETIC; every case is expected-to-be-flagged)",
+        "",
+    ]
     header = f"{'tier':<6}{'n':>4}   " + "".join(f"{m:>12}" for m in MODES)
     lines.append(header)
     lines.append("-" * len(header))
@@ -89,21 +92,29 @@ def format_report(cases: list[dict], result: dict) -> str:
 def format_framework_report(fw_result: dict) -> str:
     """Per-compliance-framework recall, alongside the per-tier table."""
     empty = {"hit": 0, "total": 0}
-    lines = ["recall by compliance framework",
-             "(each case counted under every framework its kind exercises)", ""]
+    lines = [
+        "recall by compliance framework",
+        "(each case counted under every framework its kind exercises)",
+        "",
+    ]
     header = f"{'framework':<11}{'n':>4}   " + "".join(f"{m:>12}" for m in MODES)
     lines.append(header)
     lines.append("-" * len(header))
     for fw in FRAMEWORKS:
         n = fw_result[MODES[0]].get(fw, empty)["total"]
-        cells = "".join(f"{_recall(fw_result[m].get(fw, empty)):>11.0%} " for m in MODES)
+        cells = "".join(
+            f"{_recall(fw_result[m].get(fw, empty)):>11.0%} " for m in MODES
+        )
         lines.append(f"{fw:<11}{n:>4}   {cells}")
     return "\n".join(lines)
 
 
 def missed(cases: list[dict], mode: str) -> list[str]:
-    return [f"{c['id']} ({c['obfuscation']})"
-            for c in cases if c["kind"] not in detect(c["text"], mode)]
+    return [
+        f"{c['id']} ({c['obfuscation']})"
+        for c in cases
+        if c["kind"] not in detect(c["text"], mode)
+    ]
 
 
 def check_corpus_files(cases: list[dict]) -> list[str]:
@@ -139,8 +150,10 @@ def main() -> int:
             exit_code = 1
     missing_files = check_corpus_files(cases)
     if missing_files:
-        print(f"\nMISSING corpus files: {missing_files} — run corpus_builder first",
-              file=sys.stderr)
+        print(
+            f"\nMISSING corpus files: {missing_files} — run corpus_builder first",
+            file=sys.stderr,
+        )
         exit_code = 1
     return exit_code
 

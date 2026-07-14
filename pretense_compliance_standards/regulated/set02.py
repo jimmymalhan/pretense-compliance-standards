@@ -35,7 +35,9 @@ import sys
 
 # Allow `python3 pretense_compliance_standards/regulated/set02.py` (script dir, not repo root,
 # is sys.path[0]) to import the package by adding the repo root to the path.
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_REPO_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
@@ -117,11 +119,17 @@ def build_cases() -> list[dict]:
     C: list[dict] = []
 
     def add(cid, difficulty, kind, obfuscation, text):
-        C.append({
-            "id": cid, "difficulty": difficulty, "kind": kind,
-            "obfuscation": obfuscation, "source_file": SOURCE_FILE,
-            "text": text, "expected": True,
-        })
+        C.append(
+            {
+                "id": cid,
+                "difficulty": difficulty,
+                "kind": kind,
+                "obfuscation": obfuscation,
+                "source_file": SOURCE_FILE,
+                "text": text,
+                "expected": True,
+            }
+        )
 
     # Pre-generate literals we reuse across tiers/encodings.
     iban_gb = _fake_iban("GB")
@@ -139,53 +147,113 @@ def build_cases() -> list[dict]:
     log_pw = _fake_secret(10)
 
     # --- tier 0: plain / inline (blended kinds) ---
-    add("r2-iban-inline", 0, "iban", "inline",
-        f"Settlement account {iban_gb} confirmed for the counterparty.")
-    add("r2-email-inline", 0, "email", "inline",
-        f"Statements are delivered to {email_a} each month.")
-    add("r2-log-inline", 0, "access_log", "inline",
+    add(
+        "r2-iban-inline",
+        0,
+        "iban",
+        "inline",
+        f"Settlement account {iban_gb} confirmed for the counterparty.",
+    )
+    add(
+        "r2-email-inline",
+        0,
+        "email",
+        "inline",
+        f"Statements are delivered to {email_a} each month.",
+    )
+    add(
+        "r2-log-inline",
+        0,
+        "access_log",
+        "inline",
         f"2026-07-11T09:02:17Z INFO auth user={email_b.split('@')[0]} "
-        f"password={log_pw} result=ok")
-    add("r2-vat-inline", 0, "vat", "inline",
-        f"Supplier registration on file: {vat_de}.")
-    add("r2-dburl-inline", 0, "db_url", "inline",
-        f"Connection string {db_url} in the deploy note.")
+        f"password={log_pw} result=ok",
+    )
+    add(
+        "r2-vat-inline", 0, "vat", "inline", f"Supplier registration on file: {vat_de}."
+    )
+    add(
+        "r2-dburl-inline",
+        0,
+        "db_url",
+        "inline",
+        f"Connection string {db_url} in the deploy note.",
+    )
 
     # --- tier 1: labeled fields ---
     add("r2-iban-labeled", 1, "iban", "labeled-field", f"iban: {iban_de}")
-    add("r2-nid-labeled", 1, "national_id", "labeled-field",
-        f"national_id = {nid}")
-    add("r2-passport-labeled", 1, "passport", "labeled-field",
-        f"passport_no: {passport}")
-    add("r2-phone-eu-labeled", 1, "phone", "labeled-field",
-        f"contact_phone: {eu_phone}")
+    add("r2-nid-labeled", 1, "national_id", "labeled-field", f"national_id = {nid}")
+    add(
+        "r2-passport-labeled",
+        1,
+        "passport",
+        "labeled-field",
+        f"passport_no: {passport}",
+    )
+    add(
+        "r2-phone-eu-labeled", 1, "phone", "labeled-field", f"contact_phone: {eu_phone}"
+    )
     add("r2-vat-labeled", 1, "vat", "labeled-field", f"VAT: {vat_fr}")
 
     # --- tier 2: structural (split across quotes / spaced / grouped) ---
     grp = iban_fr.replace(" ", "")
-    add("r2-iban-split", 2, "iban", "split-literals",
-        f'iban = "{grp[:8]}" "{grp[8:]}"')
-    add("r2-email-split", 2, "email", "split-literals",
-        f'"{email_a.split("@")[0]}" "@example.com"')
-    add("r2-phone-us-spaced", 2, "phone", "spaced",
-        f"phone = {us_phone[:5]} {us_phone[6:]}")
-    add("r2-log-split", 2, "access_log", "split-literals",
-        f'entry = "user=svc " "password={log_pw}"')
+    add("r2-iban-split", 2, "iban", "split-literals", f'iban = "{grp[:8]}" "{grp[8:]}"')
+    add(
+        "r2-email-split",
+        2,
+        "email",
+        "split-literals",
+        f'"{email_a.split("@")[0]}" "@example.com"',
+    )
+    add(
+        "r2-phone-us-spaced",
+        2,
+        "phone",
+        "spaced",
+        f"phone = {us_phone[:5]} {us_phone[6:]}",
+    )
+    add(
+        "r2-log-split",
+        2,
+        "access_log",
+        "split-literals",
+        f'entry = "user=svc " "password={log_pw}"',
+    )
 
     # --- tier 3: encoded (base64 / hex) ---
     add("r2-iban-b64", 3, "iban", "base64", f"blob={_b64(iban_gb)}")
     add("r2-email-b64", 3, "email", "base64", f"blob={_b64(email_b)}")
     add("r2-dburl-b64", 3, "db_url", "base64", f"payload={_b64(db_url)}")
-    add("r2-pw-hex", 3, "access_log", "hex",
-        f"pw_blob={('password=' + log_pw).encode().hex()}")
+    add(
+        "r2-pw-hex",
+        3,
+        "access_log",
+        "hex",
+        f"pw_blob={('password=' + log_pw).encode().hex()}",
+    )
 
     # --- tier 4: exotic (zero-width separators / layered encoding) ---
-    add("r2-iban-zw", 4, "iban", "zero-width",
-        f"acct {ZW.join(grp[i:i+4] for i in range(0, len(grp), 4))} ref")
-    add("r2-nid-zw", 4, "national_id", "zero-width",
-        f"id9{ZW}{nid[1:].replace('-', ZW)}x")
-    add("r2-dburl-wrapped", 4, "db_url", "base64-wrapped",
-        f"cfg={_b64('dsn=' + db_url)}")
+    add(
+        "r2-iban-zw",
+        4,
+        "iban",
+        "zero-width",
+        f"acct {ZW.join(grp[i:i+4] for i in range(0, len(grp), 4))} ref",
+    )
+    add(
+        "r2-nid-zw",
+        4,
+        "national_id",
+        "zero-width",
+        f"id9{ZW}{nid[1:].replace('-', ZW)}x",
+    )
+    add(
+        "r2-dburl-wrapped",
+        4,
+        "db_url",
+        "base64-wrapped",
+        f"cfg={_b64('dsn=' + db_url)}",
+    )
 
     return C
 
@@ -193,6 +261,7 @@ def build_cases() -> list[dict]:
 # ---------------------------------------------------------------------------
 # Self-validation: every guardrail is enforced before the file is trusted.
 # ---------------------------------------------------------------------------
+
 
 def _validate(cases: list[dict], written_text: str) -> None:
     # 1. Banner present in the written corpus file (JSON escapes non-ASCII, so
@@ -226,7 +295,10 @@ def _validate(cases: list[dict], written_text: str) -> None:
             mo = re.search(r"[A-Z]{2}(\d\d)", text)
             if not mo or mo.group(1) != "00":
                 raise AssertionError(f"IBAN check digits not 00: {c['id']}")
-        if c["kind"] == "national_id" and c["obfuscation"] in ("inline", "labeled-field"):
+        if c["kind"] == "national_id" and c["obfuscation"] in (
+            "inline",
+            "labeled-field",
+        ):
             # Canonical form is 4-4-4 grouped digits (never SSN-shaped).
             if not re.search(r"\d{4}-\d{4}-\d{4}", text):
                 raise AssertionError(f"national_id not 4-4-4: {c['id']}")

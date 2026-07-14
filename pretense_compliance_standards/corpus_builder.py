@@ -57,14 +57,14 @@ def _luhn_complete(body15: str) -> str:
 
 
 # --- fixed synthetic literals (all provably fake) ---
-SSN = "900-55-1234"                       # 900-range: never issued
-PAN = _luhn_complete("448523601785829")   # Luhn-valid, random -> not a real account
-EMAIL = "ava.carter7@example.com"         # RFC 2606 reserved domain
-PHONE = "(415) 555-0142"                  # 555-01xx: reserved for fiction
+SSN = "900-55-1234"  # 900-range: never issued
+PAN = _luhn_complete("448523601785829")  # Luhn-valid, random -> not a real account
+EMAIL = "ava.carter7@example.com"  # RFC 2606 reserved domain
+PHONE = "(415) 555-0142"  # 555-01xx: reserved for fiction
 API_KEY = "sk_test_ABCdef0123456789ABCdef01"
-AWS_KEY = "AKIAIOSFODNN7EXAMPLE"          # AWS's own documentation example key
+AWS_KEY = "AKIAIOSFODNN7EXAMPLE"  # AWS's own documentation example key
 JWT = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmYWtlIn0.c2lnbmF0dXJlX2Zha2U"  # fake
-SECRET = "hardcoded-not-rotated-secret"   # on the detector denylist
+SECRET = "hardcoded-not-rotated-secret"  # on the detector denylist
 
 
 def _b64(s: str) -> str:
@@ -80,11 +80,17 @@ def build_cases() -> list[dict]:
     C: list[dict] = []
 
     def add(cid, difficulty, kind, obfuscation, source_file, text):
-        C.append({
-            "id": cid, "difficulty": difficulty, "kind": kind,
-            "obfuscation": obfuscation, "source_file": source_file,
-            "text": text, "expected": True,
-        })
+        C.append(
+            {
+                "id": cid,
+                "difficulty": difficulty,
+                "kind": kind,
+                "obfuscation": obfuscation,
+                "source_file": source_file,
+                "text": text,
+                "expected": True,
+            }
+        )
 
     f0 = "corpus/tier0_plain.json"
     add("t0-ssn", 0, "ssn", "inline", f0, f"Member SSN on file: {SSN}.")
@@ -106,12 +112,32 @@ def build_cases() -> list[dict]:
     add("t1-secret-field", 1, "secret", "config-field", f1, f"signing = {SECRET}")
 
     f2 = "corpus/tier2_split.log"
-    add("t2-pan-spaced", 2, "pan", "space-grouped", f2, f"Card: {_groups(PAN, ' ')} exp 12/29")
+    add(
+        "t2-pan-spaced",
+        2,
+        "pan",
+        "space-grouped",
+        f2,
+        f"Card: {_groups(PAN, ' ')} exp 12/29",
+    )
     add("t2-pan-dashed", 2, "pan", "dash-grouped", f2, f"PAN={_groups(PAN, '-')}")
     add("t2-ssn-split", 2, "ssn", "split-literals", f2, 'ssn = "900-55" "-1234"')
-    add("t2-secret-concat", 2, "secret", "concatenated", f2,
-        'signing = "hardcoded-not-rotated" + "-secret"')
-    add("t2-email-split", 2, "email", "split-literals", f2, '"ava.carter7" "@example.com"')
+    add(
+        "t2-secret-concat",
+        2,
+        "secret",
+        "concatenated",
+        f2,
+        'signing = "hardcoded-not-rotated" + "-secret"',
+    )
+    add(
+        "t2-email-split",
+        2,
+        "email",
+        "split-literals",
+        f2,
+        '"ava.carter7" "@example.com"',
+    )
 
     f3 = "corpus/tier3_encoded.json"
     add("t3-ssn-b64", 3, "ssn", "base64", f3, f"blob={_b64(SSN)}")
@@ -141,10 +167,13 @@ def build_cases() -> list[dict]:
 
 # --- file writers: realistic containers, every file banner-marked SYNTHETIC ---
 
+
 def _write_json(path, cases):
     payload = {
         "_notice": BANNER,
-        "records": [{"id": c["id"], "kind": c["kind"], "text": c["text"]} for c in cases],
+        "records": [
+            {"id": c["id"], "kind": c["kind"], "text": c["text"]} for c in cases
+        ],
     }
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(payload, fh, indent=2)

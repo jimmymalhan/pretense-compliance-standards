@@ -94,7 +94,7 @@ def _hex(s: str) -> str:
 
 def _space_digits(s: str) -> str:
     """Regroup a run of digits into space-separated pairs (structural noise)."""
-    return " ".join(s[i:i + 2] for i in range(0, len(s), 2))
+    return " ".join(s[i : i + 2] for i in range(0, len(s), 2))
 
 
 def build_cases() -> list[dict]:
@@ -102,15 +102,17 @@ def build_cases() -> list[dict]:
     C: list[dict] = []
 
     def add(cid, difficulty, kind, obfuscation, text):
-        C.append({
-            "id": cid,
-            "difficulty": difficulty,
-            "kind": kind,
-            "obfuscation": obfuscation,
-            "source_file": SOURCE_FILE,
-            "text": text,
-            "expected": True,
-        })
+        C.append(
+            {
+                "id": cid,
+                "difficulty": difficulty,
+                "kind": kind,
+                "obfuscation": obfuscation,
+                "source_file": SOURCE_FILE,
+                "text": text,
+                "expected": True,
+            }
+        )
 
     # Pre-draw fixed literals so encoded/split tiers reference stable values.
     mrn_a, mrn_b, mrn_c = _mrn(), _mrn(), _mrn()
@@ -125,58 +127,118 @@ def build_cases() -> list[dict]:
     email_a = _fake_email(name_b.split()[0], name_b.split()[1])
 
     # --- tier 0: plain, inline (blended order, not grouped by category) ---
-    add("r1-mrn-inline", 0, "medical_record_number", "inline",
-        f"Patient chart pulled under {mrn_a} ahead of the follow-up visit.")
-    add("r1-ghp-inline", 0, "github_token", "inline",
-        f"CI pipeline authenticates with token {ghp_a} before the build step.")
-    add("r1-icd-inline", 0, "icd10", "inline",
-        f"Encounter closed with primary code {icd_a} on the problem list.")
+    add(
+        "r1-mrn-inline",
+        0,
+        "medical_record_number",
+        "inline",
+        f"Patient chart pulled under {mrn_a} ahead of the follow-up visit.",
+    )
+    add(
+        "r1-ghp-inline",
+        0,
+        "github_token",
+        "inline",
+        f"CI pipeline authenticates with token {ghp_a} before the build step.",
+    )
+    add(
+        "r1-icd-inline",
+        0,
+        "icd10",
+        "inline",
+        f"Encounter closed with primary code {icd_a} on the problem list.",
+    )
     # health_record free-text carries a detectable anchor (its paired ICD code)
     # because a bare diagnosis phrase is not machine-detectable on its own.
-    add("r1-health-inline", 0, "health_record", "inline",
-        f"{name_a} was seen today and diagnosed with {dx_a} [{icd_a}].")
+    add(
+        "r1-health-inline",
+        0,
+        "health_record",
+        "inline",
+        f"{name_a} was seen today and diagnosed with {dx_a} [{icd_a}].",
+    )
 
     # --- tier 1: labeled / canonical field variants ---
-    add("r1-member-field", 1, "insurance_member_id", "config-field",
-        f"member_id: {mem_a}")
-    add("r1-apikey-field", 1, "api_key", "config-field",
-        f"billing.stripe_key = {key_a}")
-    add("r1-mrn-label", 1, "medical_record_number", "labeled",
-        f"MRN: {mrn_b}")
-    add("r1-ghp-field", 1, "github_token", "config-field",
-        f"github_access_token = {ghp_b}")
-    add("r1-icd-label", 1, "icd10", "labeled",
-        f"diagnosis_code = {icd_b}")
+    add(
+        "r1-member-field",
+        1,
+        "insurance_member_id",
+        "config-field",
+        f"member_id: {mem_a}",
+    )
+    add(
+        "r1-apikey-field", 1, "api_key", "config-field", f"billing.stripe_key = {key_a}"
+    )
+    add("r1-mrn-label", 1, "medical_record_number", "labeled", f"MRN: {mrn_b}")
+    add(
+        "r1-ghp-field",
+        1,
+        "github_token",
+        "config-field",
+        f"github_access_token = {ghp_b}",
+    )
+    add("r1-icd-label", 1, "icd10", "labeled", f"diagnosis_code = {icd_b}")
 
     # --- tier 2: structural (split across quotes/lines, grouped digits) ---
-    add("r1-mrn-spaced", 2, "medical_record_number", "space-grouped",
-        f"chart no. MRN {_space_digits(mrn_c[3:])}")
-    add("r1-member-split", 2, "insurance_member_id", "split-literals",
-        f'member = "{mem_b[:3]}" "{mem_b[3:]}"')
-    add("r1-ghp-concat", 2, "github_token", "concatenated",
-        f'token = "ghp_" + "{ghp_c[4:]}"')
-    add("r1-apikey-split", 2, "api_key", "split-literals",
-        f'key = "sk_test_" "{key_b[len("sk_test_"):]}"')
+    add(
+        "r1-mrn-spaced",
+        2,
+        "medical_record_number",
+        "space-grouped",
+        f"chart no. MRN {_space_digits(mrn_c[3:])}",
+    )
+    add(
+        "r1-member-split",
+        2,
+        "insurance_member_id",
+        "split-literals",
+        f'member = "{mem_b[:3]}" "{mem_b[3:]}"',
+    )
+    add(
+        "r1-ghp-concat",
+        2,
+        "github_token",
+        "concatenated",
+        f'token = "ghp_" + "{ghp_c[4:]}"',
+    )
+    add(
+        "r1-apikey-split",
+        2,
+        "api_key",
+        "split-literals",
+        f'key = "sk_test_" "{key_b[len("sk_test_"):]}"',
+    )
 
     # --- tier 3: encoded (base64 / hex / homoglyph) ---
-    add("r1-mrn-b64", 3, "medical_record_number", "base64",
-        f"blob={_b64(mrn_a)}")
-    add("r1-member-hex", 3, "insurance_member_id", "hex",
-        f"blob={_hex(mem_a)}")
-    add("r1-ghp-b64", 3, "github_token", "base64",
-        f"payload={_b64(ghp_a)}")
-    add("r1-icd-homoglyph", 3, "icd10", "unicode-homoglyph",
-        f"code={icd_c[0]}１" + icd_c[2:])  # fullwidth digit substitution
+    add("r1-mrn-b64", 3, "medical_record_number", "base64", f"blob={_b64(mrn_a)}")
+    add("r1-member-hex", 3, "insurance_member_id", "hex", f"blob={_hex(mem_a)}")
+    add("r1-ghp-b64", 3, "github_token", "base64", f"payload={_b64(ghp_a)}")
+    add(
+        "r1-icd-homoglyph",
+        3,
+        "icd10",
+        "unicode-homoglyph",
+        f"code={icd_c[0]}１" + icd_c[2:],
+    )  # fullwidth digit substitution
 
     # --- tier 4: exotic (zero-width separators, embedded contact record) ---
-    add("r1-ghp-zw", 4, "github_token", "zero-width",
-        f"gh{ZW}p_{ZW.join(ghp_a[4:])}")
-    add("r1-mrn-zw", 4, "medical_record_number", "zero-width",
-        f"ref M{ZW}R{ZW}N{ZW}{_space_digits(mrn_b[3:]).replace(' ', ZW)}end")
+    add("r1-ghp-zw", 4, "github_token", "zero-width", f"gh{ZW}p_{ZW.join(ghp_a[4:])}")
+    add(
+        "r1-mrn-zw",
+        4,
+        "medical_record_number",
+        "zero-width",
+        f"ref M{ZW}R{ZW}N{ZW}{_space_digits(mrn_b[3:]).replace(' ', ZW)}end",
+    )
     # embedded record keeps an ICD anchor alongside the free-text diagnosis so
     # the detector still fires through the exotic zero-noise framing.
-    add("r1-health-embedded", 4, "health_record", "embedded",
-        f"note::{name_b}|dx={dx_b} {icd_b}|call {phone_a}|{email_a}::eof")
+    add(
+        "r1-health-embedded",
+        4,
+        "health_record",
+        "embedded",
+        f"note::{name_b}|dx={dx_b} {icd_b}|call {phone_a}|{email_a}::eof",
+    )
 
     return C
 
@@ -218,8 +280,10 @@ def main() -> None:
     print(f"Wrote {len(cases)} blended cases -> {OUT_PATH}")
     print(f"  tiers: {tiers}")
     print(f"  kinds: {kinds}")
-    print("  self-validation: PASS (banner present; SSN/phone/email fake; "
-          "no framework tokens)")
+    print(
+        "  self-validation: PASS (banner present; SSN/phone/email fake; "
+        "no framework tokens)"
+    )
 
 
 if __name__ == "__main__":
