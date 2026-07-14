@@ -1,0 +1,341 @@
+{
+  "_notice": "SYNTHETIC \u2014 FAKE COMPLIANCE TEST DATA, NOT REAL \u2014 benign look-alikes; a correct detector flags NONE of these.",
+  "cases": [
+    {
+      "id": "n-ssn-badge",
+      "kind_hint": "ssn",
+      "text": "Employee badge 123-45-6789 printed at reception.",
+      "note": "3-2-4 shape but not in the 900 range -> not an SSN/national id",
+      "expected": false
+    },
+    {
+      "id": "n-ssn-ticket",
+      "kind_hint": "national_id",
+      "text": "Support ticket ref 456-78-9012 archived.",
+      "note": "ordinary 3-2-4 reference, non-900",
+      "expected": false
+    },
+    {
+      "id": "n-nid-grouped",
+      "kind_hint": "national_id",
+      "text": "Asset tag 1042-7745-8035 in the register.",
+      "note": "4-4-4 grouping but leading digit is not 9",
+      "expected": false
+    },
+    {
+      "id": "n-pan-order",
+      "kind_hint": "pan",
+      "text": "Order number 1234 5678 9012 3458 shipped Tuesday.",
+      "note": "16 digits but fails the Luhn check -> not a card number",
+      "expected": false
+    },
+    {
+      "id": "n-pan-serial",
+      "kind_hint": "pan",
+      "text": "Device serial 4000111122223333 registered.",
+      "note": "16-digit serial, non-Luhn",
+      "expected": false
+    },
+    {
+      "id": "n-cvv-room",
+      "kind_hint": "card_cvv",
+      "text": "Guest assigned to room 123 for the night.",
+      "note": "bare 3 digits with no cvv/cvc label",
+      "expected": false
+    },
+    {
+      "id": "n-email-org",
+      "kind_hint": "email",
+      "text": "Please contact jordan@example.org for the report.",
+      "note": "example.org, not the reserved example.com the detector keys on",
+      "expected": false
+    },
+    {
+      "id": "n-email-test",
+      "kind_hint": "email",
+      "text": "Distribution alias team@sample.test on record.",
+      "note": "non-example.com domain",
+      "expected": false
+    },
+    {
+      "id": "n-phone-real",
+      "kind_hint": "phone",
+      "text": "Reception line (212) 867-5309, ask for dispatch.",
+      "note": "not in the 555-01xx fiction range or the UK drama range",
+      "expected": false
+    },
+    {
+      "id": "n-phone-555x",
+      "kind_hint": "phone",
+      "text": "Old demo line 555-0299 has been retired.",
+      "note": "555-02xx, outside the reserved 555-01xx block",
+      "expected": false
+    },
+    {
+      "id": "n-ip-invalid",
+      "kind_hint": "ip_address",
+      "text": "Firmware build v256.300.1.4 rolled out.",
+      "note": "octets exceed 255 -> not a valid IPv4 address",
+      "expected": false
+    },
+    {
+      "id": "n-ip-partial",
+      "kind_hint": "ip_address",
+      "text": "Rack position 10.20.30 on the floor plan.",
+      "note": "only three octets -> not an IPv4 address",
+      "expected": false
+    },
+    {
+      "id": "n-ipv6-time",
+      "kind_hint": "ipv6",
+      "text": "Nightly backup finished at 12:34:56 UTC.",
+      "note": "clock time: 2 colon groups, no :: compression",
+      "expected": false
+    },
+    {
+      "id": "n-ipv6-mac",
+      "kind_hint": "ipv6",
+      "text": "Adapter MAC 00:1b:44:11:3a:b7 seen on the switch.",
+      "note": "MAC address: 6 groups, no :: -> not IPv6",
+      "expected": false
+    },
+    {
+      "id": "n-ipv6-scope",
+      "kind_hint": "ipv6",
+      "text": "Refactored the parser around namespace Foo::bar1 last week.",
+      "note": "C++/log scope resolution X::Y, not an IPv6 :: compression",
+      "expected": false
+    },
+    {
+      "id": "n-ipv6-cpp",
+      "kind_hint": "ipv6",
+      "text": "The logger prints std::deadbeef when the cache key is missing.",
+      "note": "std::<hex-ish word> scope resolution, not IPv6",
+      "expected": false
+    },
+    {
+      "id": "n-routing-aisle",
+      "kind_hint": "routing_number",
+      "text": "Warehouse aisle 011000015 restocked.",
+      "note": "9 digits with no routing/aba label",
+      "expected": false
+    },
+    {
+      "id": "n-acct-locker",
+      "kind_hint": "bank_account",
+      "text": "Locker combination 000123456789 reset.",
+      "note": "12-digit code with no account label",
+      "expected": false
+    },
+    {
+      "id": "n-ein-invoice",
+      "kind_hint": "ein",
+      "text": "Invoice 12-3456789 marked settled today.",
+      "note": "NN-NNNNNNN shape with no EIN/employer-id label",
+      "expected": false
+    },
+    {
+      "id": "n-ein-po",
+      "kind_hint": "ein",
+      "text": "Purchase order 34-7654321 approved by finance.",
+      "note": "NN-NNNNNNN shape, no EIN label (non-9 prefix so it is not a 900-range id)",
+      "expected": false
+    },
+    {
+      "id": "n-ein-vein",
+      "kind_hint": "ein",
+      "text": "Blood was drawn from a vein; sample 12-3456789 went to the lab.",
+      "note": "the word 'vein' ends in 'ein' but is not an EIN label (word-boundary guard)",
+      "expected": false
+    },
+    {
+      "id": "n-npi-batch",
+      "kind_hint": "npi",
+      "text": "Batch 1234567890 completed processing overnight.",
+      "note": "10-digit batch id with no NPI label",
+      "expected": false
+    },
+    {
+      "id": "n-icd-model",
+      "kind_hint": "icd10",
+      "text": "Model B20 and unit I10 are back in stock.",
+      "note": "letter+2-digit codes with no clinical context",
+      "expected": false
+    },
+    {
+      "id": "n-icd-grid",
+      "kind_hint": "icd10",
+      "text": "Grid reference A15 is marked on the map.",
+      "note": "map grid ref, ICD-10 shape but no diagnosis/code context",
+      "expected": false
+    },
+    {
+      "id": "n-icd-areacode",
+      "kind_hint": "icd10",
+      "text": "Front desk wrote down the area code A15 by mistake.",
+      "note": "'area code' is a non-clinical 'code' phrase -> not a diagnosis code",
+      "expected": false
+    },
+    {
+      "id": "n-icd-product",
+      "kind_hint": "icd10",
+      "text": "Warehouse says product code B20 is out of stock.",
+      "note": "'product code' is non-clinical -> not a diagnosis code",
+      "expected": false
+    },
+    {
+      "id": "n-icd-errcode",
+      "kind_hint": "icd10",
+      "text": "The nightly service returned error code E11 twice.",
+      "note": "'error code' is non-clinical -> not a diagnosis code",
+      "expected": false
+    },
+    {
+      "id": "n-icd-confirmation",
+      "kind_hint": "icd10",
+      "text": "Your confirmation code B20 was emailed to you.",
+      "note": "'confirmation code' is transactional; only clinical 'code' phrases count",
+      "expected": false
+    },
+    {
+      "id": "n-icd-tracking",
+      "kind_hint": "icd10",
+      "text": "The tracking code B20 shows the parcel in transit.",
+      "note": "'tracking code' is non-clinical -> not a diagnosis code",
+      "expected": false
+    },
+    {
+      "id": "n-icd-job",
+      "kind_hint": "icd10",
+      "text": "Timesheet lists job code E44 for the shift.",
+      "note": "'job code' is non-clinical -> not a diagnosis code",
+      "expected": false
+    },
+    {
+      "id": "n-health-survey",
+      "kind_hint": "health_record",
+      "text": "Patient satisfaction survey completed this week.",
+      "note": "mentions 'patient' but carries no diagnosis or record marker",
+      "expected": false
+    },
+    {
+      "id": "n-mrn-aisle",
+      "kind_hint": "medical_record_number",
+      "text": "Shelf MRN reference table on aisle 4.",
+      "note": "the letters MRN with no following 8-digit number",
+      "expected": false
+    },
+    {
+      "id": "n-dob-meeting",
+      "kind_hint": "date_of_birth",
+      "text": "The kickoff meeting is set for 2024-03-15.",
+      "note": "ISO date with no DOB/birth-date label",
+      "expected": false
+    },
+    {
+      "id": "n-dl-seat",
+      "kind_hint": "drivers_license",
+      "text": "Seat D1234567 assigned for the conference.",
+      "note": "letter+7-digit seat id with no driver-license label",
+      "expected": false
+    },
+    {
+      "id": "n-passport-sku",
+      "kind_hint": "passport",
+      "text": "North bay inventory restocked, SKU ref ABC-12345.",
+      "note": "3 letters + 5 digits -> neither passport nor insurance-member shape",
+      "expected": false
+    },
+    {
+      "id": "n-vat-batch",
+      "kind_hint": "vat",
+      "text": "Production run sealed and labeled, batch ref DE-12345.",
+      "note": "2 letters + 5 digits, short of the VAT 8-12 digit length",
+      "expected": false
+    },
+    {
+      "id": "n-iban-sort",
+      "kind_hint": "iban",
+      "text": "The memo notes the regional office code GB29.",
+      "note": "IBAN-style prefix but far too short to be an IBAN",
+      "expected": false
+    },
+    {
+      "id": "n-contract-doc",
+      "kind_hint": "contract_number",
+      "text": "Circulated for review this week: draft doc CT-24-99.",
+      "note": "resembles a contract id but the field widths do not match",
+      "expected": false
+    },
+    {
+      "id": "n-part-bin",
+      "kind_hint": "part_number",
+      "text": "Kept the loading dock clear near storage bin PN-99.",
+      "note": "PN- prefix but only two trailing chars",
+      "expected": false
+    },
+    {
+      "id": "n-program-lane",
+      "kind_hint": "internal_program_code",
+      "text": "Ground crew kept clear the loading lane PRG-99.",
+      "note": "PRG- prefix but too short for a program code",
+      "expected": false
+    },
+    {
+      "id": "n-aws-label",
+      "kind_hint": "aws_key",
+      "text": "Left as a stub in the sample config: label AKIB1234.",
+      "note": "AKIB, not the AKIA prefix the detector keys on",
+      "expected": false
+    },
+    {
+      "id": "n-apikey-demo",
+      "kind_hint": "api_key",
+      "text": "Sample token sk_demo_abc123 used in the tutorial.",
+      "note": "sk_demo, not the sk_test_/sk_live_ prefix",
+      "expected": false
+    },
+    {
+      "id": "n-jwt-frag",
+      "kind_hint": "jwt",
+      "text": "Log fragment eyJhbGci truncated by the collector.",
+      "note": "a single base64 segment, not three dot-joined JWT segments",
+      "expected": false
+    },
+    {
+      "id": "n-github-tag",
+      "kind_hint": "github_token",
+      "text": "Cut the gh-release-42 tag on the repo.",
+      "note": "gh- prefix but not a ghp_/ghs_ personal access token",
+      "expected": false
+    },
+    {
+      "id": "n-secret-vault",
+      "kind_hint": "secret",
+      "text": "Vault rotation used passphrase hunter3 this cycle.",
+      "note": "hunter3 is not on the deterministic-hash denylist (hunter2 is)",
+      "expected": false
+    },
+    {
+      "id": "n-slack-chan",
+      "kind_hint": "slack_token",
+      "text": "Posted the notes in channel xox-general.",
+      "note": "xox- without the b/p/o/r/s type char and length of a real token",
+      "expected": false
+    },
+    {
+      "id": "n-gcp-path",
+      "kind_hint": "gcp_key",
+      "text": "Left the AIza-short placeholder in the sample config.",
+      "note": "AIza prefix but far short of the 35-char key body",
+      "expected": false
+    },
+    {
+      "id": "n-openai-note",
+      "kind_hint": "openai_key",
+      "text": "Renamed the sk-notes file in the shared drive.",
+      "note": "sk- followed by a short word, not a 20+ char key body",
+      "expected": false
+    }
+  ]
+}

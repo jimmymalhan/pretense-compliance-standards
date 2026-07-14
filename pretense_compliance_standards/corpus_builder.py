@@ -30,6 +30,7 @@ import pathlib
 
 from . import BANNER
 from .compliance import frameworks_for
+from .negatives import build_negatives
 from .regulated import collect_regulated_cases
 
 CORPUS_DIR = pathlib.Path(__file__).parent / "corpus"
@@ -225,11 +226,33 @@ def write_corpus(cases: list[dict]) -> None:
         json.dump(manifest, fh, indent=2)
 
 
+def write_negatives(cases: list[dict]) -> None:
+    """Write the benign look-alike (negative) corpus alongside the positives.
+
+    Kept in its own `negatives.json` manifest — deliberately NOT merged into
+    `cases.json` — so every recall test keeps seeing only `expected: True`
+    cases, while the harness reads both files to score precision.
+    """
+    CORPUS_DIR.mkdir(parents=True, exist_ok=True)
+    manifest = {
+        "_notice": BANNER
+        + " — benign look-alikes; a correct detector flags NONE of these.",
+        "cases": cases,
+    }
+    with open(CORPUS_DIR / "negatives.json", "w", encoding="utf-8") as fh:
+        json.dump(manifest, fh, indent=2)
+
+
 def main() -> None:
     cases = build_cases()
     write_corpus(cases)
+    negatives = build_negatives()
+    write_negatives(negatives)
     tiers = sorted({c["difficulty"] for c in cases})
     print(f"Wrote {len(cases)} synthetic cases across tiers {tiers} to {CORPUS_DIR}/")
+    print(
+        f"Wrote {len(negatives)} benign look-alike (negative) cases to {CORPUS_DIR}/negatives.json"
+    )
     print(f"Reminder: {BANNER}.")
 
 
