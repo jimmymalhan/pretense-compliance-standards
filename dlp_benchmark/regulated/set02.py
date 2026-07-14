@@ -9,8 +9,8 @@ fake by construction and drawn from a reserved / example range:
     phone (EU)   -> +44 (0)20 7946 0xxx       (Ofcom fictional drama range)
     iban         -> check digits forced to 00 (structurally NOT a real IBAN)
     vat          -> two-letter prefix + random digits (bogus registration)
-    national_id  -> labeled generic id, random digits (never issued)
-    passport     -> 1 letter + 8 digits, random
+    national_id  -> 4-4-4 grouped digits, random (never issued; not SSN-shaped)
+    passport     -> 2 letters + 7 digits, random (e.g. XA0000042)
     db_url       -> user:<random>@db.internal.example.com (example host)
     access-log   -> a plaintext password=<random> token in a fake log line
 
@@ -94,7 +94,11 @@ def _fake_national_id() -> str:
 
 
 def _fake_passport() -> str:
-    return f"{random.choice(string.ascii_uppercase)}{_digits(8)}"
+    # 2 uppercase letters + 7 digits, e.g. XA0000042 (bogus, never issued).
+    return (
+        f"{random.choice(string.ascii_uppercase)}"
+        f"{random.choice(string.ascii_uppercase)}{_digits(7)}"
+    )
 
 
 def _fake_secret(n: int = 20) -> str:
@@ -172,11 +176,12 @@ def build_cases() -> list[dict]:
     add("r2-iban-b64", 3, "iban", "base64", f"blob={_b64(iban_gb)}")
     add("r2-email-b64", 3, "email", "base64", f"blob={_b64(email_b)}")
     add("r2-dburl-b64", 3, "db_url", "base64", f"payload={_b64(db_url)}")
-    add("r2-pw-hex", 3, "access_log", "hex", f"pw_blob={log_pw.encode().hex()}")
+    add("r2-pw-hex", 3, "access_log", "hex",
+        f"pw_blob={('password=' + log_pw).encode().hex()}")
 
     # --- tier 4: exotic (zero-width separators / layered encoding) ---
     add("r2-iban-zw", 4, "iban", "zero-width",
-        f"acct{ZW.join(grp[i:i+4] for i in range(0, len(grp), 4))}ref")
+        f"acct {ZW.join(grp[i:i+4] for i in range(0, len(grp), 4))} ref")
     add("r2-nid-zw", 4, "national_id", "zero-width",
         f"id9{ZW}{nid[1:].replace('-', ZW)}x")
     add("r2-dburl-wrapped", 4, "db_url", "base64-wrapped",
@@ -221,6 +226,18 @@ def _validate(cases: list[dict], written_text: str) -> None:
             mo = re.search(r"[A-Z]{2}(\d\d)", text)
             if not mo or mo.group(1) != "00":
                 raise AssertionError(f"IBAN check digits not 00: {c['id']}")
+        if c["kind"] == "national_id" and c["obfuscation"] in ("inline", "labeled-field"):
+            # Canonical form is 4-4-4 grouped digits (never SSN-shaped).
+            if not re.search(r"\d{4}-\d{4}-\d{4}", text):
+                raise AssertionError(f"national_id not 4-4-4: {c['id']}")
+        if c["kind"] == "passport" and c["obfuscation"] in ("inline", "labeled-field"):
+            # Canonical form is 2 uppercase letters + 7 digits.
+            if not re.search(r"\b[A-Z]{2}\d{7}\b", text):
+                raise AssertionError(f"passport not 2-letter+7-digit: {c['id']}")
+        if c["kind"] == "vat" and c["obfuscation"] in ("inline", "labeled-field"):
+            # Canonical form is 2 uppercase letters + 8-12 digits.
+            if not re.search(r"\b[A-Z]{2}\d{8,12}\b", text):
+                raise AssertionError(f"vat not 2-letter+8-12-digit: {c['id']}")
 
     # 5. At least one US-format phone with 555-01 survives as a fake anchor.
     if not any("555-01" in c["text"] for c in cases if c["kind"] == "phone"):

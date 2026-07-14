@@ -49,8 +49,8 @@ _OUT_PATH = pathlib.Path(__file__).resolve().parents[1] / SOURCE_FILE
 # --- invented, provably-synthetic controlled-program / technical identifiers ---
 
 def _contract_number() -> str:
-    # e.g. CT-2029-004417 — invented contract series, not a real award number.
-    return f"CT-20{random.randint(25, 39)}-{_digits(6)}"
+    # e.g. CTR-2029-004417 — invented contract series, not a real award number.
+    return f"CTR-20{random.randint(25, 39)}-{_digits(6)}"
 
 
 def _part_number() -> str:
@@ -75,9 +75,9 @@ def _fake_jwt() -> str:
 
 
 def _db_url() -> str:
-    # Example host + throwaway credentials -> provably fake connection string.
+    # Reserved example host + throwaway credentials -> provably fake conn string.
     pw = "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
-    return f"mysql://svc_user:fakepw_{pw}@db.example.com:3306/orders"
+    return f"mysql://user:fakepw_{pw}@db.example.com:3306/svc"
 
 
 def _gcp_key() -> str:
@@ -209,9 +209,12 @@ def _validate(payload: dict) -> None:
         if "555" in t and "555-01" not in t:
             raise AssertionError(f"phone not in 555-01xx block: {t!r}")
 
-    # Every email address lives in the reserved example.com domain.
+    # Every email-shaped token lives in the reserved example.com domain (or a
+    # subdomain of it, e.g. the db.example.com host inside a fake db_url). RFC
+    # 2606 reserves example.com and its subdomains, so both are provably fake.
     for m in _EMAIL_SHAPE.findall(blob):
-        if not m.lower().endswith("@example.com"):
+        host = m.lower()
+        if not (host.endswith("@example.com") or host.endswith(".example.com")):
             raise AssertionError(f"email outside example.com: {m}")
 
     # No framework tokens may leak into the corpus (neutral kinds only).

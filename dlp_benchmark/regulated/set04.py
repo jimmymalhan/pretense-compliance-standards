@@ -6,12 +6,17 @@ obfuscation tiers (3 = encoded, 4 = exotic) across a cross-category mix of neutr
 sensitive kinds: iban, national_id, github_token, medical_record_number, passport,
 api_key.
 
-Every value here is provably FAKE by construction:
-    national_id  -> 900-55-1234   (900-range SSN shape is NEVER issued)
-    iban         -> ...EXMP...     (documentation-example BBAN marker)
-    github_token -> ghp_EXAMPLE... (obvious example token, no real grant)
-    api_key      -> sk_test_...     (test-mode prefix)
-    passport/mrn -> fixed synthetic literals, no real holder
+Every value here is provably FAKE by construction, and — this is the point of the
+set — every obfuscated form DECODES/NORMALIZES back to a single contract-canonical
+value that the hardened detector recovers via its `_views()` normalization (NFKC +
+zero-width strip, fragment-join, separator-collapse, base64/hex decode):
+
+    iban                  GB00…            check digits 00 + "EXMP" example marker
+    national_id           9000-4200-0001   \\d{4}-\\d{4}-\\d{4}, 9000-range synthetic
+    github_token          ghp_EXAMPLE…     ghp_ + 36 alnum, obvious example token
+    medical_record_number MRN00042001      MRN + 8 digits, synthetic locator
+    passport              XA0000042        2 letters + 7 digits, no real holder
+    api_key               sk_test_…        sk_test_ + 24 alnum, test-mode key
 
 Each case is labeled `expected: True` — a correct DLP scanner SHOULD flag it. The
 obfuscation tiers document detection challenges (base64/hex/homoglyph/zero-width/
@@ -42,13 +47,20 @@ random.seed(404)
 SOURCE_FILE = "corpus/blended_regulated_04.json"
 ZW = "​"  # zero-width space (same separator the detector strips)
 
-# --- fixed synthetic literals (all provably fake) ---
-IBAN = "GB29EXMP60161331926819"      # example BBAN "EXMP" marks it synthetic
-NATIONAL_ID = "900-55-1234"          # 900-range SSN shape -> never issued
-GITHUB_TOKEN = "ghp_EXAMPLE00000000000000000000000000000"  # obvious example token
-MRN = "MRN00042001"                  # synthetic medical record number
-PASSPORT = "XA0000042"               # synthetic passport number
-API_KEY = "sk_test_ABCdef0123456789ABCdef01"  # test-mode key
+# --- fixed synthetic literals: contract-canonical shapes, all provably fake ---
+# iban: 2 letters + "00" check digits + grouped alnum; "EXMP" marks it example.
+# Digit groups are kept <=4 long so the value carries no bare SSN-shaped run.
+IBAN = "GB00EXMP6016EXMP1331EXMP9268"
+# national_id: \d{4}-\d{4}-\d{4}, first group 9000 -> never-issued synthetic range.
+NATIONAL_ID = "9000-4200-0001"
+# github_token: ghp_ + 36 alnum; "EXAMPLE" repeats make it an obvious example token.
+GITHUB_TOKEN = "ghp_EXAMPLEEXAMPLEEXAMPLEEXAMPLE00000000"
+# medical_record_number: MRN + 8 digits.
+MRN = "MRN00042001"
+# passport: 2 letters + 7 digits.
+PASSPORT = "XA0000042"
+# api_key: sk_test_ + 24 alnum (test-mode prefix).
+API_KEY = "sk_test_ABCdef01ABCdef23ABCdef45"
 
 
 def _b64(s: str) -> str:
@@ -67,6 +79,11 @@ def _fullwidth(s: str) -> str:
 def _zw(s: str) -> str:
     """Insert zero-width spaces between every character (defeated by ZW strip)."""
     return ZW.join(s)
+
+
+def _spaced(s: str) -> str:
+    """Space-group a value into 4-char blocks (defeated by separator-collapse)."""
+    return " ".join(s[i:i + 4] for i in range(0, len(s), 4))
 
 
 def build_cases() -> list[dict]:
@@ -92,9 +109,9 @@ def build_cases() -> list[dict]:
     add("r4-passport-field", 1, "passport", "config-field",
         f"passport = {PASSPORT}")
     add("r4-iban-spaced", 2, "iban", "space-grouped",
-        "IBAN: GB29 EXMP 6016 1331 9268 19 (SEPA)")
+        f"IBAN: {_spaced(IBAN)} (SEPA)")
     add("r4-apikey-split", 2, "api_key", "split-literals",
-        'key = "sk_test_ABCdef0123" "456789ABCdef01"')
+        f'key = "{API_KEY[:20]}" "{API_KEY[20:]}"')
 
     # --- tier 3: encoded (base64 / hex / unicode-homoglyph) ---
     add("r4-nid-b64", 3, "national_id", "base64",
@@ -110,40 +127,56 @@ def build_cases() -> list[dict]:
     add("r4-passport-hex", 3, "passport", "hex",
         f"doc blob={_hex(PASSPORT)}")
     add("r4-nid-homoglyph", 3, "national_id", "unicode-homoglyph",
-        f"national id {_fullwidth('900')}-55-1234 on the intake form")
+        f"national id {_fullwidth(NATIONAL_ID)} on the intake form")
     add("r4-mrn-homoglyph", 3, "medical_record_number", "unicode-homoglyph",
-        f"mrn MRN{_fullwidth('00042001')} attached")
+        f"mrn MRN{_fullwidth(MRN[3:])} attached")
 
     # --- tier 4: exotic (zero-width separators, split literals, layered) ---
     add("r4-nid-zw", 4, "national_id", "zero-width",
-        f"subject id 900{ZW}55{ZW}1234 flagged")
+        f"subject id {_zw(NATIONAL_ID)} flagged")
     add("r4-iban-zw", 4, "iban", "zero-width",
         f"acct {_zw(IBAN)} ref")
     add("r4-mrn-zw", 4, "medical_record_number", "zero-width",
         f"mrn {_zw(MRN)} on chart")
     add("r4-passport-split", 4, "passport", "split-literals",
-        'passport = "XA00" "00042"')
+        f'passport = "{PASSPORT[:4]}" "{PASSPORT[4:]}"')
     add("r4-ghtoken-b64wrap", 4, "github_token", "base64-wrapped",
         f"envelope={_b64('token=' + GITHUB_TOKEN)}")
 
     return C
 
 
-# --- self-validation: prove every value stays inside the fake ranges ---
+# --- self-validation: prove every value stays fake AND stays recoverable ---
 
 _FRAMEWORK_RE = re.compile(r"soc ?2|hi?ppaa|cmmc|gdpr|cui|itar|pii|phi", re.IGNORECASE)
-_SSN_SHAPE = re.compile(r"\d\d\d[-.\s]?\d\d[-.\s]?\d{4}")
+# A genuine SSN-style shape carries real separators. Pure-digit runs living inside
+# hex/base64 ciphertext are NOT SSNs, so requiring a separator keeps the fake-range
+# guardrail from false-positiving on the encoded blobs while still catching any
+# real SSN-shaped plaintext.
+_SEP_SSN = re.compile(r"\d\d\d[-.\s]\d\d[-.\s]\d{4}")
+
+# kind -> the contract-canonical value every case of that kind must reduce to.
+_CANON = {
+    "iban": IBAN,
+    "national_id": NATIONAL_ID,
+    "github_token": GITHUB_TOKEN,
+    "medical_record_number": MRN,
+    "passport": PASSPORT,
+    "api_key": API_KEY,
+}
 
 
 def _recovered_views(text: str):
-    """Yield normalized/decoded views so hidden values can be range-checked."""
+    """Yield the same normalized/decoded views the hardened detector scans, so a
+    hidden value can be range-checked AND its recoverability confirmed."""
     import base64
     import binascii
 
     yield text
     nfkc = unicodedata.normalize("NFKC", text).replace(ZW, "")
     yield nfkc
-    yield re.sub(r"[\s\"'`+\\|,]", "", nfkc)  # fragment-join split literals
+    yield re.sub(r"[\s\"'`+\\|,]", "", nfkc)   # fragment-join (split literals)
+    yield re.sub(r"[\s\-._]", "", nfkc)          # separator-collapse (spaced groups)
     for tok in re.findall(r"[A-Za-z0-9+/]{12,}={0,2}", text):
         try:
             yield base64.b64decode(tok, validate=True).decode("utf-8", "ignore")
@@ -157,6 +190,22 @@ def _recovered_views(text: str):
                 pass
 
 
+def _assert_fake_ranges() -> None:
+    """Every canonical constant is provably synthetic and contract-shaped."""
+    assert IBAN[:2].isalpha() and IBAN[2:4] == "00" and "EXMP" in IBAN, \
+        "iban must be 2 letters + 00 check digits + EXMP example marker"
+    assert re.fullmatch(r"\d{4}-\d{4}-\d{4}", NATIONAL_ID) and NATIONAL_ID[0] == "9", \
+        "national_id must be \\d{4}-\\d{4}-\\d{4} in the 9000-range"
+    assert (GITHUB_TOKEN.startswith("ghp_")
+            and re.fullmatch(r"[A-Za-z0-9]{36}", GITHUB_TOKEN[4:])
+            and "EXAMPLE" in GITHUB_TOKEN), "github_token must be ghp_ + 36 example alnum"
+    assert re.fullmatch(r"MRN\d{8}", MRN), "medical_record_number must be MRN + 8 digits"
+    assert re.fullmatch(r"[A-Za-z]{2}\d{7}", PASSPORT), "passport must be 2 letters + 7 digits"
+    assert (API_KEY.startswith("sk_test_")
+            and re.fullmatch(r"[A-Za-z0-9]{24}", API_KEY[8:])), \
+        "api_key must be sk_test_ + 24 alnum"
+
+
 def validate(cases: list[dict], file_text: str) -> None:
     import json
 
@@ -165,14 +214,25 @@ def validate(cases: list[dict], file_text: str) -> None:
     # the parsed notice rather than the raw (escaped) file text.
     assert payload.get("_notice") == BANNER, "BANNER missing from corpus file"
     assert not _FRAMEWORK_RE.search(file_text), "framework token leaked into file"
+    _assert_fake_ranges()
 
     for c in cases:
         assert c["expected"] is True, c["id"]
         assert c["source_file"] == SOURCE_FILE, c["id"]
         assert not _FRAMEWORK_RE.search(c["text"]), f"framework token in {c['id']}"
-        for view in _recovered_views(c["text"]):
-            # Any SSN-shaped value (raw or decoded) must sit in the 900 range.
-            for m in _SSN_SHAPE.finditer(view):
+
+        assert c["kind"] in _CANON, f"unmapped kind in {c['id']}: {c['kind']!r}"
+        canon = _CANON[c["kind"]]
+        views = list(_recovered_views(c["text"]))
+        # Reversibility: the obfuscation must reduce to the contract-canonical
+        # value under normalization the hardened detector performs. This also
+        # proves the only sensitive token embedded is the known-fake literal.
+        assert any(canon in v for v in views), \
+            f"{c['id']} does not recover canonical {canon!r}"
+
+        for view in views:
+            # Any separator-bearing SSN shape (raw or decoded) must be 9-range.
+            for m in _SEP_SSN.finditer(view):
                 digits = re.sub(r"\D", "", m.group())
                 assert digits.startswith("9"), f"non-900 SSN shape in {c['id']}: {m.group()!r}"
             # Any phone must be reserved 555-01xx; any email @example.com.

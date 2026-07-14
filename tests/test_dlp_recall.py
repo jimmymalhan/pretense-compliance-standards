@@ -13,6 +13,7 @@ Nothing here contains real data — every value is fake by construction.
 
 from __future__ import annotations
 
+import collections
 import json
 import pathlib
 import re
@@ -33,6 +34,14 @@ _FRAMEWORK_RE = re.compile(
 # Any SSN-shaped value must be in the never-issued 900-range (provably fake).
 _SSN_SHAPE_RE = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 _SSN_FAKE_RE = re.compile(r"9\d\d-\d\d-\d{4}")
+# Zero-width / invisible separators used to break up canonical values (matches
+# the set the detector strips: ZWSP, ZWNJ, ZWJ, word-joiner, BOM/ZWNBSP).
+_ZERO_WIDTH_RE = re.compile("[​‌‍⁠﻿]")
+
+# Difficulty tier 4 is the acknowledged "exotic" frontier (zero-width separators,
+# layered/embedded encodings). Tiers 0-3 are the non-exotic recall contract that
+# hardened mode is expected to meet for every kind.
+_EXOTIC_TIER = 4
 
 _CORPUS_DIR = pathlib.Path(corpus_builder.__file__).parent
 # JSON writers escape non-ASCII (the em-dash) as \uXXXX, so the banner may appear
@@ -117,20 +126,90 @@ def test_all_corpus_files_carry_banner(cases):
 
 
 def test_no_framework_tokens_in_any_case(cases):
-    """No case text/kind names a compliance framework (neutral kinds only)."""
+    """No case names a compliance framework in ANY string field (neutral only).
+
+    The stated guarantee covers ``text``/``kind``, but a framework token is just
+    as leaky if it hides in an ``id``, ``obfuscation`` label, or ``source_file``
+    added by a future regulated data module — so every string-valued field is
+    scanned, not only text/kind.
+    """
     for c in cases:
-        for field in ("text", "kind"):
-            match = _FRAMEWORK_RE.search(str(c[field]))
+        for field, value in c.items():
+            if not isinstance(value, str):
+                continue
+            match = _FRAMEWORK_RE.search(value)
             assert match is None, f"{c['id']} {field}: {match.group() if match else ''}"
 
 
 def test_all_ssn_shaped_values_are_fake(cases):
     """Any SSN-shaped value anywhere in the corpus is in the fake 900-range.
 
-    Text is NFKC-folded first so Unicode-homoglyph digit forms are compared as
-    their canonical ASCII digits (e.g. a fullwidth ``９`` folds to ``9``).
+    Two views of each case are scanned so obfuscation cannot hide a real SSN:
+
+      * NFKC-folded (+ zero-width stripped) — so Unicode-homoglyph digit forms
+        are compared as their canonical ASCII digits (e.g. fullwidth ``９``->``9``)
+        and invisible separators inside a value are removed.
+      * Fragment-joined — quotes/whitespace/join punctuation removed (mirroring
+        the detector's hardened normalization) so an SSN split across string
+        literals (e.g. ``"900-55" "-1234"``) is reassembled and still checked.
+
+    Dash/dot separators are preserved in both views so the SSN shape survives.
     """
     for c in cases:
-        folded = unicodedata.normalize("NFKC", c["text"])
-        for hit in _SSN_SHAPE_RE.findall(folded):
-            assert _SSN_FAKE_RE.fullmatch(hit), f"{c['id']}: {hit}"
+        folded = _ZERO_WIDTH_RE.sub("", unicodedata.normalize("NFKC", c["text"]))
+        glued = re.sub(r"[\s\"'`+\\|,]", "", folded)
+        for view in (folded, glued):
+            for hit in _SSN_SHAPE_RE.findall(view):
+                assert _SSN_FAKE_RE.fullmatch(hit), f"{c['id']}: {hit}"
+
+
+def test_every_kind_detected_hardened_on_non_exotic_cases(cases):
+    """Per-kind coverage guard against future kind/detector drift.
+
+    For EVERY distinct ``kind`` in the corpus, hardened mode must detect ALL of
+    that kind's non-exotic cases (difficulty tiers 0-3). Each kind must also own
+    at least one non-exotic case, so a new kind cannot ship as exotic-only (which
+    would leave it effectively untested by this contract).
+
+    Why this exists in addition to ``test_every_case_expected_and_detected_hardened``
+    (which loops per case over all tiers): organizing the check *per kind* turns a
+    silent gap into a named one. If a future change removes/renames a detector,
+    renames a kind, or drops a kind's canonical cases, this fails and reports the
+    exact kind(s) — the per-case loop would just report scattered ids. It is a
+    strict subset of the all-cases contract (non-exotic tiers only), so it can
+    never be redder than that test.
+
+    ISOLATION NOTE: in THIS worktree the detector (Unit 1) and regulated data
+    (Units 2-6) are the un-merged OLD baseline, so kinds whose detectors/data are
+    not yet aligned (e.g. medical_record_number, national_id, icd10) are missed
+    and this test is EXPECTED to be red here. It is written to be correct
+    post-integration and will go green once Units 1-6 merge; it is deliberately
+    NOT weakened to pass in isolation. Tier-4 "exotic" cases are excluded because
+    they are the acknowledged open frontier, not a regression signal.
+    """
+    by_kind: dict[str, list[dict]] = collections.defaultdict(list)
+    for c in cases:
+        by_kind[c["kind"]].append(c)
+    assert by_kind, "expected a non-empty corpus"
+
+    missing_anchor = sorted(
+        kind
+        for kind, kcases in by_kind.items()
+        if all(c["difficulty"] >= _EXOTIC_TIER for c in kcases)
+    )
+    assert not missing_anchor, (
+        f"kinds with no non-exotic (tier<{_EXOTIC_TIER}) case to anchor coverage: "
+        f"{missing_anchor}"
+    )
+
+    missed: dict[str, list[str]] = {}
+    for kind, kcases in by_kind.items():
+        for c in kcases:
+            if c["difficulty"] >= _EXOTIC_TIER:
+                continue
+            if kind not in detect(c["text"], "hardened"):
+                missed.setdefault(kind, []).append(c["id"])
+    assert not missed, (
+        "hardened mode missed non-exotic cases for these kinds "
+        f"(detector/kind drift): { {k: sorted(v) for k, v in sorted(missed.items())} }"
+    )

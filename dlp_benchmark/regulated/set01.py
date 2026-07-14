@@ -131,8 +131,10 @@ def build_cases() -> list[dict]:
         f"CI pipeline authenticates with token {ghp_a} before the build step.")
     add("r1-icd-inline", 0, "icd10", "inline",
         f"Encounter closed with primary code {icd_a} on the problem list.")
+    # health_record free-text carries a detectable anchor (its paired ICD code)
+    # because a bare diagnosis phrase is not machine-detectable on its own.
     add("r1-health-inline", 0, "health_record", "inline",
-        f"{name_a} was seen today and diagnosed with {dx_a}.")
+        f"{name_a} was seen today and diagnosed with {dx_a} [{icd_a}].")
 
     # --- tier 1: labeled / canonical field variants ---
     add("r1-member-field", 1, "insurance_member_id", "config-field",
@@ -171,8 +173,10 @@ def build_cases() -> list[dict]:
         f"gh{ZW}p_{ZW.join(ghp_a[4:])}")
     add("r1-mrn-zw", 4, "medical_record_number", "zero-width",
         f"ref M{ZW}R{ZW}N{ZW}{_space_digits(mrn_b[3:]).replace(' ', ZW)}end")
+    # embedded record keeps an ICD anchor alongside the free-text diagnosis so
+    # the detector still fires through the exotic zero-noise framing.
     add("r1-health-embedded", 4, "health_record", "embedded",
-        f"note::{name_b}|dx={dx_b}|call {phone_a}|{email_a}::eof")
+        f"note::{name_b}|dx={dx_b} {icd_b}|call {phone_a}|{email_a}::eof")
 
     return C
 

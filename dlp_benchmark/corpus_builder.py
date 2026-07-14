@@ -173,6 +173,13 @@ def write_corpus(cases: list[dict]) -> None:
             _write_log(path, group)
         elif source_file.endswith(".csv"):
             _write_csv(path, group, header=["id", "kind", "payload"])
+        else:
+            # Fail loud rather than silently dropping ground-truth cases that
+            # are already in cases.json but would have no backing corpus file.
+            raise ValueError(
+                f"Unhandled source_file extension for {source_file!r}: "
+                f"expected .json/.log/.csv ({len(group)} case(s) affected)"
+            )
 
     manifest = {
         "_notice": BANNER + " — ground-truth labels for DLP recall scoring.",

@@ -41,6 +41,8 @@ from dlp_benchmark import BANNER
 from dlp_benchmark import corpus_builder
 from dlp_benchmark.generator import (
     CURRENCIES,
+    DIAGNOSES,
+    MEDICATIONS,
     TICKERS,
     _luhn_card,
 )
@@ -128,7 +130,12 @@ def build_cases() -> list[dict]:
     add("r5-iban-field", 1, "iban", "config-field", f"settlement_iban = {_fake_iban()}")
     add("r5-apikey-env", 1, "api_key", "env-field", f"STRIPE_API_KEY={_api_key()}")
     add("r5-dburl-env", 1, "db_url", "env-field", f"DATABASE_URL={_db_url()}")
-    add("r5-mrn-field", 1, "health_record", "config-field", f"patient_mrn: {_mrn()}")
+    # health_record: a FREE-TEXT diagnosis that also carries an MRN anchor,
+    # wrapped in a realistic EHR-export JSON fragment (finance-entity flavored).
+    _icd_h1, dx_h1 = random.choice(DIAGNOSES)
+    add("r5-health-json", 1, "health_record", "json-fragment",
+        json.dumps({"account": "brokerage", "ticker": "AAPL",
+                    "chart_note": f"{_mrn()} {dx_h1}, started {random.choice(MEDICATIONS)}"}))
     add("r5-contract-cell", 1, "contract_number", "csv-cell",
         _ticker_row(_contract_no()))
 
@@ -145,6 +152,11 @@ def build_cases() -> list[dict]:
         f"2026-07-11T09:12:03Z WARN pool connect dsn={_db_url()} retries=3")
     add("r5-contract-log", 2, "contract_number", "log-line",
         f"2026-07-11T09:15:44Z INFO renew contract={_contract_no()} portfolio=NMS")
+    # health_record: free-text diagnosis anchored by an ICD code, in a log line.
+    icd_h2, dx_h2 = random.choice(DIAGNOSES)
+    add("r5-health-log", 2, "health_record", "log-line",
+        f'2026-07-11T09:18:27Z INFO ehr_export patient=REC-1042 '
+        f'dx="{icd_h2} {dx_h2}" rx="{random.choice(MEDICATIONS)}" exch=XNAS')
 
     # --- tier 3: exotic — encoded / concatenated / homoglyph in a container ---
     api3 = _api_key()
@@ -180,6 +192,12 @@ def build_cases() -> list[dict]:
 _FRAMEWORK_RE = re.compile(r"soc ?2|hi?ppaa|cmmc|gdpr|cui|itar|pii|phi", re.IGNORECASE)
 _SSN_SHAPED_RE = re.compile(r"\b[0-8][0-9][0-9]-[0-9][0-9]-[0-9]{4}\b")
 _NINE_SSN_RE = re.compile(r"9\d\d-\d\d-\d{4}")
+# health_record anchors: an MRN + 8 digits, or an ICD-shaped code (letter+2 digits,
+# optional decimal). One must be present so the record is a recognizable dx record.
+_MRN_ANCHOR_RE = re.compile(r"MRN\d{8}")
+_ICD_ANCHOR_RE = re.compile(r"\b[A-Z]\d\d(?:\.\d+)?\b")
+# Canonical contract-number shape (CTR-YYYY-NNNNNN), un-obfuscated forms.
+_CTR_RE = re.compile(r"CTR-\d{4}-\d{6}")
 
 
 def _validate(cases: list[dict], payload_text: str) -> None:
@@ -208,6 +226,16 @@ def _validate(cases: list[dict], payload_text: str) -> None:
         if c["kind"] == "iban" and c["obfuscation"] in ("config-field", "csv-cell"):
             # Country code + '00' check digits, un-obfuscated forms only.
             assert re.search(r"[A-Z]{2}00", text), f"{c['id']}: IBAN check digits not 00"
+        if c["kind"] == "health_record":
+            # Contract: free-text dx that also carries an MRN or ICD anchor.
+            assert _MRN_ANCHOR_RE.search(text) or _ICD_ANCHOR_RE.search(text), \
+                f"{c['id']}: health_record missing MRN/ICD anchor"
+        if c["kind"] == "contract_number":
+            assert _CTR_RE.search(text), f"{c['id']}: contract_number not CTR-YYYY-NNNNNN"
+        if c["kind"] == "api_key":
+            assert "sk_test_" in text, f"{c['id']}: api_key missing sk_test_ prefix"
+        if c["kind"] == "db_url":
+            assert "example.com" in text, f"{c['id']}: db_url host not on example.com"
 
 
 def main() -> int:

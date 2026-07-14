@@ -17,9 +17,9 @@ The bridge prints a per-tier table plus an overall row:
 ```
 tier |   n | identify | mutate
 -----+-----+----------+-------
-   0 |   8 |    87.5% |  37.5%
+   0 |  27 |    59.3% |  22.2%
    ...
- all |  29 |    51.7% |  17.2%
+ all | 131 |    36.6% |  12.2%
 ```
 
 All corpus input is **synthetic, fake, and banner-marked**. This tool only

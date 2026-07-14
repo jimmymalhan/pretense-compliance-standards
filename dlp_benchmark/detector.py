@@ -29,7 +29,7 @@ import hashlib
 import re
 import unicodedata
 
-from .generator import INSECURE_CONFIG
+from .generator import DIAGNOSES, INSECURE_CONFIG
 
 # ---------------------------------------------------------------------------
 # Deterministic-hashing denylist: sha256 of known-sensitive literal tokens.
@@ -53,23 +53,58 @@ _PAN_BOUNDED = re.compile(r"(?<!\d)\d{13,19}(?!\d)")
 _PAN_MASKED = re.compile(r"\d{6}[\*x]{4,}\d{4}", re.IGNORECASE)
 _API_KEY = re.compile(r"sk_(?:test|live)_[A-Za-z0-9]{16,}")
 _AWS_KEY = re.compile(r"AKIA[0-9A-Z]{16}")
-_JWT = re.compile(r"eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+")
+# JWT: three base64url segments. Only the *header* must start with the canonical
+# `eyJ` marker; the payload segment need not (a signed-but-opaque payload still
+# leaks). Relaxed from requiring `eyJ` on the second segment too.
+_JWT = re.compile(r"eyJ[\w-]+\.[\w-]+\.[\w-]+")
 _EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@example\.com", re.IGNORECASE)
-_PHONE = re.compile(r"\(?\d{3}\)?[-.\s]?555[-.\s]?01\d\d")
+# Phone: US 555-01xx (reserved-for-fiction) plus the UK Ofcom reserved-for-drama
+# range (+44 (0)20 7946 0xxx, or the local 020 7946 0xxx form).
+_PHONE = re.compile(
+    r"\(?\d{3}\)?[-.\s]?555[-.\s]?01\d\d"
+    r"|(?:\+44\s?\(0\)|0)20[-.\s]?7946[-.\s]?0\d{3}"
+)
 
 # --- Extended structural detectors (new sensitive-data categories) ----------
-# IBAN: 2 letters + 2 check digits + grouped alphanumerics, spaced or not.
-_IBAN = re.compile(r"\b[A-Z]{2}\d{2}(?:[ ]?[A-Za-z0-9]){11,30}\b")
-# Generic labeled national identifier, e.g. "ID-1234567".
-_NATIONAL_ID = re.compile(r"\bID[- ]?\d{6,9}\b")
-# Passport: 1 letter + 8 digits, e.g. "X12345678".
-_PASSPORT = re.compile(r"\b[A-Za-z]\d{8}\b")
+# IBAN: 2 letters + 2 check digits + grouped alphanumerics, spaced or not. No
+# leading word boundary: after zero-width strip an IBAN can sit flush against
+# surrounding letters (e.g. "acctFR76...ref"), which a `\b` anchor would miss.
+_IBAN = re.compile(r"[A-Z]{2}\d{2}(?:[ ]?[A-Za-z0-9]){11,30}\b")
+# National identifier: 4-4-4 grouped (9dddd-...) or the 3-2-4 SSN-shape, both in
+# the never-issued 900-range. Zero-width forms collapse to a bare 9- or 12-digit
+# run (all national ids start with 9 by construction), handled separately below.
+_NATIONAL_ID = re.compile(r"\b(?:\d{4}-\d{4}-\d{4}|\d{3}-\d{2}-\d{4})\b")
+_NATIONAL_ID_COLLAPSED = re.compile(r"(?<!\d)9(?:\d{8}|\d{11})(?!\d)")
+# Passport: 2 letters + 7 digits (e.g. "XA0000042") or 1 letter + 8 digits.
+_PASSPORT = re.compile(r"\b[A-Z]{2}\d{7}\b|\b[A-Z]\d{8}\b")
 # EU-style VAT: 2 letters + 8-12 digits.
 _VAT = re.compile(r"\b[A-Z]{2}\d{8,12}\b")
-# Labeled contract id, e.g. "CT-2024-12345".
-_CONTRACT_NUMBER = re.compile(r"\bCT-\d{4}-\d{4,6}\b")
-# Labeled part number, e.g. "PN-A1B2C3".
-_PART_NUMBER = re.compile(r"\bPN-[A-Z0-9]{6,}\b")
+# Labeled contract id, e.g. "CT-2024-12345" or "CTR-2026-934216".
+_CONTRACT_NUMBER = re.compile(r"\bCTR?-\d{4}-\d{4,6}\b")
+# Labeled part number, e.g. "PN-A1B2C3"; hyphen optional and case-insensitive so
+# the collapsed/zero-width-stripped form ("pn9FRUDT") is still recovered.
+_PART_NUMBER = re.compile(r"\bPN-?[A-Z0-9]{6,}\b", re.IGNORECASE)
+# Medical record number: "MRN" + 8 digits (collapse view rejoins spaced groups).
+_MRN = re.compile(r"MRN\d{8}")
+# ICD-10 diagnosis code: letter + 2 digits, optional decimal subcode (F32.1, B20).
+_ICD10 = re.compile(r"\b[A-Z]\d\d(?:\.\d+)?\b")
+# Insurance member id: 3 letters + 9 digits (e.g. "RRF139047426").
+_INSURANCE_MEMBER = re.compile(r"\b[A-Z]{3}\d{9}\b")
+# Internal program code: "PRG-" + 6 alphanumerics; hyphen optional so the
+# separator-collapsed spaced form ("PRG1B3ZEK") still matches.
+_PROGRAM_CODE = re.compile(r"\bPRG-?[A-Z0-9]{6}\b")
+# Access log leaking a plaintext credential: a password-ish field assignment.
+# Covers `password=<val>` and the encoded `pw_blob=<hex>` label variant.
+_ACCESS_LOG = re.compile(r"\b(?:password|passwd|pw\w*)\s*=\s*\S+", re.IGNORECASE)
+# Health record: a known clinical diagnosis phrase, a `dx=`/`patient_mrn` field,
+# or "diagnosed with" prose — any of which marks the text as protected health data.
+_HEALTH_RECORD = re.compile(
+    "|".join(
+        [r"patient_mrn", r"\bdx\s*=", r"diagnosed with"]
+        + [re.escape(desc) for _code, desc in DIAGNOSES]
+    ),
+    re.IGNORECASE,
+)
 # Source-hosting personal access tokens (ghp_ / ghs_).
 _GITHUB_TOKEN = re.compile(r"gh[ps]_[A-Za-z0-9]{36,}")
 # Chat-platform tokens (xoxb-/xoxp-/xoxo-/xoxr-/xoxs-).
@@ -151,7 +186,9 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
 
     kinds: ssn, pan, api_key, aws_key, jwt, email, phone, secret,
     iban, national_id, passport, vat, contract_number, part_number,
-    github_token, slack_token, db_url, gcp_key
+    github_token, slack_token, db_url, gcp_key, medical_record_number,
+    icd10, insurance_member_id, internal_program_code, access_log,
+    health_record
     `mode` is "naive" or "hardened".
     """
     if mode not in ("naive", "hardened"):
@@ -179,7 +216,7 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
             found.add("phone")
         if _IBAN.search(view):
             found.add("iban")
-        if _NATIONAL_ID.search(view):
+        if _NATIONAL_ID.search(view) or _NATIONAL_ID_COLLAPSED.search(view):
             found.add("national_id")
         if _PASSPORT.search(view):
             found.add("passport")
@@ -197,6 +234,18 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
             found.add("db_url")
         if _GCP_KEY.search(view):
             found.add("gcp_key")
+        if _MRN.search(view):
+            found.add("medical_record_number")
+        if _ICD10.search(view):
+            found.add("icd10")
+        if _INSURANCE_MEMBER.search(view):
+            found.add("insurance_member_id")
+        if _PROGRAM_CODE.search(view):
+            found.add("internal_program_code")
+        if _ACCESS_LOG.search(view):
+            found.add("access_log")
+        if _HEALTH_RECORD.search(view):
+            found.add("health_record")
         # Deterministic-hashing denylist check.
         for tok in _tokens(view):
             if hashlib.sha256(tok.encode()).hexdigest() in _DENYLIST_HASHES:

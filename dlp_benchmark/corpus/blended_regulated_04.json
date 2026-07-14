@@ -4,17 +4,17 @@
     {
       "id": "r4-iban-plain",
       "kind": "iban",
-      "text": "Settlement IBAN GB29EXMP60161331926819 on file for the clearing account."
+      "text": "Settlement IBAN GB00EXMP6016EXMP1331EXMP9268 on file for the clearing account."
     },
     {
       "id": "r4-nid-plain",
       "kind": "national_id",
-      "text": "National identifier recorded as 900-55-1234 in onboarding."
+      "text": "National identifier recorded as 9000-4200-0001 in onboarding."
     },
     {
       "id": "r4-ghtoken-plain",
       "kind": "github_token",
-      "text": "ci deploy token ghp_EXAMPLE00000000000000000000000000000 was committed to the pipeline config."
+      "text": "ci deploy token ghp_EXAMPLEEXAMPLEEXAMPLEEXAMPLE00000000 was committed to the pipeline config."
     },
     {
       "id": "r4-mrn-label",
@@ -29,32 +29,32 @@
     {
       "id": "r4-iban-spaced",
       "kind": "iban",
-      "text": "IBAN: GB29 EXMP 6016 1331 9268 19 (SEPA)"
+      "text": "IBAN: GB00 EXMP 6016 EXMP 1331 EXMP 9268 (SEPA)"
     },
     {
       "id": "r4-apikey-split",
       "kind": "api_key",
-      "text": "key = \"sk_test_ABCdef0123\" \"456789ABCdef01\""
+      "text": "key = \"sk_test_ABCdef01ABCd\" \"ef23ABCdef45\""
     },
     {
       "id": "r4-nid-b64",
       "kind": "national_id",
-      "text": "payload blob=OTAwLTU1LTEyMzQ="
+      "text": "payload blob=OTAwMC00MjAwLTAwMDE="
     },
     {
       "id": "r4-iban-b64",
       "kind": "iban",
-      "text": "remit blob=R0IyOUVYTVA2MDE2MTMzMTkyNjgxOQ=="
+      "text": "remit blob=R0IwMEVYTVA2MDE2RVhNUDEzMzFFWE1QOTI2OA=="
     },
     {
       "id": "r4-ghtoken-b64",
       "kind": "github_token",
-      "text": "secret blob=Z2hwX0VYQU1QTEUwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA=="
+      "text": "secret blob=Z2hwX0VYQU1QTEVFWEFNUExFRVhBTVBMRUVYQU1QTEUwMDAwMDAwMA=="
     },
     {
       "id": "r4-apikey-b64",
       "kind": "api_key",
-      "text": "env blob=c2tfdGVzdF9BQkNkZWYwMTIzNDU2Nzg5QUJDZGVmMDE="
+      "text": "env blob=c2tfdGVzdF9BQkNkZWYwMUFCQ2RlZjIzQUJDZGVmNDU="
     },
     {
       "id": "r4-mrn-hex",
@@ -69,7 +69,7 @@
     {
       "id": "r4-nid-homoglyph",
       "kind": "national_id",
-      "text": "national id \uff19\uff10\uff10-55-1234 on the intake form"
+      "text": "national id \uff19\uff10\uff10\uff10-\uff14\uff12\uff10\uff10-\uff10\uff10\uff10\uff11 on the intake form"
     },
     {
       "id": "r4-mrn-homoglyph",
@@ -79,12 +79,12 @@
     {
       "id": "r4-nid-zw",
       "kind": "national_id",
-      "text": "subject id 900\u200b55\u200b1234 flagged"
+      "text": "subject id 9\u200b0\u200b0\u200b0\u200b-\u200b4\u200b2\u200b0\u200b0\u200b-\u200b0\u200b0\u200b0\u200b1 flagged"
     },
     {
       "id": "r4-iban-zw",
       "kind": "iban",
-      "text": "acct G\u200bB\u200b2\u200b9\u200bE\u200bX\u200bM\u200bP\u200b6\u200b0\u200b1\u200b6\u200b1\u200b3\u200b3\u200b1\u200b9\u200b2\u200b6\u200b8\u200b1\u200b9 ref"
+      "text": "acct G\u200bB\u200b0\u200b0\u200bE\u200bX\u200bM\u200bP\u200b6\u200b0\u200b1\u200b6\u200bE\u200bX\u200bM\u200bP\u200b1\u200b3\u200b3\u200b1\u200bE\u200bX\u200bM\u200bP\u200b9\u200b2\u200b6\u200b8 ref"
     },
     {
       "id": "r4-mrn-zw",
@@ -99,7 +99,7 @@
     {
       "id": "r4-ghtoken-b64wrap",
       "kind": "github_token",
-      "text": "envelope=dG9rZW49Z2hwX0VYQU1QTEUwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA=="
+      "text": "envelope=dG9rZW49Z2hwX0VYQU1QTEVFWEFNUExFRVhBTVBMRUVYQU1QTEUwMDAwMDAwMA=="
     }
   ]
 }
