@@ -14,17 +14,18 @@
 
 The testbed lives in **[`pretense_compliance_standards/`](pretense_compliance_standards/README.md)**:
 
-- A **graded corpus** of 470+ synthetic sensitive-data cases across 6 obfuscation tiers
-  (inline → labeled → split → encoded → zero-width → layered/nested), covering 38 data kinds.
+- A **graded corpus** of 530+ synthetic sensitive-data cases across 6 obfuscation tiers
+  (inline → labeled → split → encoded → zero-width → layered/nested), covering 44 data kinds.
 - A reference **deterministic-hashing detector** (naive vs. hardened) scoring **recall
   per difficulty tier** and **per compliance framework**.
 - A **pretense bridge** that runs the real pretense.ai engine over the corpus and reports
   **identify % / mutate %** coverage per framework.
 
-**28 frameworks covered:** SOC2, ISO 27001, ISO 27701, NIST 800-53, NIST 800-171,
+**36 frameworks covered:** SOC2, ISO 27001, ISO 27701, NIST 800-53, NIST 800-171,
 FedRAMP, FISMA, NIS2, NYDFS 500, DORA, APRA CPS 234, HIPAA, HITECH, HITRUST, GDPR,
-UK-GDPR, CCPA/CPRA, LGPD, PIPEDA, POPIA, PIPL, PDPA-SG, COPPA, FERPA, SOX, GLBA,
-CMMC L2, PCI DSS.
+UK-GDPR, CCPA/CPRA, LGPD, PIPEDA, POPIA, PIPL, PDPA-SG, COPPA, FERPA, DPDP (India),
+APPI (Japan), PIPA (Korea), Australia Privacy Act, Swiss FADP, PDPA (Thailand),
+CJIS, IRS Pub 1075, SOX, GLBA, CMMC L2, PCI DSS.
 
 ## The guarantee
 

@@ -458,6 +458,33 @@ def test_labeled_regulated_data_still_detected(text, kind):
     assert kind in detect(text, "hardened"), f"{kind} not detected in {text!r}"
 
 
+@pytest.mark.parametrize(
+    "text,kind",
+    [
+        ("mac 00:00:5e:00:53:af", "mac_address"),
+        ("wallet 0x000000000000000000000000000000000000dEaD", "crypto_wallet_address"),
+        ("key -----BEGIN OPENSSH PRIVATE KEY-----", "ssh_private_key"),
+        ("bic: TESTGB2LXXX", "swift_bic"),
+        ("vin: 1HGBH41JXMN109186", "vehicle_vin"),
+        ("medicare id: 1EG4TE5MK73", "medicare_id"),
+    ],
+)
+def test_new_m3_kinds_detected(text, kind):
+    """The M3 breadth kinds are detected in hardened mode from their canonical form."""
+    assert kind in detect(text, "hardened")
+
+
+def test_mac_and_ipv6_do_not_collide():
+    """A 6-octet MAC is mac_address, never ipv6; an 8-group colon-hex is ipv6, not
+    a MAC; and a longer colon-hex fingerprint is neither (guards both anchors)."""
+    mac = detect("nic 00:00:5e:00:53:af up", "hardened")
+    assert "mac_address" in mac and "ipv6" not in mac
+    v6 = detect("addr 2001:db8:0:0:0:0:0:1 ok", "hardened")
+    assert "ipv6" in v6 and "mac_address" not in v6
+    fp = detect("fingerprint 43:51:43:a1:b5:fc:8b:b7:0a:3a logged", "hardened")
+    assert "mac_address" not in fp and "ipv6" not in fp
+
+
 def test_hardened_precision_is_perfect(cases, negatives):
     """Hardened mode scores zero false positives (precision 1.0) with recall intact.
 

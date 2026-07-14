@@ -131,4 +131,12 @@ markers = [
     "glba: GLBA framework",
     "cmmc_l2: CMMC L2 framework",
     "pci_dss: PCI DSS framework",
+    "dpdp: DPDP (India) framework",
+    "appi: APPI (Japan) framework",
+    "pipa_kr: PIPA (South Korea) framework",
+    "au_privacy: Australia Privacy Act / NDB framework",
+    "fadp: Swiss FADP framework",
+    "pdpa_th: PDPA (Thailand) framework",
+    "cjis: CJIS framework",
+    "irs_1075: IRS Pub 1075 framework",
 ]

@@ -39,6 +39,7 @@ _CREDENTIALS = [
     "azure_key",
     "sendgrid_key",
     "twilio_key",
+    "ssh_private_key",
 ]  # SOC2 / security controls (secrets, credentials, access)
 _PHI = [
     "medical_record_number",
@@ -46,6 +47,7 @@ _PHI = [
     "health_record",
     "insurance_member_id",
     "npi",
+    "medicare_id",
 ]  # protected health information
 _CONTACT = ["email", "phone"]  # PII contact info
 _NATIONAL_ID = [
@@ -54,7 +56,7 @@ _NATIONAL_ID = [
     "passport",
     "drivers_license",
 ]  # government identifiers
-_EU_FINANCE = ["iban", "vat"]  # EU financial identifiers
+_EU_FINANCE = ["iban", "vat", "swift_bic"]  # EU financial identifiers
 _CUI = [
     "contract_number",
     "part_number",
@@ -62,8 +64,9 @@ _CUI = [
 ]  # controlled tech info
 _CARD = ["pan", "card_cvv"]  # cardholder data
 _FINANCIAL = ["bank_account", "routing_number", "ein"]  # financial account data
-_PII_EXTRA = ["date_of_birth"]  # additional personal data
-_NETWORK = ["ip_address", "ipv6"]  # network identifiers
+_PII_EXTRA = ["date_of_birth", "vehicle_vin"]  # additional personal data
+_NETWORK = ["ip_address", "ipv6", "mac_address"]  # network identifiers
+_CRYPTO = ["crypto_wallet_address"]  # digital-asset identifiers
 
 # framework -> kinds it regulates. Source of truth; KIND_FRAMEWORKS is derived
 # from it so the two can never drift. Ordering here sets the report order.
@@ -78,8 +81,8 @@ FRAMEWORK_KINDS: dict[str, list[str]] = {
     "FedRAMP": _CREDENTIALS + _NETWORK,  # cloud auth (NIST 800-53 based)
     "FISMA": _CREDENTIALS + _NATIONAL_ID + _NETWORK,  # US federal info security
     "NIS2": _CREDENTIALS + _NETWORK,  # EU network & info security
-    "NYDFS_500": _CREDENTIALS + _FINANCIAL,  # NY financial-services cyber
-    "DORA": _CREDENTIALS + _FINANCIAL + ["iban", "pan"],  # EU financial ICT
+    "NYDFS_500": _CREDENTIALS + _FINANCIAL + _CRYPTO,  # NY financial-services cyber
+    "DORA": _CREDENTIALS + _FINANCIAL + _CRYPTO + ["iban", "pan"],  # EU financial ICT
     "APRA_CPS234": _CREDENTIALS + _FINANCIAL + ["pan"],  # Australia financial
     # --- health regimes ---
     "HIPAA": _PHI + ["ssn"] + _CONTACT + _PII_EXTRA,
@@ -96,6 +99,18 @@ FRAMEWORK_KINDS: dict[str, list[str]] = {
     "PDPA_SG": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Singapore
     "COPPA": _CONTACT + _PII_EXTRA + ["national_id"],  # US children's privacy
     "FERPA": ["ssn"] + _CONTACT + _PII_EXTRA,  # US student education records
+    "DPDP": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # India Digital Personal Data
+    "APPI": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Japan personal information
+    "PIPA_KR": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # South Korea personal info
+    "AU_PRIVACY": _NATIONAL_ID
+    + _CONTACT
+    + _PII_EXTRA
+    + _NETWORK,  # Australia Privacy Act / NDB
+    "FADP": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _EU_FINANCE,  # Switzerland FADP
+    "PDPA_TH": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Thailand PDPA
+    "CJIS": _NATIONAL_ID + ["ssn"] + _CONTACT + _NETWORK,  # US criminal-justice info
+    "IRS_1075": ["ssn", "ein", "bank_account"]
+    + _NATIONAL_ID,  # US federal tax info (FTI)
     # --- financial / controlled / card ---
     "SOX": _CREDENTIALS + _FINANCIAL,  # US financial-reporting controls
     "GLBA": _CARD + _FINANCIAL + ["iban", "ssn"] + _CONTACT,  # US financial privacy
