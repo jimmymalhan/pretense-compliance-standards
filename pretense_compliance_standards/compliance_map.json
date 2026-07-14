@@ -3,19 +3,29 @@
   "frameworks": [
     "SOC2",
     "ISO_27001",
+    "ISO_27701",
     "NIST_800_53",
     "NIST_800_171",
     "FedRAMP",
+    "FISMA",
     "NIS2",
+    "NYDFS_500",
     "DORA",
+    "APRA_CPS234",
     "HIPAA",
     "HITECH",
+    "HITRUST",
     "GDPR",
+    "UK_GDPR",
     "CCPA_CPRA",
     "LGPD",
     "PIPEDA",
     "POPIA",
+    "PIPL",
+    "PDPA_SG",
+    "COPPA",
     "FERPA",
+    "SOX",
     "GLBA",
     "CMMC_L2",
     "PCI_DSS"
@@ -24,137 +34,346 @@
     "api_key": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "aws_key": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "gcp_key": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "github_token": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "slack_token": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "db_url": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "jwt": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "secret": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
     ],
     "access_log": [
       "SOC2",
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "NIST_800_171",
       "FedRAMP",
+      "FISMA",
       "NIS2",
-      "DORA"
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "openai_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "anthropic_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "azure_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "sendgrid_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "twilio_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "ip_address": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA"
+    ],
+    "ipv6": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA"
     ],
     "ssn": [
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
+      "FISMA",
       "HIPAA",
       "HITECH",
+      "GDPR",
+      "UK_GDPR",
       "CCPA_CPRA",
       "LGPD",
       "PIPEDA",
       "POPIA",
+      "PIPL",
+      "PDPA_SG",
       "FERPA",
       "GLBA"
     ],
     "national_id": [
       "ISO_27001",
+      "ISO_27701",
+      "FISMA",
       "GDPR",
-      "CCPA_CPRA",
-      "LGPD",
-      "PIPEDA",
-      "POPIA"
-    ],
-    "passport": [
-      "ISO_27001",
-      "GDPR",
-      "CCPA_CPRA",
-      "LGPD",
-      "PIPEDA",
-      "POPIA"
-    ],
-    "email": [
-      "ISO_27001",
-      "NIST_800_53",
-      "HIPAA",
-      "HITECH",
-      "GDPR",
+      "UK_GDPR",
       "CCPA_CPRA",
       "LGPD",
       "PIPEDA",
       "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA"
+    ],
+    "passport": [
+      "ISO_27001",
+      "ISO_27701",
+      "FISMA",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG"
+    ],
+    "drivers_license": [
+      "ISO_27001",
+      "ISO_27701",
+      "FISMA",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG"
+    ],
+    "email": [
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "HIPAA",
+      "HITECH",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA",
       "FERPA",
       "GLBA"
     ],
     "phone": [
       "ISO_27001",
+      "ISO_27701",
       "NIST_800_53",
       "HIPAA",
       "HITECH",
       "GDPR",
+      "UK_GDPR",
       "CCPA_CPRA",
       "LGPD",
       "PIPEDA",
       "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA",
       "FERPA",
       "GLBA"
+    ],
+    "date_of_birth": [
+      "ISO_27701",
+      "HIPAA",
+      "HITECH",
+      "HITRUST",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA",
+      "FERPA"
     ],
     "contract_number": [
       "NIST_800_171",
@@ -168,35 +387,73 @@
       "NIST_800_171",
       "CMMC_L2"
     ],
+    "bank_account": [
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "SOX",
+      "GLBA"
+    ],
+    "routing_number": [
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "SOX",
+      "GLBA"
+    ],
+    "ein": [
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "SOX",
+      "GLBA"
+    ],
     "iban": [
       "DORA",
       "GDPR",
+      "UK_GDPR",
       "GLBA"
     ],
     "pan": [
       "DORA",
+      "APRA_CPS234",
       "CCPA_CPRA",
       "GLBA",
       "PCI_DSS"
     ],
     "medical_record_number": [
       "HIPAA",
-      "HITECH"
+      "HITECH",
+      "HITRUST"
     ],
     "icd10": [
       "HIPAA",
-      "HITECH"
+      "HITECH",
+      "HITRUST"
     ],
     "health_record": [
       "HIPAA",
-      "HITECH"
+      "HITECH",
+      "HITRUST"
     ],
     "insurance_member_id": [
       "HIPAA",
-      "HITECH"
+      "HITECH",
+      "HITRUST"
+    ],
+    "npi": [
+      "HIPAA",
+      "HITECH",
+      "HITRUST"
     ],
     "vat": [
-      "GDPR"
+      "GDPR",
+      "UK_GDPR"
+    ],
+    "card_cvv": [
+      "CCPA_CPRA",
+      "GLBA",
+      "PCI_DSS"
     ]
   }
 }

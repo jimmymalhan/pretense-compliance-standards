@@ -34,42 +34,71 @@ _CREDENTIALS = [
     "jwt",
     "secret",
     "access_log",
-]  # SOC2 / security controls
-_PHI = ["medical_record_number", "icd10", "health_record", "insurance_member_id"]
+    "openai_key",
+    "anthropic_key",
+    "azure_key",
+    "sendgrid_key",
+    "twilio_key",
+]  # SOC2 / security controls (secrets, credentials, access)
+_PHI = [
+    "medical_record_number",
+    "icd10",
+    "health_record",
+    "insurance_member_id",
+    "npi",
+]  # protected health information
 _CONTACT = ["email", "phone"]  # PII contact info
-_NATIONAL_ID = ["ssn", "national_id", "passport"]  # government identifiers
+_NATIONAL_ID = [
+    "ssn",
+    "national_id",
+    "passport",
+    "drivers_license",
+]  # government identifiers
 _EU_FINANCE = ["iban", "vat"]  # EU financial identifiers
 _CUI = [
     "contract_number",
     "part_number",
     "internal_program_code",
 ]  # controlled tech info
-_CARD = ["pan"]  # cardholder data
+_CARD = ["pan", "card_cvv"]  # cardholder data
+_FINANCIAL = ["bank_account", "routing_number", "ein"]  # financial account data
+_PII_EXTRA = ["date_of_birth"]  # additional personal data
+_NETWORK = ["ip_address", "ipv6"]  # network identifiers
 
 # framework -> kinds it regulates. Source of truth; KIND_FRAMEWORKS is derived
 # from it so the two can never drift. Ordering here sets the report order.
 # Each framework is mapped to the kinds whose data category it plausibly governs.
 FRAMEWORK_KINDS: dict[str, list[str]] = {
     # --- security / credential regimes ---
-    "SOC2": _CREDENTIALS,
-    "ISO_27001": _CREDENTIALS + _NATIONAL_ID + _CONTACT,
-    "NIST_800_53": _CREDENTIALS + ["ssn"] + _CONTACT,
+    "SOC2": _CREDENTIALS + _NETWORK,
+    "ISO_27001": _CREDENTIALS + _NATIONAL_ID + _CONTACT + _NETWORK,
+    "ISO_27701": _CREDENTIALS + _NATIONAL_ID + _CONTACT + _PII_EXTRA + _NETWORK,
+    "NIST_800_53": _CREDENTIALS + ["ssn"] + _CONTACT + _NETWORK,
     "NIST_800_171": _CUI + _CREDENTIALS,  # protecting CUI systems
-    "FedRAMP": _CREDENTIALS,  # cloud auth (NIST 800-53 based)
-    "NIS2": _CREDENTIALS,  # EU network & info security
-    "DORA": _CREDENTIALS + ["iban", "pan"],  # EU financial ICT resilience
+    "FedRAMP": _CREDENTIALS + _NETWORK,  # cloud auth (NIST 800-53 based)
+    "FISMA": _CREDENTIALS + _NATIONAL_ID + _NETWORK,  # US federal info security
+    "NIS2": _CREDENTIALS + _NETWORK,  # EU network & info security
+    "NYDFS_500": _CREDENTIALS + _FINANCIAL,  # NY financial-services cyber
+    "DORA": _CREDENTIALS + _FINANCIAL + ["iban", "pan"],  # EU financial ICT
+    "APRA_CPS234": _CREDENTIALS + _FINANCIAL + ["pan"],  # Australia financial
     # --- health regimes ---
-    "HIPAA": _PHI + ["ssn"] + _CONTACT,
-    "HITECH": _PHI + ["ssn"] + _CONTACT,  # strengthens HIPAA (ePHI)
+    "HIPAA": _PHI + ["ssn"] + _CONTACT + _PII_EXTRA,
+    "HITECH": _PHI + ["ssn"] + _CONTACT + _PII_EXTRA,  # strengthens HIPAA (ePHI)
+    "HITRUST": _PHI + _CREDENTIALS + _PII_EXTRA,  # health + security controls
     # --- privacy regimes ---
-    "GDPR": ["national_id", "passport"] + _EU_FINANCE + _CONTACT,
-    "CCPA_CPRA": _NATIONAL_ID + _CONTACT + _CARD,  # California consumer privacy
-    "LGPD": _NATIONAL_ID + _CONTACT,  # Brazil
-    "PIPEDA": _NATIONAL_ID + _CONTACT,  # Canada
-    "POPIA": _NATIONAL_ID + _CONTACT,  # South Africa
-    "FERPA": ["ssn"] + _CONTACT,  # US student education records
+    "GDPR": _NATIONAL_ID + _EU_FINANCE + _CONTACT + _PII_EXTRA + _NETWORK,
+    "UK_GDPR": _NATIONAL_ID + _EU_FINANCE + _CONTACT + _PII_EXTRA + _NETWORK,
+    "CCPA_CPRA": _NATIONAL_ID + _CONTACT + _CARD + _PII_EXTRA + _NETWORK,
+    "LGPD": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Brazil
+    "PIPEDA": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Canada
+    "POPIA": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # South Africa
+    "PIPL": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # China
+    "PDPA_SG": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Singapore
+    "COPPA": _CONTACT + _PII_EXTRA + ["national_id"],  # US children's privacy
+    "FERPA": ["ssn"] + _CONTACT + _PII_EXTRA,  # US student education records
     # --- financial / controlled / card ---
-    "GLBA": _CARD + ["iban", "ssn"] + _CONTACT,  # US financial privacy
+    "SOX": _CREDENTIALS + _FINANCIAL,  # US financial-reporting controls
+    "GLBA": _CARD + _FINANCIAL + ["iban", "ssn"] + _CONTACT,  # US financial privacy
     "CMMC_L2": _CUI,  # DoD controlled unclassified info
     "PCI_DSS": _CARD,  # cardholder data
 }
