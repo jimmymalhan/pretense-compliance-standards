@@ -40,15 +40,16 @@ framework** (whose regulated data is under-protected?).
 | 1 | labeled CSV/config fields; canonical-reachable format variants |
 | 2 | value split across quotes/lines; space/dash-grouped digits |
 | 3 | base64 / hex / Unicode-homoglyph encodings |
-| 4 | zero-width separators, embedded/wrapped encodings |
+| 4 | zero-width separators, single embedded encodings |
+| 5 | layered/nested encodings: base64-of-base64, gzip+base64, full percent-encoding, ROT13 |
 
 `detector.detect(text, mode)` returns the set of sensitive `kind`s found. **`naive`**
 = fixed regexes + a `sha256` denylist over raw text (catches canonical forms only).
 **`hardened`** = the same detectors over *normalized views* (fragment-join, separator
-collapse, NFKC + zero-width strip, base64/hex decode). Naive holds on the easy tiers
-and collapses under obfuscation; hardened normalization recovers it to 100%. Each
-naive miss is printed as a named normalization gap — the actionable to-do for a real
-scanner.
+collapse, NFKC + zero-width strip, and a bounded **multi-pass** decoder that unwinds
+base64/hex/gzip/percent/ROT13 layers). Naive holds on the easy tiers and collapses
+under obfuscation; hardened normalization recovers it to 100%. Each naive miss is
+printed as a named normalization gap — the actionable to-do for a real scanner.
 
 ## Compliance framework coverage
 

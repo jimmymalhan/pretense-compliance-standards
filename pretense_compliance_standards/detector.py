@@ -28,6 +28,8 @@ import binascii
 import hashlib
 import re
 import unicodedata
+import urllib.parse
+import zlib
 
 from .generator import DIAGNOSES, INSECURE_CONFIG
 
@@ -57,7 +59,10 @@ _AWS_KEY = re.compile(r"AKIA[0-9A-Z]{16}")
 # `eyJ` marker; the payload segment need not (a signed-but-opaque payload still
 # leaks). Relaxed from requiring `eyJ` on the second segment too.
 _JWT = re.compile(r"eyJ[\w-]+\.[\w-]+\.[\w-]+")
-_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@example\.com", re.IGNORECASE)
+# Local part bounded to the RFC-5321 max (64) so the `+@` shape cannot backtrack
+# quadratically on a long run of local-part characters (a decoded/percent view
+# can be large), which would be a CPU-DoS vector.
+_EMAIL = re.compile(r"[A-Za-z0-9._%+-]{1,64}@example\.com", re.IGNORECASE)
 # Phone: US 555-01xx (reserved-for-fiction) plus the UK Ofcom reserved-for-drama
 # range (+44 (0)20 7946 0xxx, or the local 020 7946 0xxx form).
 _PHONE = re.compile(
@@ -252,24 +257,129 @@ def _tokens(view: str):
             yield tok
 
 
-def _decode_candidates(text: str):
-    """Yield plausible base64/hex decodings of tokens in `text` (hardened only)."""
-    for tok in re.findall(r"[A-Za-z0-9+/]{12,}={0,2}", text):
+_B64_TOKEN = re.compile(r"[A-Za-z0-9+/]{12,}={0,2}")
+_HEX_TOKEN = re.compile(r"\b[0-9a-fA-F]{12,}\b")
+_PCT = re.compile(r"%[0-9a-fA-F]{2}")
+
+# Tier-5 obfuscation is *layered* (base64-of-base64, gzip+base64, percent), so
+# decoding is iterated. The walk is bounded on every axis — input size, depth,
+# tokens per layer, total decodings, and decoded length — and only *textual*
+# decodings propagate. Those bounds are what keep hardened mode safe on hostile
+# input: a nested-base64 blob, a compression bomb, or a wall of random tokens
+# cannot cause quadratic CPU / unbounded memory, and random decoded bytes never
+# reach the detectors (so they cannot produce false positives). ROT13 is
+# deliberately NOT a layer: it is a 1:1 map on plaintext, so scanning its view
+# would double the false-positive surface (e.g. rotate a benign token onto a
+# denylisted secret) for no realistic gain.
+_MAX_DECODE_DEPTH = 2  # double-base64 is the deepest real layering
+_MAX_DECODE_LEN = 4096  # decoded views are bounded small (corpus values are tiny)
+_MAX_DECODE_TOKENS = 32  # tokens decoded per kind per layer
+_MAX_DECODE_TOTAL = 128  # total decodings across the whole walk
+_MAX_DECODE_INPUT = 65536  # skip decoding entirely for very large inputs
+_MAX_SCAN_LEN = 65536  # cap the raw text every view is built from (DoS bound)
+
+
+def _looks_textual(s: str) -> bool:
+    """True if `s` is predominantly printable text, not random decoded bytes.
+
+    This is the gate that stops opaque tokens (session ids, object hashes, binary
+    blobs) — which base64/hex-decode to noise — from reaching the detectors and
+    tripping a loose pattern on random bytes."""
+    if not s:
+        return False
+    printable = sum(1 for c in s if c.isprintable() or c in "\t\n\r ")
+    return printable / len(s) >= 0.9
+
+
+def _maybe_decompress(raw: bytes) -> str | None:
+    """Return decompressed UTF-8 text if `raw` is gzip/zlib data, else None.
+
+    Output is bounded to `_MAX_DECODE_LEN` bytes via a streaming decompressobj, so
+    a compression bomb cannot allocate unbounded memory (a bounded read, not
+    `zlib.decompress`, which would inflate the whole payload first)."""
+    for wbits in (31, 15):  # 31 = gzip header, 15 = raw zlib
         try:
-            dec = base64.b64decode(tok, validate=True)
-            yield dec.decode("utf-8", "ignore")
+            out = zlib.decompressobj(wbits).decompress(raw, _MAX_DECODE_LEN + 1)
+        except (zlib.error, OSError):
+            continue
+        if out and len(out) <= _MAX_DECODE_LEN:
+            return out.decode("utf-8", "ignore")
+    return None
+
+
+def _decode_layer(text: str):
+    """Yield ONE level of *textual* decodings of `text`: base64 (optionally
+    gzip/zlib-compressed), hex, and percent/URL-encoding. At most
+    `_MAX_DECODE_TOKENS` tokens of each kind are decoded, and only decodings that
+    look like text are yielded."""
+    for i, m in enumerate(_B64_TOKEN.finditer(text)):
+        if i >= _MAX_DECODE_TOKENS:
+            break
+        try:
+            raw = base64.b64decode(m.group(), validate=True)
         except (binascii.Error, ValueError):
-            pass
-    for tok in re.findall(r"\b[0-9a-fA-F]{12,}\b", text):
-        if len(tok) % 2 == 0:
-            try:
-                yield bytes.fromhex(tok).decode("utf-8", "ignore")
-            except (ValueError, UnicodeDecodeError):
-                pass
+            continue
+        decompressed = _maybe_decompress(raw)
+        candidate = (
+            decompressed if decompressed is not None else raw.decode("utf-8", "ignore")
+        )
+        if _looks_textual(candidate):
+            yield candidate
+    for i, m in enumerate(_HEX_TOKEN.finditer(text)):
+        if i >= _MAX_DECODE_TOKENS:
+            break
+        tok = m.group()
+        if len(tok) % 2:
+            continue
+        try:
+            candidate = bytes.fromhex(tok).decode("utf-8", "ignore")
+        except (ValueError, UnicodeDecodeError):
+            continue
+        if _looks_textual(candidate):
+            yield candidate
+    if _PCT.search(text):
+        unquoted = urllib.parse.unquote(text)
+        if unquoted != text and _looks_textual(unquoted):
+            yield unquoted
+
+
+def _decode_candidates(text: str):
+    """Yield textual decodings of `text`, following up to `_MAX_DECODE_DEPTH`
+    nested layers (base64-of-base64, gzip+base64, percent-encoding). The seen-set,
+    the depth / per-layer-token / total / length / input-size caps, and the
+    textual filter together keep the breadth-first walk bounded and
+    false-positive-free on adversarial input."""
+    if len(text) > _MAX_DECODE_INPUT:
+        return
+    seen = {text}
+    frontier = [text]
+    total = 0
+    for _ in range(_MAX_DECODE_DEPTH):
+        nxt = []
+        for current in frontier:
+            for decoded in _decode_layer(current):
+                if decoded and decoded not in seen and len(decoded) <= _MAX_DECODE_LEN:
+                    seen.add(decoded)
+                    nxt.append(decoded)
+                    yield decoded
+                    total += 1
+                    if total >= _MAX_DECODE_TOTAL:
+                        return
+        if not nxt:
+            break
+        frontier = nxt
 
 
 def _views(text: str, mode: str):
-    """Return the list of text views a detector scans, given the mode."""
+    """Return the list of text views a detector scans, given the mode.
+
+    The scanned text is capped to `_MAX_SCAN_LEN`: the ~40 detector regexes are
+    all linear, but the constant factor (notably `_PAN_BOUNDED` + Luhn per match)
+    makes a multi-hundred-KB input take seconds, so an unbounded scan would be a
+    CPU-DoS. Real scanners cap payload size the same way; corpus cases are tiny,
+    so this never truncates real input."""
+    if len(text) > _MAX_SCAN_LEN:
+        text = text[:_MAX_SCAN_LEN]
     if mode == "naive":
         return [text]
 
