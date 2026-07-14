@@ -10,8 +10,16 @@
       "text": "Member SSN on file: 900-55-1234.",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -23,6 +31,9 @@
       "text": "Primary card 4485236017858297 charged $42.00.",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -36,7 +47,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -49,7 +65,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -62,7 +83,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -74,9 +100,17 @@
       "text": "Contact ava.carter7@example.com for statements.",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -88,9 +122,17 @@
       "text": "Call center (415) 555-0142.",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -103,7 +145,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -115,8 +162,16 @@
       "text": "tax_id: 900.55.1234",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -128,9 +183,17 @@
       "text": "phone: 415-555-0142",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -142,9 +205,17 @@
       "text": "EMAIL: AVA.CARTER7@EXAMPLE.COM",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -156,6 +227,9 @@
       "text": "card_on_file,4485236017858297,active",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -169,7 +243,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -182,7 +261,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -195,7 +279,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -207,6 +296,9 @@
       "text": "Card: 4485 2360 1785 8297 exp 12/29",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -219,6 +311,9 @@
       "text": "PAN=4485-2360-1785-8297",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -231,8 +326,16 @@
       "text": "ssn = \"900-55\" \"-1234\"",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -245,7 +348,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -257,9 +365,17 @@
       "text": "\"ava.carter7\" \"@example.com\"",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -271,8 +387,16 @@
       "text": "blob=OTAwLTU1LTEyMzQ=",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -284,6 +408,9 @@
       "text": "blob=NDQ4NTIzNjAxNzg1ODI5Nw==",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -296,9 +423,17 @@
       "text": "blob=YXZhLmNhcnRlcjdAZXhhbXBsZS5jb20=",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -311,7 +446,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -323,8 +463,16 @@
       "text": "ssn=\uff1900-55-1234",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -336,6 +484,9 @@
       "text": "acct4485\u200b2360\u200b1785\u200b8297ref",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -348,8 +499,16 @@
       "text": "id900\u200b55\u200b1234x",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -362,7 +521,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -374,6 +538,9 @@
       "text": "raw=34343835323336303137383538323937",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -386,7 +553,8 @@
       "text": "Patient chart pulled under MRN33971604 ahead of the follow-up visit.",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -399,7 +567,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -411,7 +584,8 @@
       "text": "Encounter closed with primary code I10 on the problem list.",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -423,7 +597,8 @@
       "text": "Liam Nguyen was seen today and diagnosed with Essential (primary) hypertension [I10].",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -435,7 +610,8 @@
       "text": "member_id: DJY047426576",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -448,7 +624,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -460,7 +641,8 @@
       "text": "MRN: MRN65234287",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -473,7 +655,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -485,7 +672,8 @@
       "text": "diagnosis_code = I10",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -497,7 +685,8 @@
       "text": "chart no. MRN 50 91 36 62",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -509,7 +698,8 @@
       "text": "member = \"RTV\" \"234461890\"",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -522,7 +712,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -535,7 +730,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -547,7 +747,8 @@
       "text": "blob=TVJOMzM5NzE2MDQ=",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -559,7 +760,8 @@
       "text": "blob=444a59303437343236353736",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -572,7 +774,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -584,7 +791,8 @@
       "text": "code=I\uff110",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -597,7 +805,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -609,7 +822,8 @@
       "text": "ref M\u200bR\u200bN\u200b65\u200b23\u200b42\u200b87end",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -621,7 +835,8 @@
       "text": "note::Lucas Kim|dx=Essential (primary) hypertension I10|call (949) 555-0104|lucas.kim8@example.com::eof",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -633,7 +848,9 @@
       "text": "Settlement account GB00 XXXX 1571 4237 7166 49 confirmed for the counterparty.",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -645,9 +862,17 @@
       "text": "Statements are delivered to ava.carter32@example.com each month.",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -660,7 +885,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -685,7 +915,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -697,7 +932,9 @@
       "text": "iban: DE00 XXXX 7692 2979 2086 49",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -709,8 +946,12 @@
       "text": "national_id = 9368-2130-1347",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -722,8 +963,12 @@
       "text": "passport_no: EV8141268",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -735,9 +980,17 @@
       "text": "contact_phone: +44 (0)20 7946 0878",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -761,7 +1014,9 @@
       "text": "iban = \"FR00XXXX\" \"46120039541579\"",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -773,9 +1028,17 @@
       "text": "\"ava.carter32\" \"@example.com\"",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -787,9 +1050,17 @@
       "text": "phone = (280) 555-0197",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -802,7 +1073,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -814,7 +1090,9 @@
       "text": "blob=R0IwMCBYWFhYIDE1NzEgNDIzNyA3MTY2IDQ5",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -826,9 +1104,17 @@
       "text": "blob=bGlhbS5wYXRlbDc5QGV4YW1wbGUuY29t",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -841,7 +1127,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -854,7 +1145,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -866,7 +1162,9 @@
       "text": "acct FR00\u200bXXXX\u200b4612\u200b0039\u200b5415\u200b79 ref",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -878,8 +1176,12 @@
       "text": "id9\u200b368\u200b2130\u200b1347x",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -892,7 +1194,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -904,6 +1211,7 @@
       "text": "Award reference CTR-2025-270565 is on file for the build lot.",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -916,6 +1224,7 @@
       "text": "Ship the assembly for part PN-9FRUDT to the depot.",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -928,6 +1237,7 @@
       "text": "Milestone review scheduled under PRG-1B3ZEK next quarter.",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -941,7 +1251,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -954,7 +1269,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -967,7 +1287,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -979,8 +1304,16 @@
       "text": "Vendor contact SSN on record: 906-17-8866.",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -992,6 +1325,7 @@
       "text": "contract_no = CTR-2025-270565",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1004,6 +1338,7 @@
       "text": "line_item,PN-9FRUDT,qty=12,active",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1017,7 +1352,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1030,7 +1370,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1042,9 +1387,17 @@
       "text": "program_poc_phone: (882) 555-0137",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -1056,9 +1409,17 @@
       "text": "poc_email = dana.okoro35@example.com",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -1070,6 +1431,7 @@
       "text": "contract = \"CTR-202\" \"5-270565\"",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1082,6 +1444,7 @@
       "text": "code = P R G - 1 B 3 Z E K",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1095,7 +1458,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1108,7 +1476,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1120,6 +1493,7 @@
       "text": "blob=Q1RSLTIwMjUtMjcwNTY1",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1133,7 +1507,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1145,6 +1524,7 @@
       "text": "ref=CTR-\uff12\uff10\uff12\uff15-\uff12\uff17\uff10\uff15\uff16\uff15",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1157,6 +1537,7 @@
       "text": "pn\u200b9F\u200bRUDTref",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1170,7 +1551,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1183,7 +1569,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1195,7 +1586,9 @@
       "text": "Settlement IBAN GB00EXMP6016EXMP1331EXMP9268 on file for the clearing account.",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -1207,8 +1600,12 @@
       "text": "National identifier recorded as 9000-4200-0001 in onboarding.",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -1221,7 +1618,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1233,7 +1635,8 @@
       "text": "record_locator: MRN00042001",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -1245,8 +1648,12 @@
       "text": "passport = XA0000042",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -1258,7 +1665,9 @@
       "text": "IBAN: GB00 EXMP 6016 EXMP 1331 EXMP 9268 (SEPA)",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -1271,7 +1680,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1283,8 +1697,12 @@
       "text": "payload blob=OTAwMC00MjAwLTAwMDE=",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -1296,7 +1714,9 @@
       "text": "remit blob=R0IwMEVYTVA2MDE2RVhNUDEzMzFFWE1QOTI2OA==",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -1309,7 +1729,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1322,7 +1747,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1334,7 +1764,8 @@
       "text": "chart blob=4d524e3030303432303031",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -1346,8 +1777,12 @@
       "text": "doc blob=584130303030303432",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -1359,8 +1794,12 @@
       "text": "national id \uff19\uff10\uff10\uff10-\uff14\uff12\uff10\uff10-\uff10\uff10\uff10\uff11 on the intake form",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -1372,7 +1811,8 @@
       "text": "mrn MRN\uff10\uff10\uff10\uff14\uff12\uff10\uff10\uff11 attached",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -1384,8 +1824,12 @@
       "text": "subject id 9\u200b0\u200b0\u200b0\u200b-\u200b4\u200b2\u200b0\u200b0\u200b-\u200b0\u200b0\u200b0\u200b1 flagged",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -1397,7 +1841,9 @@
       "text": "acct G\u200bB\u200b0\u200b0\u200bE\u200bX\u200bM\u200bP\u200b6\u200b0\u200b1\u200b6\u200bE\u200bX\u200bM\u200bP\u200b1\u200b3\u200b3\u200b1\u200bE\u200bX\u200bM\u200bP\u200b9\u200b2\u200b6\u200b8 ref",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -1409,7 +1855,8 @@
       "text": "mrn M\u200bR\u200bN\u200b0\u200b0\u200b0\u200b4\u200b2\u200b0\u200b0\u200b1 on chart",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -1421,8 +1868,12 @@
       "text": "passport = \"XA00\" \"00042\"",
       "expected": true,
       "compliance": [
+        "ISO_27001",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA"
       ]
     },
     {
@@ -1435,7 +1886,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1447,6 +1903,9 @@
       "text": "MSFT,Microsoft Corporation,NMS,7094477452711205,USD",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -1459,7 +1918,9 @@
       "text": "settlement_iban = GB00SYNT66857670244990",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -1472,7 +1933,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1485,7 +1951,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1497,7 +1968,8 @@
       "text": "{\"account\": \"brokerage\", \"ticker\": \"AAPL\", \"chart_note\": \"MRN84548885 Unspecified asthma, uncomplicated, started Lisinopril 10mg\"}",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -1509,6 +1981,7 @@
       "text": "AAPL,Apple Inc.,NMS,CTR-2021-836729,USD",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1521,6 +1994,9 @@
       "text": "{\"ticker\": \"AAPL\", \"card_on_file\": \"9738559754340698\", \"status\": \"active\"}",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -1533,7 +2009,9 @@
       "text": "IBAN DE00 TEST 2636 5727 069763",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -1545,8 +2023,16 @@
       "text": "{\"holder\": \"Ava Carter\", \"tax_id\": \"943-79-6418\", \"sector\": \"Financials\"}",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -1559,7 +2045,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1571,6 +2062,7 @@
       "text": "2026-07-11T09:15:44Z INFO renew contract=CTR-2021-238301 portfolio=NMS",
       "expected": true,
       "compliance": [
+        "NIST_800_171",
         "CMMC_L2"
       ]
     },
@@ -1583,7 +2075,8 @@
       "text": "2026-07-11T09:18:27Z INFO ehr_export patient=REC-1042 dx=\"I10 Essential (primary) hypertension\" rx=\"Lisinopril 10mg\" exch=XNAS",
       "expected": true,
       "compliance": [
-        "HIPAA"
+        "HIPAA",
+        "HITECH"
       ]
     },
     {
@@ -1596,7 +2089,12 @@
       "expected": true,
       "compliance": [
         "SOC2",
-        "ISO_27001"
+        "ISO_27001",
+        "NIST_800_53",
+        "NIST_800_171",
+        "FedRAMP",
+        "NIS2",
+        "DORA"
       ]
     },
     {
@@ -1608,8 +2106,16 @@
       "text": "account_holder_ssn=\uff1922-18-8459",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
-        "ISO_27001"
+        "HITECH",
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -1621,7 +2127,9 @@
       "text": "{\"acct\": \"brokerage\", \"iban_b64\": \"RlIwMFNZTlQ5MTU2ODY2NzQ4MTExMw==\"}",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     },
     {
@@ -1633,9 +2141,17 @@
       "text": "2026-07-11T09:20:10Z INFO statement_sent to=diego.carter68@example.com exch=XNAS",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -1647,6 +2163,9 @@
       "text": "AAPL,Apple Inc.,NMS,6202\u200b6359\u200b9531\u200b1707,GBP",
       "expected": true,
       "compliance": [
+        "DORA",
+        "CCPA_CPRA",
+        "GLBA",
         "PCI_DSS"
       ]
     },
@@ -1659,9 +2178,17 @@
       "text": "2026-07-11T09:31:02Z DEBUG contact raw=3839342d3535352d30313839 region=NYQ",
       "expected": true,
       "compliance": [
+        "ISO_27001",
+        "NIST_800_53",
         "HIPAA",
+        "HITECH",
         "GDPR",
-        "ISO_27001"
+        "CCPA_CPRA",
+        "LGPD",
+        "PIPEDA",
+        "POPIA",
+        "FERPA",
+        "GLBA"
       ]
     },
     {
@@ -1673,7 +2200,9 @@
       "text": "beneficiary_iban:NL00TEST\u200b45567646980731",
       "expected": true,
       "compliance": [
-        "GDPR"
+        "DORA",
+        "GDPR",
+        "GLBA"
       ]
     }
   ]

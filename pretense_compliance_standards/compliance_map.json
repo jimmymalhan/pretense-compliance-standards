@@ -2,100 +2,201 @@
   "_notice": "SYNTHETIC benchmark taxonomy \u2014 kind -> compliance frameworks.",
   "frameworks": [
     "SOC2",
-    "HIPAA",
-    "GDPR",
-    "CMMC_L2",
     "ISO_27001",
+    "NIST_800_53",
+    "NIST_800_171",
+    "FedRAMP",
+    "NIS2",
+    "DORA",
+    "HIPAA",
+    "HITECH",
+    "GDPR",
+    "CCPA_CPRA",
+    "LGPD",
+    "PIPEDA",
+    "POPIA",
+    "FERPA",
+    "GLBA",
+    "CMMC_L2",
     "PCI_DSS"
   ],
   "kind_frameworks": {
-    "medical_record_number": [
-      "HIPAA"
-    ],
-    "icd10": [
-      "HIPAA"
-    ],
-    "health_record": [
-      "HIPAA"
-    ],
-    "insurance_member_id": [
-      "HIPAA"
-    ],
-    "ssn": [
-      "HIPAA",
-      "ISO_27001"
-    ],
-    "email": [
-      "HIPAA",
-      "GDPR",
-      "ISO_27001"
-    ],
-    "phone": [
-      "HIPAA",
-      "GDPR",
-      "ISO_27001"
-    ],
-    "national_id": [
-      "GDPR",
-      "ISO_27001"
-    ],
-    "passport": [
-      "GDPR",
-      "ISO_27001"
-    ],
-    "iban": [
-      "GDPR"
-    ],
-    "vat": [
-      "GDPR"
-    ],
     "api_key": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "aws_key": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "gcp_key": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "github_token": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "slack_token": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "db_url": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "jwt": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "secret": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
     ],
     "access_log": [
       "SOC2",
-      "ISO_27001"
+      "ISO_27001",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "NIS2",
+      "DORA"
+    ],
+    "ssn": [
+      "ISO_27001",
+      "NIST_800_53",
+      "HIPAA",
+      "HITECH",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "FERPA",
+      "GLBA"
+    ],
+    "national_id": [
+      "ISO_27001",
+      "GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA"
+    ],
+    "passport": [
+      "ISO_27001",
+      "GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA"
+    ],
+    "email": [
+      "ISO_27001",
+      "NIST_800_53",
+      "HIPAA",
+      "HITECH",
+      "GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "FERPA",
+      "GLBA"
+    ],
+    "phone": [
+      "ISO_27001",
+      "NIST_800_53",
+      "HIPAA",
+      "HITECH",
+      "GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "FERPA",
+      "GLBA"
     ],
     "contract_number": [
+      "NIST_800_171",
       "CMMC_L2"
     ],
     "part_number": [
+      "NIST_800_171",
       "CMMC_L2"
     ],
     "internal_program_code": [
+      "NIST_800_171",
       "CMMC_L2"
     ],
+    "iban": [
+      "DORA",
+      "GDPR",
+      "GLBA"
+    ],
     "pan": [
+      "DORA",
+      "CCPA_CPRA",
+      "GLBA",
       "PCI_DSS"
+    ],
+    "medical_record_number": [
+      "HIPAA",
+      "HITECH"
+    ],
+    "icd10": [
+      "HIPAA",
+      "HITECH"
+    ],
+    "health_record": [
+      "HIPAA",
+      "HITECH"
+    ],
+    "insurance_member_id": [
+      "HIPAA",
+      "HITECH"
+    ],
+    "vat": [
+      "GDPR"
     ]
   }
 }

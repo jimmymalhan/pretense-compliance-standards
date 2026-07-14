@@ -23,43 +23,54 @@ from __future__ import annotations
 import json
 import pathlib
 
-# kind -> frameworks it exercises. Every corpus kind must appear here with a
-# non-empty list; every framework must claim at least one kind.
-KIND_FRAMEWORKS: dict[str, list[str]] = {
-    # --- health / PHI (HIPAA) ---
-    "medical_record_number": ["HIPAA"],
-    "icd10": ["HIPAA"],
-    "health_record": ["HIPAA"],
-    "insurance_member_id": ["HIPAA"],
-    # --- identifiers that straddle multiple regimes ---
-    "ssn": ["HIPAA", "ISO_27001"],                 # US identifier / PII in PHI context
-    "email": ["HIPAA", "GDPR", "ISO_27001"],       # contact info + EU personal data
-    "phone": ["HIPAA", "GDPR", "ISO_27001"],
-    # --- EU personal data (GDPR) ---
-    "national_id": ["GDPR", "ISO_27001"],
-    "passport": ["GDPR", "ISO_27001"],
-    "iban": ["GDPR"],
-    "vat": ["GDPR"],
-    # --- credentials / security (SOC2 + ISO 27001) ---
-    "api_key": ["SOC2", "ISO_27001"],
-    "aws_key": ["SOC2", "ISO_27001"],
-    "gcp_key": ["SOC2", "ISO_27001"],
-    "github_token": ["SOC2", "ISO_27001"],
-    "slack_token": ["SOC2", "ISO_27001"],
-    "db_url": ["SOC2", "ISO_27001"],
-    "jwt": ["SOC2", "ISO_27001"],
-    "secret": ["SOC2", "ISO_27001"],
-    "access_log": ["SOC2", "ISO_27001"],
-    # --- controlled unclassified / technical info (CMMC Level 2) ---
-    "contract_number": ["CMMC_L2"],
-    "part_number": ["CMMC_L2"],
-    "internal_program_code": ["CMMC_L2"],
-    # --- cardholder data (PCI DSS) ---
-    "pan": ["PCI_DSS"],
+# Data-kind groups (building blocks; each kind belongs to exactly one group).
+_CREDENTIALS = ["api_key", "aws_key", "gcp_key", "github_token", "slack_token",
+                "db_url", "jwt", "secret", "access_log"]   # SOC2 / security controls
+_PHI = ["medical_record_number", "icd10", "health_record", "insurance_member_id"]
+_CONTACT = ["email", "phone"]                               # PII contact info
+_NATIONAL_ID = ["ssn", "national_id", "passport"]           # government identifiers
+_EU_FINANCE = ["iban", "vat"]                               # EU financial identifiers
+_CUI = ["contract_number", "part_number", "internal_program_code"]  # controlled tech info
+_CARD = ["pan"]                                             # cardholder data
+
+# framework -> kinds it regulates. Source of truth; KIND_FRAMEWORKS is derived
+# from it so the two can never drift. Ordering here sets the report order.
+# Each framework is mapped to the kinds whose data category it plausibly governs.
+FRAMEWORK_KINDS: dict[str, list[str]] = {
+    # --- security / credential regimes ---
+    "SOC2":         _CREDENTIALS,
+    "ISO_27001":    _CREDENTIALS + _NATIONAL_ID + _CONTACT,
+    "NIST_800_53":  _CREDENTIALS + ["ssn"] + _CONTACT,
+    "NIST_800_171": _CUI + _CREDENTIALS,                    # protecting CUI systems
+    "FedRAMP":      _CREDENTIALS,                           # cloud auth (NIST 800-53 based)
+    "NIS2":         _CREDENTIALS,                           # EU network & info security
+    "DORA":         _CREDENTIALS + ["iban", "pan"],         # EU financial ICT resilience
+    # --- health regimes ---
+    "HIPAA":        _PHI + ["ssn"] + _CONTACT,
+    "HITECH":       _PHI + ["ssn"] + _CONTACT,              # strengthens HIPAA (ePHI)
+    # --- privacy regimes ---
+    "GDPR":         ["national_id", "passport"] + _EU_FINANCE + _CONTACT,
+    "CCPA_CPRA":    _NATIONAL_ID + _CONTACT + _CARD,        # California consumer privacy
+    "LGPD":         _NATIONAL_ID + _CONTACT,                # Brazil
+    "PIPEDA":       _NATIONAL_ID + _CONTACT,                # Canada
+    "POPIA":        _NATIONAL_ID + _CONTACT,                # South Africa
+    "FERPA":        ["ssn"] + _CONTACT,                     # US student education records
+    # --- financial / controlled / card ---
+    "GLBA":         _CARD + ["iban", "ssn"] + _CONTACT,     # US financial privacy
+    "CMMC_L2":      _CUI,                                   # DoD controlled unclassified info
+    "PCI_DSS":      _CARD,                                  # cardholder data
 }
 
-# Canonical framework order for reports (stable, not derived from dict order).
-FRAMEWORKS: list[str] = ["SOC2", "HIPAA", "GDPR", "CMMC_L2", "ISO_27001", "PCI_DSS"]
+# Canonical framework order for reports.
+FRAMEWORKS: list[str] = list(FRAMEWORK_KINDS)
+
+# kind -> frameworks it exercises (derived from FRAMEWORK_KINDS; never drifts).
+KIND_FRAMEWORKS: dict[str, list[str]] = {}
+for _fw in FRAMEWORKS:
+    for _kind in FRAMEWORK_KINDS[_fw]:
+        KIND_FRAMEWORKS.setdefault(_kind, [])
+        if _fw not in KIND_FRAMEWORKS[_kind]:
+            KIND_FRAMEWORKS[_kind].append(_fw)
 
 
 def frameworks_for(kind: str) -> list[str]:
