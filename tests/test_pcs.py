@@ -1,5 +1,5 @@
 """
-Regression tests for the synthetic DLP recall benchmark (`dlp_benchmark`).
+Regression tests for the synthetic DLP recall benchmark (`pretense_compliance_standards`).
 
 These lock in the benchmark's contract:
   * the corpus is buildable and every corpus file exists,
@@ -21,9 +21,9 @@ import unicodedata
 
 import pytest
 
-from dlp_benchmark import BANNER, corpus_builder, harness
-from dlp_benchmark.compliance import FRAMEWORKS, frameworks_for
-from dlp_benchmark.detector import detect
+from pretense_compliance_standards import BANNER, corpus_builder, harness
+from pretense_compliance_standards.compliance import FRAMEWORKS, frameworks_for
+from pretense_compliance_standards.detector import detect
 
 # Framework-name guardrail: a compliance framework may be NAMED in a case's
 # ``compliance`` metadata field (the new categorization layer), but must NEVER

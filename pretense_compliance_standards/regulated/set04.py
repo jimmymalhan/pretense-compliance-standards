@@ -23,7 +23,7 @@ obfuscation tiers document detection challenges (base64/hex/homoglyph/zero-width
 split-literals) that a hardened scanner recovers via normalization; they are NOT
 ways to smuggle data past a control.
 
-Run:  python3 dlp_benchmark/regulated/set04.py
+Run:  python3 pretense_compliance_standards/regulated/set04.py
 """
 
 from __future__ import annotations
@@ -37,8 +37,8 @@ import unicodedata
 # Make the package importable when this file is run as a standalone script.
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
-from dlp_benchmark import BANNER  # noqa: E402
-from dlp_benchmark import corpus_builder  # noqa: E402
+from pretense_compliance_standards import BANNER  # noqa: E402
+from pretense_compliance_standards import corpus_builder  # noqa: E402
 
 # Reproducible corpus for test assertions (values are fixed literals below; the
 # seed keeps any incidental ordering/choices stable).

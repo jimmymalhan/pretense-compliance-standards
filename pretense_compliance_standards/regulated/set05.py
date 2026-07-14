@@ -19,7 +19,7 @@ Provable-fakeness contract (identical spirit to the rest of the benchmark):
 Neutral `kind` labels only (no compliance-framework strings anywhere). Each
 case is labeled scanner INPUT (`expected: True`) to raise detector recall.
 
-Run:  python3 dlp_benchmark/regulated/set05.py
+Run:  python3 pretense_compliance_standards/regulated/set05.py
       -> writes corpus/blended_regulated_05.json, self-validates, prints summary.
 """
 
@@ -32,14 +32,14 @@ import re
 import string
 import sys
 
-# Allow running as a plain script (python3 dlp_benchmark/regulated/set05.py)
-# as well as `python3 -m dlp_benchmark.regulated.set05`.
+# Allow running as a plain script (python3 pretense_compliance_standards/regulated/set05.py)
+# as well as `python3 -m pretense_compliance_standards.regulated.set05`.
 if __package__ in (None, ""):
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
-from dlp_benchmark import BANNER
-from dlp_benchmark import corpus_builder
-from dlp_benchmark.generator import (
+from pretense_compliance_standards import BANNER
+from pretense_compliance_standards import corpus_builder
+from pretense_compliance_standards.generator import (
     CURRENCIES,
     DIAGNOSES,
     MEDICATIONS,

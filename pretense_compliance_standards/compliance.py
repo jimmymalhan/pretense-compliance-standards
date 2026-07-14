@@ -13,7 +13,7 @@ personal data). Framework names live here, in the per-case `compliance`
 metadata, and in reports/docs ONLY — never inside a case's scanned `text`
 payload, which stays clean synthetic data.
 
-Running this module (`python -m dlp_benchmark.compliance`) regenerates
+Running this module (`python -m pretense_compliance_standards.compliance`) regenerates
 `compliance_map.json` next to it, so the JS bridge can read the same mapping
 without importing Python.
 """

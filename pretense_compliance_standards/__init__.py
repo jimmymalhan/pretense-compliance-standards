@@ -1,5 +1,5 @@
 """
-dlp_benchmark — a graded DLP (data-loss-prevention) *recall* benchmark.
+pretense_compliance_standards — a graded DLP (data-loss-prevention) *recall* benchmark.
 
 Everything in this package is SYNTHETIC. Every "sensitive" value is fake by
 construction (SSNs in the never-issued 900-xx-xxxx range, 555-01xx phone
@@ -18,4 +18,4 @@ from __future__ import annotations
 
 __all__ = ["generator", "detector", "corpus_builder", "harness"]
 
-BANNER = "SYNTHETIC — FAKE DLP BENCHMARK DATA, NOT REAL"
+BANNER = "SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL"

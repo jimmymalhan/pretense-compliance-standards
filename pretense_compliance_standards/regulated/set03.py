@@ -11,8 +11,8 @@ difficulty gradient (tiers 0-4); they are never a way to smuggle data past a
 control. All contract / part / program values are entirely invented; none
 reference any real program, contractor, or identifier.
 
-Run:  python3 dlp_benchmark/regulated/set03.py
-      -> writes dlp_benchmark/corpus/blended_regulated_03.json, self-validates,
+Run:  python3 pretense_compliance_standards/regulated/set03.py
+      -> writes pretense_compliance_standards/corpus/blended_regulated_03.json, self-validates,
          prints a summary, and exits non-zero on any guardrail failure.
 """
 
@@ -26,13 +26,13 @@ import re
 import string
 
 if __package__ in (None, ""):
-    # Allow direct execution: `python3 dlp_benchmark/regulated/set03.py`.
+    # Allow direct execution: `python3 pretense_compliance_standards/regulated/set03.py`.
     import sys
 
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
-    from dlp_benchmark import BANNER
-    from dlp_benchmark.corpus_builder import _write_json
-    from dlp_benchmark.generator import _digits, _fake_email, _fake_phone, _fake_ssn
+    from pretense_compliance_standards import BANNER
+    from pretense_compliance_standards.corpus_builder import _write_json
+    from pretense_compliance_standards.generator import _digits, _fake_email, _fake_phone, _fake_ssn
 else:
     from .. import BANNER
     from ..corpus_builder import _write_json

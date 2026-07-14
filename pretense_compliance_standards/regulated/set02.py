@@ -18,8 +18,8 @@ The cases are BLENDED (kinds interleaved, not grouped) and UN-ANNOTATED — they
 are labeled *scanner input* meant to raise detector recall, never camouflage.
 Each record is something a correct DLP scanner SHOULD flag.
 
-Run:  python3 dlp_benchmark/regulated/set02.py
-      -> writes dlp_benchmark/corpus/blended_regulated_02.json, self-validates.
+Run:  python3 pretense_compliance_standards/regulated/set02.py
+      -> writes pretense_compliance_standards/corpus/blended_regulated_02.json, self-validates.
 """
 
 from __future__ import annotations
@@ -33,14 +33,14 @@ import re
 import string
 import sys
 
-# Allow `python3 dlp_benchmark/regulated/set02.py` (script dir, not repo root,
+# Allow `python3 pretense_compliance_standards/regulated/set02.py` (script dir, not repo root,
 # is sys.path[0]) to import the package by adding the repo root to the path.
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-from dlp_benchmark import BANNER
-from dlp_benchmark.corpus_builder import _write_json
+from pretense_compliance_standards import BANNER
+from pretense_compliance_standards.corpus_builder import _write_json
 
 SOURCE_FILE = "corpus/blended_regulated_02.json"
 ZW = "​"  # zero-width space
@@ -246,7 +246,7 @@ def _validate(cases: list[dict], written_text: str) -> None:
 
 def main() -> None:
     cases = build_cases()
-    out_path = pathlib.Path(_REPO_ROOT) / "dlp_benchmark" / SOURCE_FILE
+    out_path = pathlib.Path(_REPO_ROOT) / "pretense_compliance_standards" / SOURCE_FILE
     out_path.parent.mkdir(parents=True, exist_ok=True)
     _write_json(out_path, cases)
 

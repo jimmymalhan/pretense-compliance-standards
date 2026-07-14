@@ -20,7 +20,7 @@ Each case is labeled ``expected: true`` — something a correct DLP scanner SHOU
 flag. The obfuscation tiers document detection challenges to overcome, never
 ways to smuggle data past a scanner.
 
-Run:  python3 dlp_benchmark/regulated/set01.py
+Run:  python3 pretense_compliance_standards/regulated/set01.py
       -> writes corpus/blended_regulated_01.json, self-validates, prints summary.
 """
 
@@ -34,14 +34,14 @@ import re
 import string
 import sys
 
-# Allow `python3 dlp_benchmark/regulated/set01.py` (script mode) to import the
+# Allow `python3 pretense_compliance_standards/regulated/set01.py` (script mode) to import the
 # package: put the repo root on sys.path when it isn't already importable.
 if __package__ in (None, ""):
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
-from dlp_benchmark import BANNER
-from dlp_benchmark.corpus_builder import _write_json
-from dlp_benchmark.generator import (
+from pretense_compliance_standards import BANNER
+from pretense_compliance_standards.corpus_builder import _write_json
+from pretense_compliance_standards.generator import (
     DIAGNOSES,
     FIRST_NAMES,
     LAST_NAMES,

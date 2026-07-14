@@ -10,7 +10,7 @@ tiers and fall off as obfuscation increases; `hardened` should claw most of that
 back. Every point below 100% is a normalization gap to close in the detector —
 that is the actionable output of this benchmark.
 
-Run:  python -m dlp_benchmark.harness
+Run:  python -m pretense_compliance_standards.harness
 """
 
 from __future__ import annotations

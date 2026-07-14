@@ -18,7 +18,7 @@ EVERY value is synthetic and provably fake (900-range SSNs, 555-01xx phones,
 document detection challenges to overcome, never ways to smuggle data past a
 scanner.
 
-Run:  python -m dlp_benchmark.corpus_builder
+Run:  python -m pretense_compliance_standards.corpus_builder
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 # Pretense identify + mutate bridge
 
-Feeds the synthetic DLP benchmark corpus (`dlp_benchmark/corpus/cases.json`)
+Feeds the synthetic DLP benchmark corpus (`pretense_compliance_standards/corpus/cases.json`)
 through the real **pretense** AI-firewall engine and reports how much of the
 sensitive test data pretense covers, broken down by difficulty tier.
 
@@ -25,7 +25,7 @@ tier |   n | identify | mutate
 ## Per-framework report
 
 The bridge also reports how well pretense protects **each compliance
-framework's** data. It reads the taxonomy in `dlp_benchmark/compliance_map.json`
+framework's** data. It reads the taxonomy in `pretense_compliance_standards/compliance_map.json`
 (`{ "frameworks": [...], "kind_frameworks": { "<kind>": ["<fw>", ...] } }`) and,
 for every framework, aggregates identify% and mutate% over the corpus cases
 whose `kind` maps to that framework. Because a single `kind` can map to more
@@ -70,7 +70,7 @@ run in environments without the checkout.
 ## How to run
 
 ```
-node --experimental-transform-types dlp_benchmark/pretense_bridge/run.mjs
+node --experimental-transform-types pretense_compliance_standards/pretense_bridge/run.mjs
 ```
 
 `--experimental-transform-types` lets Node execute the engine's TypeScript

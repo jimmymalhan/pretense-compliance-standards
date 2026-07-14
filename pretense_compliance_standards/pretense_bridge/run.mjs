@@ -18,7 +18,7 @@
  * reads the corpus; it never mutates corpus data on disk.
  *
  * Run:
- *   node --experimental-transform-types dlp_benchmark/pretense_bridge/run.mjs
+ *   node --experimental-transform-types pretense_compliance_standards/pretense_bridge/run.mjs
  */
 
 import { copyFileSync, mkdtempSync, existsSync, readFileSync, writeFileSync, rmSync } from "node:fs";

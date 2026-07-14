@@ -1,4 +1,4 @@
-# `dlp_benchmark` — a graded DLP recall benchmark
+# `pretense_compliance_standards` — a graded DLP recall benchmark
 
 A benchmark for measuring how well a **DLP (data-loss-prevention) detector**
 catches sensitive data across a difficulty gradient, and for showing exactly
@@ -86,7 +86,7 @@ protected?"* — alongside the tier-by-tier recall story.
 
 ### Taxonomy (`kind` → frameworks)
 
-Reproduced from `compliance.py`; run `python3 -m dlp_benchmark.compliance` to
+Reproduced from `compliance.py`; run `python3 -m pretense_compliance_standards.compliance` to
 regenerate `compliance_map.json` and print the summary.
 
 | `kind` | Frameworks |
@@ -127,11 +127,11 @@ pan.
 ### Reading the per-framework reports
 
 ```bash
-python3 -m dlp_benchmark.harness   # recall per compliance framework (plus per tier)
+python3 -m pretense_compliance_standards.harness   # recall per compliance framework (plus per tier)
 ```
 
 ```bash
-node --experimental-transform-types dlp_benchmark/pretense_bridge/run.mjs   # pretense identify / mutate per framework
+node --experimental-transform-types pretense_compliance_standards/pretense_bridge/run.mjs   # pretense identify / mutate per framework
 ```
 
 The harness rolls detector recall up per framework, and the pretense bridge
@@ -151,8 +151,8 @@ read as *"framework X's data is under-protected"*, not just *"tier N is hard"*.
 ## Usage
 
 ```bash
-python3 -m dlp_benchmark.corpus_builder   # (re)generate corpus/ + cases.json
-python3 -m dlp_benchmark.compliance       # (re)generate compliance_map.json + print taxonomy summary
-python3 -m dlp_benchmark.harness          # score + print recall table (exit 1 on regression)
+python3 -m pretense_compliance_standards.corpus_builder   # (re)generate corpus/ + cases.json
+python3 -m pretense_compliance_standards.compliance       # (re)generate compliance_map.json + print taxonomy summary
+python3 -m pretense_compliance_standards.harness          # score + print recall table (exit 1 on regression)
 pytest tests/test_dlp_recall.py -q        # regression guard
 ```

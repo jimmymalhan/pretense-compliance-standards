@@ -1,5 +1,5 @@
 {
-  "_notice": "SYNTHETIC \u2014 FAKE DLP BENCHMARK DATA, NOT REAL \u2014 ground-truth labels for DLP recall scoring.",
+  "_notice": "SYNTHETIC \u2014 FAKE COMPLIANCE TEST DATA, NOT REAL \u2014 ground-truth labels for DLP recall scoring.",
   "cases": [
     {
       "id": "t0-ssn",

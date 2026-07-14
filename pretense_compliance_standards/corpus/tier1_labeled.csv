@@ -1,4 +1,4 @@
-# SYNTHETIC — FAKE DLP BENCHMARK DATA, NOT REAL
+# SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 id,kind,payload
 t1-ssn-dot,ssn,tax_id: 900.55.1234
 t1-phone-dash,phone,phone: 415-555-0142

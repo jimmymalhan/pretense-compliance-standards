@@ -1,5 +1,5 @@
 """
-dlp_benchmark.regulated — registry + auto-discovery for regulated-data modules.
+pretense_compliance_standards.regulated — registry + auto-discovery for regulated-data modules.
 
 This package holds *additional* synthetic DLP benchmark data modules that extend
 the base corpus into broader sensitive-data categories (health records,
@@ -14,7 +14,7 @@ aggregates its cases. It is a safe no-op returning ``[]`` when no data modules
 are present, so the base benchmark behaves identically until such modules arrive.
 
 Everything here is SYNTHETIC. Every value is fake by construction; see the
-package banner ``dlp_benchmark.BANNER``.
+package banner ``pretense_compliance_standards.BANNER``.
 """
 
 from __future__ import annotations
