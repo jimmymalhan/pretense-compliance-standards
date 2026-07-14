@@ -103,12 +103,14 @@ def test_every_case_expected_and_detected_hardened(cases):
 
 @pytest.mark.parametrize("c", corpus_builder.build_cases(), ids=lambda c: c["id"])
 def test_values_are_provably_fake(c):
-    """No real PII slips in: SSN in 900-range, phones 555-01xx, email @example.com."""
+    """No real PII slips in: SSN in 900-range, phones in a reserved-for-fiction
+    range (US 555-01xx or the UK Ofcom 020 7946 0xxx drama range), email
+    @example.com."""
     text = c["text"]
     if c["kind"] == "ssn" and c["obfuscation"] == "inline":
         assert re.search(r"\b9\d\d-\d\d-\d{4}\b", text)
     if c["kind"] == "phone" and c["obfuscation"] == "inline":
-        assert "555-01" in text
+        assert "555-01" in text or "7946 0" in text or "7946-0" in text
     if c["kind"] == "email" and c["obfuscation"] == "inline":
         assert text.strip().endswith("example.com") or "@example.com" in text
 

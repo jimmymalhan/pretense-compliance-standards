@@ -125,7 +125,9 @@ _BANK_ACCOUNT = re.compile(
     re.IGNORECASE,
 )
 # ABA routing number, labeled 9 digits.
-_ROUTING = re.compile(r"\b(?:routing|aba)\b\s*(?:no|number|#)?\s*[:=#]?\s*\d{9}\b", re.IGNORECASE)
+_ROUTING = re.compile(
+    r"\b(?:routing|aba)\b\s*(?:no|number|#)?\s*[:=#]?\s*\d{9}\b", re.IGNORECASE
+)
 # US Employer Identification Number XX-XXXXXXX.
 _EIN = re.compile(r"\b\d{2}-\d{7}\b")
 # Driver's license, labeled letter + 6-8 digits.
