@@ -1,14 +1,17 @@
 [project]
-name = "financedatabase"
+name = "pretense-compliance-standards"
 version = "2.4.0"
-description = "This is a database of 300.000+ symbols containing Equities, ETFs, Funds, Indices, Currencies, Cryptocurrencies and Money Markets."
+description = "Pretense Compliance Standards — a fully-synthetic DLP/compliance testbed scoring how pretense.ai protects regulated data across major compliance frameworks. Built on the FinanceDatabase library (used as the realistic codebase-under-test)."
 license = {text = "MIT"}
 authors = [
     { name = "Jeroen Bouma" }
 ]
+maintainers = [
+    { name = "Jimmy Malhan" }
+]
 readme = "README.md"
-homepage = "https://www.jeroenbouma.com/"
-repository = "https://github.com/JerBouma/FinanceDatabase"
+homepage = "https://github.com/jimmymalhan/pretense-compliance-standards"
+repository = "https://github.com/jimmymalhan/pretense-compliance-standards"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Financial and Insurance Industry",
@@ -59,10 +62,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["financedatabase"]
+packages = ["pretense_compliance_standards", "financedatabase"]
 
 [tool.hatch.build.targets.sdist]
 include = [
+    "pretense_compliance_standards/**",
     "financedatabase/**",
 ]
 

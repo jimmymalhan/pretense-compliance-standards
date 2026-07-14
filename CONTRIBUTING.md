@@ -1,5 +1,30 @@
-# CONTRIBUTING
-First off all, thank you for taking the time to contribute (or at least read the Contributing Guidelines)! 🚀
+# Contributing to Pretense Compliance Standards
+
+Thanks for contributing! 🚀 This repo is the **Pretense Compliance Standards** testbed —
+a fully-synthetic DLP/compliance corpus and scorer. The suite lives in
+[`pretense_compliance_standards/`](pretense_compliance_standards/README.md).
+
+## Ways to contribute
+
+- **Add synthetic test cases** — new `regulated/setNN.py` data modules (auto-discovered).
+  Every value must be **provably fake** (900-range SSNs, `555-01xx` phones, `@example.com`,
+  Luhn-but-random PANs, `sk_test_`/example secrets) and every file must carry the
+  `SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL` banner. Never put real data or
+  framework names inside a scanned payload.
+- **Extend the framework taxonomy** — map data `kind`s to more frameworks in
+  `pretense_compliance_standards/compliance.py`.
+- **Harden the detector** — close naive→hardened normalization gaps in `detector.py`.
+
+Before opening a PR: `uv run pytest tests/test_pcs.py -q --noconftest` (green),
+`uv run black --check .`, and `python3 -m pretense_compliance_standards.harness` (exit 0).
+
+---
+
+## Upstream: FinanceDatabase contribution guide
+
+The guidance below is from **[FinanceDatabase](https://github.com/JerBouma/FinanceDatabase)**
+by **Jeroen Bouma** (MIT), the finance-symbol library reused here as the codebase-under-test.
+It applies to the `financedatabase/` + `database/` components, preserved with full credit.
 
 The FinanceDatabase serves the role of providing anyone with any type of financial product categorisation entirely for free. To be able to achieve this, the FinanceDatabase relies on involvement from the community to update, edit and remove tickers over time. This is made easy enough that anyone, even with a lack of coding experience can contribute because of the generation of CSV files that can be manually edited.
 
