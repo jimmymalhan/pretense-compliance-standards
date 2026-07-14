@@ -1,7 +1,7 @@
 """
 regulated/set02.py — Blended data-set 02 (EU-personal + access-log mix).
 
-SYNTHETIC — FAKE DLP BENCHMARK DATA, NOT REAL. Every value in this module is
+SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL. Every value in this module is
 fake by construction and drawn from a reserved / example range:
 
     email        -> ...@example.com          (RFC 2606 reserved domain)
