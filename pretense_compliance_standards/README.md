@@ -59,13 +59,15 @@ exercises (`compliance.py`, a many-to-many taxonomy). Each corpus case carries a
 **per framework** — so a gap reads as *"framework X's data is under-protected"*,
 not just *"tier N is hard."*
 
-**28 frameworks covered:** SOC2, ISO 27001, ISO 27701, NIST 800-53, NIST 800-171,
+**36 frameworks covered:** SOC2, ISO 27001, ISO 27701, NIST 800-53, NIST 800-171,
 FedRAMP, FISMA, NIS2, NYDFS 500, DORA, APRA CPS 234, HIPAA, HITECH, HITRUST, GDPR,
-UK-GDPR, CCPA/CPRA, LGPD, PIPEDA, POPIA, PIPL, PDPA-SG, COPPA, FERPA, SOX, GLBA,
-CMMC L2, PCI DSS — spanning security/credential regimes, health (PHI), global
-privacy laws, financial, and controlled-unclassified categories. Across 38 data
-kinds (incl. card CVV, bank/routing/EIN, driver's license, DOB, IPv4/IPv6, NPI,
-and cloud/vendor API keys).
+UK-GDPR, CCPA/CPRA, LGPD, PIPEDA, POPIA, PIPL, PDPA-SG, COPPA, FERPA, DPDP (India),
+APPI (Japan), PIPA (Korea), Australia Privacy Act, Swiss FADP, PDPA (Thailand),
+CJIS, IRS Pub 1075, SOX, GLBA, CMMC L2, PCI DSS — spanning security/credential
+regimes, health (PHI), global privacy laws, financial, and controlled-unclassified
+categories. Across 44 data kinds (incl. card CVV, bank/routing/EIN, driver's
+license, DOB, IPv4/IPv6, MAC, crypto wallet, SSH/PEM private key, SWIFT/BIC, VIN,
+Medicare ID, NPI, and cloud/vendor API keys).
 
 The taxonomy is defined once in `compliance.py` (`FRAMEWORK_KINDS` is the source of
 truth; `KIND_FRAMEWORKS` is derived so the two can't drift). Print the live mapping:

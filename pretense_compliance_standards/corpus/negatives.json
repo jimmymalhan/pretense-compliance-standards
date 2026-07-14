@@ -93,10 +93,80 @@
       "expected": false
     },
     {
-      "id": "n-ipv6-mac",
-      "kind_hint": "ipv6",
-      "text": "Adapter MAC 00:1b:44:11:3a:b7 seen on the switch.",
-      "note": "MAC address: 6 groups, no :: -> not IPv6",
+      "id": "n-mac-short",
+      "kind_hint": "mac_address",
+      "text": "Cache tag de:ad:be:ef logged for the node.",
+      "note": "only 4 hex groups -> not a full 6-octet MAC (and not IPv6)",
+      "expected": false
+    },
+    {
+      "id": "n-crypto-short",
+      "kind_hint": "crypto_wallet_address",
+      "text": "Debug pointer at 0x1a2b3c logged during the crash.",
+      "note": "0x + short hex -> a memory pointer, not a 40-hex wallet address",
+      "expected": false
+    },
+    {
+      "id": "n-crypto-hash",
+      "kind_hint": "crypto_wallet_address",
+      "text": "Commit 0xdeadbeef tagged in the release notes.",
+      "note": "0x + 8 hex -> a short hash, not a 40-hex wallet address",
+      "expected": false
+    },
+    {
+      "id": "n-vin-nolabel",
+      "kind_hint": "vehicle_vin",
+      "text": "The vin lookup service returned no record today.",
+      "note": "the word 'vin' with no following 17-char VIN",
+      "expected": false
+    },
+    {
+      "id": "n-bic-noword",
+      "kind_hint": "swift_bic",
+      "text": "Please swift-track the shipment to the loading dock.",
+      "note": "'swift' as an adjective, no BIC code following",
+      "expected": false
+    },
+    {
+      "id": "n-ssh-pubkey",
+      "kind_hint": "ssh_private_key",
+      "text": "Stored the -----BEGIN PUBLIC KEY----- in the vault.",
+      "note": "a PUBLIC key header is not a private key",
+      "expected": false
+    },
+    {
+      "id": "n-medicare-partb",
+      "kind_hint": "medicare_id",
+      "text": "Enrolled in medicare part b for 2026 coverage.",
+      "note": "'medicare' as a program name, no 11-char MBI following",
+      "expected": false
+    },
+    {
+      "id": "n-medicare-info",
+      "kind_hint": "medicare_id",
+      "text": "Patient medicare information was updated in the portal.",
+      "note": "'medicare information' (lowercase prose) is not an uppercase MBI",
+      "expected": false
+    },
+    {
+      "id": "n-bic-swiftword",
+      "kind_hint": "swift_bic",
+      "text": "We expect a swift response from the vendor team.",
+      "note": "'swift response' (lowercase) is not an uppercase BIC code",
+      "expected": false
+    },
+    {
+      "id": "n-vin-slug",
+      "kind_hint": "vehicle_vin",
+      "text": "Job vin lookupabcdefgh1234567 processed overnight.",
+      "note": "a lowercase 17-char slug after 'vin' is not an uppercase VIN",
+      "expected": false
+    },
+    {
+      "id": "n-mac-fingerprint",
+      "kind_hint": "mac_address",
+      "text": "SSH host fingerprint 43:51:43:a1:b5:fc:8b:b7:0a:3a logged.",
+      "note": "10-octet colon-hex fingerprint -> neither a 6-octet MAC nor IPv6",
       "expected": false
     },
     {

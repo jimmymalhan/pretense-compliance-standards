@@ -199,7 +199,7 @@ _IP_ADDRESS = re.compile(
 # unanchored `::` matches C++/log scope-resolution ("std::deadbeef"), so the
 # leading-`::` branch has a (?<!\w) guard to reject a `::` glued to a word.
 _IPV6 = re.compile(
-    r"\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b"
+    r"(?<![0-9a-fA-F:])(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}(?![0-9a-fA-F:])"
     r"|\b(?:[0-9a-fA-F]{1,4}:){1,7}:(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?\b"
     r"|(?<!\w)::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}\b"
 )
@@ -215,6 +215,34 @@ _AZURE_KEY = re.compile(r"AccountKey=[A-Za-z0-9+/=]{40,}", re.IGNORECASE)
 _SENDGRID_KEY = re.compile(r"\bSG\.[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}\b")
 # Twilio key `SK` + 32 hex.
 _TWILIO_KEY = re.compile(r"\bSK[a-f0-9]{32}\b")
+
+# --- M3 kinds: network / crypto / key / financial / vehicle / health id ---
+# MAC address: EXACTLY 6 colon-separated hex octets. The lookarounds require the
+# run not to be embedded in a longer colon-hex string, so a 10-octet SSH/cert
+# fingerprint is not matched as a MAC. (A full-8-group colon-hex string is still
+# IPv6-shaped and handled by _IPV6; a 6-octet run is not.)
+_MAC_ADDRESS = re.compile(
+    r"(?<![0-9A-Fa-f:])(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}(?![0-9A-Fa-f:])"
+)
+# Crypto wallet: Ethereum-style `0x` + 40 hex.
+_CRYPTO_WALLET = re.compile(r"\b0x[0-9a-fA-F]{40}\b")
+# SSH / PEM private-key header (any key type).
+_SSH_KEY = re.compile(r"-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----")
+# SWIFT/BIC bank code, labeled: 6 letters + 2 alnum (+ optional 3-char branch).
+# Only the label is case-insensitive; the code body stays UPPERCASE (as real BICs
+# are), so "swift response" — a lowercase word — is not mistaken for a BIC.
+_SWIFT_BIC = re.compile(
+    r"\b(?i:bic|swift)\b\s*[:=#]?\s*[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b"
+)
+# Vehicle VIN, labeled: 17 UPPERCASE chars from the VIN alphabet (excludes I/O/Q).
+# Case-insensitive label only, so a lowercase 17-char slug after "vin" is not a VIN.
+_VIN = re.compile(r"\b(?i:vin)\b\s*[:=#]?\s*[A-HJ-NPR-Z0-9]{17}\b")
+# US Medicare Beneficiary Identifier (MBI), labeled: 11 UPPERCASE alphanumerics
+# starting with a digit 1-9 (the MBI format). Case-insensitive label only, so
+# "medicare information" / "medicare eligibility" (lowercase prose) is not an MBI.
+_MEDICARE = re.compile(
+    r"\b(?i:medicare(?:\s*(?:id|no|number|mbi))?|mbi)\b\s*[:=#]?\s*[1-9][0-9A-Z]{10}\b"
+)
 
 # Non-ASCII homoglyph digits, in case NFKC leaves any. Intentionally does NOT
 # remap ASCII letters (O/l/I): doing so corrupts ordinary text like "example".
@@ -489,6 +517,18 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
             found.add("sendgrid_key")
         if _TWILIO_KEY.search(view):
             found.add("twilio_key")
+        if _MAC_ADDRESS.search(view):
+            found.add("mac_address")
+        if _CRYPTO_WALLET.search(view):
+            found.add("crypto_wallet_address")
+        if _SSH_KEY.search(view):
+            found.add("ssh_private_key")
+        if _SWIFT_BIC.search(view):
+            found.add("swift_bic")
+        if _VIN.search(view):
+            found.add("vehicle_vin")
+        if _MEDICARE.search(view):
+            found.add("medicare_id")
         # Deterministic-hashing denylist check.
         for tok in _tokens(view):
             if hashlib.sha256(tok.encode()).hexdigest() in _DENYLIST_HASHES:

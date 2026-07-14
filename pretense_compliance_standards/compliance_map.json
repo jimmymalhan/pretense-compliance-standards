@@ -25,6 +25,14 @@
     "PDPA_SG",
     "COPPA",
     "FERPA",
+    "DPDP",
+    "APPI",
+    "PIPA_KR",
+    "AU_PRIVACY",
+    "FADP",
+    "PDPA_TH",
+    "CJIS",
+    "IRS_1075",
     "SOX",
     "GLBA",
     "CMMC_L2",
@@ -241,6 +249,21 @@
       "HITRUST",
       "SOX"
     ],
+    "ssh_private_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
     "ip_address": [
       "SOC2",
       "ISO_27001",
@@ -251,7 +274,9 @@
       "NIS2",
       "GDPR",
       "UK_GDPR",
-      "CCPA_CPRA"
+      "CCPA_CPRA",
+      "AU_PRIVACY",
+      "CJIS"
     ],
     "ipv6": [
       "SOC2",
@@ -263,7 +288,23 @@
       "NIS2",
       "GDPR",
       "UK_GDPR",
-      "CCPA_CPRA"
+      "CCPA_CPRA",
+      "AU_PRIVACY",
+      "CJIS"
+    ],
+    "mac_address": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "AU_PRIVACY",
+      "CJIS"
     ],
     "ssn": [
       "ISO_27001",
@@ -281,6 +322,14 @@
       "PIPL",
       "PDPA_SG",
       "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH",
+      "CJIS",
+      "IRS_1075",
       "GLBA"
     ],
     "national_id": [
@@ -295,7 +344,15 @@
       "POPIA",
       "PIPL",
       "PDPA_SG",
-      "COPPA"
+      "COPPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH",
+      "CJIS",
+      "IRS_1075"
     ],
     "passport": [
       "ISO_27001",
@@ -308,7 +365,15 @@
       "PIPEDA",
       "POPIA",
       "PIPL",
-      "PDPA_SG"
+      "PDPA_SG",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH",
+      "CJIS",
+      "IRS_1075"
     ],
     "drivers_license": [
       "ISO_27001",
@@ -321,7 +386,15 @@
       "PIPEDA",
       "POPIA",
       "PIPL",
-      "PDPA_SG"
+      "PDPA_SG",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH",
+      "CJIS",
+      "IRS_1075"
     ],
     "email": [
       "ISO_27001",
@@ -339,6 +412,13 @@
       "PDPA_SG",
       "COPPA",
       "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH",
+      "CJIS",
       "GLBA"
     ],
     "phone": [
@@ -357,6 +437,13 @@
       "PDPA_SG",
       "COPPA",
       "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH",
+      "CJIS",
       "GLBA"
     ],
     "date_of_birth": [
@@ -373,7 +460,35 @@
       "PIPL",
       "PDPA_SG",
       "COPPA",
-      "FERPA"
+      "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH"
+    ],
+    "vehicle_vin": [
+      "ISO_27701",
+      "HIPAA",
+      "HITECH",
+      "HITRUST",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA",
+      "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH"
     ],
     "contract_number": [
       "NIST_800_171",
@@ -391,6 +506,7 @@
       "NYDFS_500",
       "DORA",
       "APRA_CPS234",
+      "IRS_1075",
       "SOX",
       "GLBA"
     ],
@@ -405,13 +521,19 @@
       "NYDFS_500",
       "DORA",
       "APRA_CPS234",
+      "IRS_1075",
       "SOX",
       "GLBA"
+    ],
+    "crypto_wallet_address": [
+      "NYDFS_500",
+      "DORA"
     ],
     "iban": [
       "DORA",
       "GDPR",
       "UK_GDPR",
+      "FADP",
       "GLBA"
     ],
     "pan": [
@@ -446,9 +568,20 @@
       "HITECH",
       "HITRUST"
     ],
+    "medicare_id": [
+      "HIPAA",
+      "HITECH",
+      "HITRUST"
+    ],
     "vat": [
       "GDPR",
-      "UK_GDPR"
+      "UK_GDPR",
+      "FADP"
+    ],
+    "swift_bic": [
+      "GDPR",
+      "UK_GDPR",
+      "FADP"
     ],
     "card_cvv": [
       "CCPA_CPRA",
