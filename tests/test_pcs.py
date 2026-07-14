@@ -270,3 +270,42 @@ def test_per_framework_hardened_coverage(cases):
         "hardened mode missed non-exotic cases, leaving these frameworks "
         f"under-protected: { {k: sorted(v) for k, v in sorted(missed.items())} }"
     )
+
+
+# --- Per-framework tagged tests --------------------------------------------
+# One named test id + pytest marker per framework, so every framework is its own
+# signal (`test_framework_hardened_coverage_tagged[HIPAA]`) and can be run in
+# isolation (`pytest tests/test_pcs.py -m hipaa`). Because `--strict-markers` is
+# on, an unregistered framework marker fails at collection — an automatic guard
+# that pyproject markers stay in sync with `compliance.FRAMEWORKS`.
+_FW_PARAMS = [
+    pytest.param(fw, marks=getattr(pytest.mark, fw.lower())) for fw in FRAMEWORKS
+]
+
+
+@pytest.mark.parametrize("fw", _FW_PARAMS)
+def test_framework_has_cases(fw, cases):
+    """Every compliance framework is exercised by >=1 tagged corpus case."""
+    n = sum(1 for c in cases if fw in frameworks_for(c["kind"]))
+    assert n >= 1, f"framework {fw} has no corpus case"
+
+
+@pytest.mark.parametrize("fw", _FW_PARAMS)
+def test_framework_hardened_coverage_tagged(fw, cases):
+    """Every non-exotic (tier 0-3) case mapping to this framework is detected."""
+    missed = [
+        c["id"]
+        for c in cases
+        if fw in frameworks_for(c["kind"])
+        and c["difficulty"] < _EXOTIC_TIER
+        and c["kind"] not in detect(c["text"], "hardened")
+    ]
+    assert not missed, f"{fw}: hardened mode missed {sorted(missed)}"
+
+
+def test_every_case_carries_compliance_tag(cases):
+    """Every case carries a `compliance` tag exactly matching its kind's frameworks."""
+    for c in cases:
+        tag = c.get("compliance")
+        assert tag, f"{c['id']} has no compliance tag"
+        assert set(tag) == set(frameworks_for(c["kind"])), c["id"]
