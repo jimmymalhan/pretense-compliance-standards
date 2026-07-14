@@ -1,0 +1,101 @@
+{
+  "_notice": "SYNTHETIC benchmark taxonomy \u2014 kind -> compliance frameworks.",
+  "frameworks": [
+    "SOC2",
+    "HIPAA",
+    "GDPR",
+    "CMMC_L2",
+    "ISO_27001",
+    "PCI_DSS"
+  ],
+  "kind_frameworks": {
+    "medical_record_number": [
+      "HIPAA"
+    ],
+    "icd10": [
+      "HIPAA"
+    ],
+    "health_record": [
+      "HIPAA"
+    ],
+    "insurance_member_id": [
+      "HIPAA"
+    ],
+    "ssn": [
+      "HIPAA",
+      "ISO_27001"
+    ],
+    "email": [
+      "HIPAA",
+      "GDPR",
+      "ISO_27001"
+    ],
+    "phone": [
+      "HIPAA",
+      "GDPR",
+      "ISO_27001"
+    ],
+    "national_id": [
+      "GDPR",
+      "ISO_27001"
+    ],
+    "passport": [
+      "GDPR",
+      "ISO_27001"
+    ],
+    "iban": [
+      "GDPR"
+    ],
+    "vat": [
+      "GDPR"
+    ],
+    "api_key": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "aws_key": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "gcp_key": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "github_token": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "slack_token": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "db_url": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "jwt": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "secret": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "access_log": [
+      "SOC2",
+      "ISO_27001"
+    ],
+    "contract_number": [
+      "CMMC_L2"
+    ],
+    "part_number": [
+      "CMMC_L2"
+    ],
+    "internal_program_code": [
+      "CMMC_L2"
+    ],
+    "pan": [
+      "PCI_DSS"
+    ]
+  }
+}
