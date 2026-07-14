@@ -70,10 +70,12 @@ _PHONE = re.compile(
 # leading word boundary: after zero-width strip an IBAN can sit flush against
 # surrounding letters (e.g. "acctFR76...ref"), which a `\b` anchor would miss.
 _IBAN = re.compile(r"[A-Z]{2}\d{2}(?:[ ]?[A-Za-z0-9]){11,30}\b")
-# National identifier: 4-4-4 grouped (9dddd-...) or the 3-2-4 SSN-shape, both in
-# the never-issued 900-range. Zero-width forms collapse to a bare 9- or 12-digit
-# run (all national ids start with 9 by construction), handled separately below.
-_NATIONAL_ID = re.compile(r"\b(?:\d{4}-\d{4}-\d{4}|\d{3}-\d{2}-\d{4})\b")
+# National identifier: 4-4-4 grouped (9dddd-...) or the 3-2-4 SSN-shape, both
+# bounded to the never-issued 900-range (leading 9). Without that bound the
+# plain 3-2-4 shape also matches ordinary employee IDs like "123-45-6789";
+# every synthetic national-id value starts with 9 by construction. Zero-width
+# forms collapse to a bare 9- or 12-digit run, handled separately below.
+_NATIONAL_ID = re.compile(r"\b(?:9\d{3}-\d{4}-\d{4}|9\d\d-\d\d-\d{4})\b")
 _NATIONAL_ID_COLLAPSED = re.compile(r"(?<!\d)9(?:\d{8}|\d{11})(?!\d)")
 # Passport: 2 letters + 7 digits (e.g. "XA0000042") or 1 letter + 8 digits.
 _PASSPORT = re.compile(r"\b[A-Z]{2}\d{7}\b|\b[A-Z]\d{8}\b")
@@ -86,8 +88,40 @@ _CONTRACT_NUMBER = re.compile(r"\bCTR?-\d{4}-\d{4,6}\b")
 _PART_NUMBER = re.compile(r"\bPN-?[A-Z0-9]{6,}\b", re.IGNORECASE)
 # Medical record number: "MRN" + 8 digits (collapse view rejoins spaced groups).
 _MRN = re.compile(r"MRN\d{8}")
-# ICD-10 diagnosis code: letter + 2 digits, optional decimal subcode (F32.1, B20).
-_ICD10 = re.compile(r"\b[A-Z]\d\d(?:\.\d+)?\b")
+# ICD-10 diagnosis code: letter + 2 digits (+ optional decimal). A bare 3-char
+# code (e.g. "B20") is structurally indistinguishable from a model / room / grid
+# label, so `_has_icd10` requires one of three positive signals:
+#   * a decimal subcode (F32.1) — specific enough on its own; or
+#   * clinical context (diagnosis / icd / dx) adjacent on either side, tolerating
+#     one short spanning word ("dx of E11"); or
+#   * a *clinical* "code" phrase — "<primary/secondary/principal/admitting/
+#     discharge> code L##" or a direct "code=L##" / "code: L##" assignment.
+# The "code" signal is an ALLOWLIST, deliberately NOT a denylist of non-clinical
+# words: "<word> code L##" is unbounded ("confirmation code", "tracking code",
+# "booking code", …), so only the enumerated clinical forms count. This keeps the
+# corpus's context-only cases ("primary code I10", "code=I10") while rejecting the
+# entire "<generic> code L##" family.
+_ICD10_DECIMAL = re.compile(r"\b[A-Z]\d\d\.\d+\b")
+_ICD10_CLINICAL = re.compile(
+    r"(?:diagnos\w*|\bicd(?:-?10)?\b|\bdx\b)(?:[\W_]+\w{1,6})?[\W_]{0,4}[A-Z]\d\d\b"
+    r"|\b[A-Z]\d\d[\W_]{0,4}(?:diagnos\w*|\bicd(?:-?10)?\b|\bdx\b)",
+    re.IGNORECASE,
+)
+_ICD10_CODE = re.compile(
+    r"(?:primary|secondary|principal|admitting|discharge)\s+code[sd]?\b[\W_:=]{0,4}[A-Z]\d\d\b"
+    r"|\bcode\s*[:=]\s*[A-Z]\d\d\b",
+    re.IGNORECASE,
+)
+
+
+def _has_icd10(view: str) -> bool:
+    return bool(
+        _ICD10_DECIMAL.search(view)
+        or _ICD10_CLINICAL.search(view)
+        or _ICD10_CODE.search(view)
+    )
+
+
 # Insurance member id: 3 letters + 9 digits (e.g. "RRF139047426").
 _INSURANCE_MEMBER = re.compile(r"\b[A-Z]{3}\d{9}\b")
 # Internal program code: "PRG-" + 6 alphanumerics; hyphen optional so the
@@ -128,8 +162,18 @@ _BANK_ACCOUNT = re.compile(
 _ROUTING = re.compile(
     r"\b(?:routing|aba)\b\s*(?:no|number|#)?\s*[:=#]?\s*\d{9}\b", re.IGNORECASE
 )
-# US Employer Identification Number XX-XXXXXXX.
-_EIN = re.compile(r"\b\d{2}-\d{7}\b")
+# US Employer Identification Number NN-NNNNNNN. The bare 2-then-7 digit shape
+# also matches invoice / ticket numbers, so require an EIN label nearby. The
+# label alternation is \b-anchored so it does not fire inside words that merely
+# end in "ein" (vein, protein, casein); it accepts the common label vocabulary
+# (EIN, FEIN, employer id[entification], (federal) tax id) and tolerates up to
+# two short connector words before the number ("EIN is 12-3456789").
+_EIN = re.compile(
+    r"\b(?:f?ein|employer'?s?\s*id(?:entification)?|taxpayer\s*id(?:entification)?"
+    r"|(?:federal\s+)?tax\s*id(?:entification)?)"
+    r"(?:\s*(?:no|number|#))?(?:[\W_]+\w{1,7}){0,2}[\W_]{0,4}\d{2}-\d{7}\b",
+    re.IGNORECASE,
+)
 # Driver's license, labeled letter + 6-8 digits.
 _DRIVERS_LICENSE = re.compile(
     r"\b(?:dl|driver'?s?[\s_-]?licen[sc]e)\b\s*(?:no|number|#)?\s*[:=#]?\s*[A-Z]\d{6,8}\b",
@@ -144,9 +188,15 @@ _DOB = re.compile(
 _IP_ADDRESS = re.compile(
     r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b"
 )
-# IPv6 address (incl. :: compression).
+# IPv6 address: a full 8-group form (7 colons), a `::`-compressed form that still
+# has a hex group before the `::`, or a leading `::` form. The looser "2-to-7
+# colon groups" shape also matches clock times ("12:34:56") and MACs, and an
+# unanchored `::` matches C++/log scope-resolution ("std::deadbeef"), so the
+# leading-`::` branch has a (?<!\w) guard to reject a `::` glued to a word.
 _IPV6 = re.compile(
-    r"\b(?:[0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}\b|\b(?:[0-9a-fA-F]{1,4}:)+:[0-9a-fA-F:]*\b"
+    r"\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b"
+    r"|\b(?:[0-9a-fA-F]{1,4}:){1,7}:(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?\b"
+    r"|(?<!\w)::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}\b"
 )
 # National Provider Identifier (health), labeled 10 digits.
 _NPI = re.compile(r"\bnpi\b\s*[:=#]?\s*\d{10}\b", re.IGNORECASE)
@@ -291,7 +341,7 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
             found.add("gcp_key")
         if _MRN.search(view):
             found.add("medical_record_number")
-        if _ICD10.search(view):
+        if _has_icd10(view):
             found.add("icd10")
         if _INSURANCE_MEMBER.search(view):
             found.add("insurance_member_id")

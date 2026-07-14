@@ -24,6 +24,7 @@ import pytest
 from pretense_compliance_standards import BANNER, corpus_builder, harness
 from pretense_compliance_standards.compliance import FRAMEWORKS, frameworks_for
 from pretense_compliance_standards.detector import detect
+from pretense_compliance_standards.negatives import build_negatives
 
 # Framework-name guardrail: a compliance framework may be NAMED in a case's
 # ``compliance`` metadata field (the new categorization layer), but must NEVER
@@ -309,3 +310,100 @@ def test_every_case_carries_compliance_tag(cases):
         tag = c.get("compliance")
         assert tag, f"{c['id']} has no compliance tag"
         assert set(tag) == set(frameworks_for(c["kind"])), c["id"]
+
+
+# --- precision / false-positive corpus (benign look-alikes) ----------------
+# The positive corpus is recall-only (every case is expected:True). The negative
+# corpus adds benign look-alikes a correct detector must NOT flag, so the harness
+# can report precision / F1 and an over-broad regex surfaces as a false positive
+# instead of passing silently. A hardened-mode hit on any negative is a bug.
+_NEGATIVES = build_negatives()
+
+
+@pytest.fixture(scope="module")
+def negatives():
+    # Rebuild + rewrite the negative corpus so the test never depends on stale files.
+    built = corpus_builder.build_negatives()
+    corpus_builder.write_negatives(built)
+    return built
+
+
+def test_negatives_present(negatives):
+    """The negative corpus exists, is non-trivial, and is uniformly expected:False."""
+    assert len(negatives) >= 20, "expected a meaningful negative corpus"
+    ids = [c["id"] for c in negatives]
+    assert len(ids) == len(set(ids)), "duplicate negative id"
+    for c in negatives:
+        assert c["expected"] is False, c["id"]
+        assert c["text"].strip(), c["id"]
+        assert c.get("kind_hint"), f"{c['id']} missing kind_hint"
+
+
+def test_negatives_carry_banner(negatives):
+    """The written negatives.json carries the SYNTHETIC banner like every corpus file."""
+    path = _CORPUS_DIR / "corpus" / "negatives.json"
+    assert path.exists()
+    assert _has_banner(path.read_text(encoding="utf-8"))
+
+
+def test_no_framework_names_in_negative_text():
+    """Negatives are scanned content too — no compliance-framework name may leak in."""
+    for c in _NEGATIVES:
+        match = _FRAMEWORK_RE.search(c["text"])
+        assert match is None, f"{c['id']} text: {match.group() if match else ''}"
+
+
+@pytest.mark.parametrize("c", _NEGATIVES, ids=lambda c: c["id"])
+def test_negative_case_not_flagged(c):
+    """A benign look-alike must trip NO detector in hardened mode (no false positive).
+
+    Each negative resembles the sensitive kind named in its ``kind_hint`` but is
+    not regulated data; the strongest normalization (hardened) is the most
+    false-positive-prone, so this is where over-broad detectors would show up.
+    """
+    hits = detect(c["text"], "hardened")
+    assert (
+        not hits
+    ), f"{c['id']} falsely flagged {sorted(hits)} (looks like {c['kind_hint']})"
+
+
+@pytest.mark.parametrize(
+    "text,kind",
+    [
+        # icd10: context on either side / looser clinical phrasing must still fire
+        ("Chart notes diagnosis I10 as primary.", "icd10"),
+        ("Assessment recorded as diagnosis B20 by the physician.", "icd10"),
+        ("icd-10 E11 documented at intake.", "icd10"),
+        ("Patient with dx of E11 seen today.", "icd10"),
+        ("Encounter closed with primary code I10 today.", "icd10"),
+        # ein: real label vocabulary and connector words must still fire
+        ("EIN is 12-3456789 for the entity.", "ein"),
+        ("Employer identification number 12-3456789 on the W-9.", "ein"),
+        ("Employer's Identification Number: 12-3456789 on file.", "ein"),
+        ("FEIN 98-7654321 registered with the state.", "ein"),
+    ],
+)
+def test_labeled_regulated_data_still_detected(text, kind):
+    """Guard the tightenings against over-correcting into false negatives.
+
+    The regex tightening that removed the look-alike false positives (icd10 /
+    ein) must NOT start missing genuinely-labeled regulated data — clinical
+    context on either side of an ICD code, and the common EIN label vocabulary,
+    still have to be caught in hardened mode.
+    """
+    assert kind in detect(text, "hardened"), f"{kind} not detected in {text!r}"
+
+
+def test_hardened_precision_is_perfect(cases, negatives):
+    """Hardened mode scores zero false positives (precision 1.0) with recall intact.
+
+    The tightenings that removed the over-broad matches (icd10, ein, ipv6,
+    national_id) must not cost any positive recall — precision AND recall stay 1.0.
+    """
+    pr = harness.score_precision(cases, negatives)["hardened"]
+    assert (
+        pr["fp"] == 0
+    ), f"hardened false positives: {harness.false_positives(negatives, 'hardened')}"
+    assert pr["precision"] == 1.0
+    assert pr["recall"] == 1.0
+    assert pr["f1"] == 1.0
