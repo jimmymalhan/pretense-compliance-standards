@@ -1,8 +1,11 @@
 # Pretense identify + mutate bridge
 
-Feeds the synthetic DLP benchmark corpus (`pretense_compliance_standards/corpus/cases.json`)
-through the real **pretense** AI-firewall engine and reports how much of the
-sensitive test data pretense covers, broken down by difficulty tier.
+Feeds the Pretense Compliance Standards synthetic corpus
+(`pretense_compliance_standards/corpus/cases.json`) through the real
+**pretense.ai** firewall engine and reports how much of the sensitive test data
+pretense covers — broken down by difficulty tier **and by compliance framework**
+(so you can read coverage as "how well is each framework's data protected?").
+All input is synthetic and fake (see the suite's SYNTHETIC banner).
 
 Two independent measurements per case:
 
