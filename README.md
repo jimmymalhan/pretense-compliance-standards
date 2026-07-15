@@ -51,6 +51,26 @@ See [`pretense_compliance_standards/README.md`](pretense_compliance_standards/RE
 for the full taxonomy and report formats, and [`PRETENSE_COMPLIANCE_STANDARDS.md`](PRETENSE_COMPLIANCE_STANDARDS.md)
 for the project overview.
 
+## Test one framework at a time (`frameworks/<NAME>/`)
+
+Running `corpus_builder` also generates a **root `frameworks/` tree** — one folder
+per compliance framework ([`frameworks/HIPAA/`](frameworks/README.md),
+`frameworks/GDPR/`, `frameworks/PCI_DSS/`, … 36 in all) — so you can point **pretense**
+(or the tests) at exactly one framework's synthetic data:
+
+```bash
+python3 -m pretense_compliance_standards.corpus_builder             # (re)generate frameworks/<NAME>/
+node --experimental-transform-types \
+  pretense_compliance_standards/pretense_bridge/run.mjs --framework HIPAA   # scan only HIPAA data
+uv run pytest tests/test_pcs.py -m hipaa -q --noconftest            # run only HIPAA tests
+```
+
+Each folder holds that framework's `corpus/cases.json` + a `README.md`. Because one
+data `kind` maps to many frameworks (an email is HIPAA **and** GDPR **and** CCPA), a
+case appears under every framework it belongs to — the tree is a **generated view**
+over the shared corpus. The per-framework `corpus/` data is git-ignored (a build
+artifact regenerated on demand); the folders and their READMEs are committed.
+
 ---
 
 ## Built on FinanceDatabase

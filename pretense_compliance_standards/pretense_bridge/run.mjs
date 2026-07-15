@@ -72,7 +72,38 @@ function pct(hits, n) {
   return n === 0 ? "  n/a" : `${((hits / n) * 100).toFixed(1).padStart(5)}%`;
 }
 
+/**
+ * Parse an optional `--framework <NAME>` flag, scoping the run to one compliance
+ * framework's data. Validates against the taxonomy's framework list and exits
+ * with a clear message on a missing/unknown name.
+ */
+function parseFrameworkArg(argv, frameworks) {
+  // Accept both `--framework NAME` and `--framework=NAME`.
+  let name = null;
+  const eq = argv.find((a) => a.startsWith("--framework="));
+  if (eq) {
+    name = eq.slice("--framework=".length);
+  } else {
+    const i = argv.indexOf("--framework");
+    if (i === -1) return null;
+    name = argv[i + 1];
+  }
+  if (!name) {
+    console.error("--framework requires a name, e.g. --framework HIPAA");
+    process.exit(2);
+  }
+  if (!frameworks.includes(name)) {
+    console.error(
+      `unknown framework '${name}'.\nValid frameworks: ${frameworks.join(", ")}`,
+    );
+    process.exit(2);
+  }
+  return name;
+}
+
 async function main() {
+  // Graceful skip FIRST, before reading any data file, so the no-engine path
+  // stays a clean exit 0 even if the corpus / compliance map are not present.
   if (!existsSync(PRETENSE_SRC)) {
     console.log(`pretense engine not found at ${PRETENSE_SRC}; skipping`);
     process.exit(0);
@@ -85,13 +116,24 @@ async function main() {
   // Engine modules are loaded; the staged copies are no longer needed.
   rmSync(stageDir, { recursive: true, force: true });
 
-  const corpus = JSON.parse(readFileSync(CORPUS_PATH, "utf8"));
-  const cases = corpus.cases ?? [];
-
   // Compliance taxonomy: ordered framework list + kind -> frameworks map.
   const compliance = JSON.parse(readFileSync(COMPLIANCE_PATH, "utf8"));
   const frameworks = compliance.frameworks ?? [];
   const kindFrameworks = compliance.kind_frameworks ?? {};
+
+  const fwArg = parseFrameworkArg(process.argv, frameworks);
+
+  const corpus = JSON.parse(readFileSync(CORPUS_PATH, "utf8"));
+  const allCases = corpus.cases ?? [];
+  // With --framework, scan only the cases whose kind maps to that framework.
+  const cases = fwArg
+    ? allCases.filter((c) => (kindFrameworks[c.kind] ?? []).includes(fwArg))
+    : allCases;
+  if (fwArg) {
+    console.log(
+      `Scoped to framework: ${fwArg} (${cases.length} of ${allCases.length} cases)\n`,
+    );
+  }
 
   // tier -> { n, identify, mutate }
   const tiers = new Map();
