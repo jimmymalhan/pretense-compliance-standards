@@ -39,7 +39,7 @@ from .regulated import collect_regulated_cases
 CORPUS_DIR = pathlib.Path(__file__).parent / "corpus"
 # Root-level per-framework view (generated): frameworks/<FRAMEWORK>/…
 FRAMEWORKS_DIR = pathlib.Path(__file__).parent.parent / "frameworks"
-ZW = "​"  # zero-width space
+ZW = "\u200b"  # zero-width space
 
 
 def _luhn_ok(number: str) -> bool:

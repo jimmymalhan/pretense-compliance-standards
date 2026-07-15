@@ -32,8 +32,9 @@ This cadence has shipped every change here (PRs #6–#11) with all CI green.
    adversarial probe agent to try to break the fix.
 4. Green locally, exactly as CI does:
    ```bash
-   uv run pytest tests/test_pcs.py -q --noconftest   # local needs --noconftest
+   uv run pytest tests/test_pcs.py -q
    uv run black --check .
+   uv run ruff check pretense_compliance_standards tests
    ```
 
 ## After — release (industry-standard, cautious)
@@ -58,8 +59,7 @@ This cadence has shipped every change here (PRs #6–#11) with all CI green.
   `SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL` banner.
 - **No compliance-framework names inside a scanned `text` payload** — only in metadata,
   reports, table/variable/file names, and docs.
-- Preserve Jeroen Bouma's upstream MIT LICENSE + attribution; do not gut `financedatabase/`,
-  `database/`, `compression/`.
+- Everything is synthetic and MIT-licensed (© Jimmy Malhan); no real regulated data.
 
 ## Push protection
 

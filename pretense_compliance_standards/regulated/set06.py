@@ -27,7 +27,6 @@ Run:  python3 pretense_compliance_standards/regulated/set06.py
 from __future__ import annotations
 
 import base64
-import json
 import pathlib
 import re
 import sys
@@ -35,12 +34,14 @@ import sys
 if __package__ in (None, ""):
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
-from pretense_compliance_standards import BANNER
-from pretense_compliance_standards import corpus_builder as _cb
+from pretense_compliance_standards import (
+    BANNER,
+    corpus_builder as _cb,
+)
 from pretense_compliance_standards.detector import detect
 
 SOURCE_FILE = "corpus/blended_regulated_06.json"
-ZW = "​"  # zero-width space
+ZW = "\u200b"  # zero-width space
 
 
 def _b64(s: str) -> str:

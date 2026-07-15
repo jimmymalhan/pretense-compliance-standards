@@ -5,11 +5,8 @@
 > *mutate* (identifier redaction) — protects regulated data across the major global
 > compliance frameworks. End to end, reproducible, and scored per framework.
 
-**This is a customized fork.** The finance-symbol code at the repo root
-(`financedatabase/`, `database/`, `compression/`) is the upstream
-[FinanceDatabase](https://github.com/JerBouma/FinanceDatabase) project by Jeroen Bouma
-(MIT, preserved — see `LICENSE` and `NOTICE`), reused here as a realistic *codebase
-under test*. The testbed itself lives in **[`pretense_compliance_standards/`](pretense_compliance_standards/README.md)**.
+The testbed lives in **[`pretense_compliance_standards/`](pretense_compliance_standards/README.md)**,
+with per-framework scan targets generated under [`frameworks/`](frameworks/README.md).
 
 ## What it does
 
@@ -38,7 +35,7 @@ python3 -m pretense_compliance_standards.harness           # recall per tier + p
 python3 -m pretense_compliance_standards.compliance        # print the framework taxonomy
 node --experimental-transform-types \
   pretense_compliance_standards/pretense_bridge/run.mjs     # pretense identify/mutate per framework
-uv run pytest tests/test_pcs.py -q --noconftest             # test suite
+uv run pytest tests/test_pcs.py -q             # test suite
 ```
 
 See [`pretense_compliance_standards/README.md`](pretense_compliance_standards/README.md)

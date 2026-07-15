@@ -57,7 +57,7 @@ random.seed(20260710)
 SOURCE_FILE = "corpus/blended_regulated_01.json"
 OUT_PATH = pathlib.Path(__file__).resolve().parent.parent / SOURCE_FILE
 
-ZW = "​"  # zero-width space
+ZW = "\u200b"  # zero-width space
 
 
 # --- fake-value generators (all provably synthetic) ------------------------

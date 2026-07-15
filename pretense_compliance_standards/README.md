@@ -24,7 +24,7 @@ framework** (whose regulated data is under-protected?).
 
 | File | Role |
 |------|------|
-| `generator.py` | Synthetic, finance-flavored PII/PHI/PCI record generator. |
+| `generator.py` | Synthetic PII/PHI/PCI record generator. |
 | `regulated/` | Auto-discovered synthetic data-sets (health, EU-personal, controlled/technical, credentials, embedded). |
 | `corpus_builder.py` | Writes the graded corpus (`corpus/*.json/.csv/.log`) + `corpus/cases.json` manifest; tags each case with its `compliance` frameworks. |
 | `detector.py` | Reference **deterministic-hashing** detector, `naive` and `hardened` modes. |
@@ -104,8 +104,5 @@ same data as a Markdown summary. The default text output is unchanged.
 python3 -m pretense_compliance_standards.corpus_builder   # (re)generate corpus/ + cases.json
 python3 -m pretense_compliance_standards.compliance       # (re)generate compliance_map.json + taxonomy
 python3 -m pretense_compliance_standards.harness          # score recall (per tier + per framework)
-uv run pytest tests/test_pcs.py -q --noconftest           # test suite
+uv run pytest tests/test_pcs.py -q           # test suite
 ```
-
-> `--noconftest` is required locally because the upstream FinanceDatabase
-> `tests/conftest.py` is unrelated to this suite; CI runs the fixed conftest.

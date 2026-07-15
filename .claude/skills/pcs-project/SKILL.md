@@ -8,8 +8,8 @@ description: >-
 
 # Pretense Compliance Standards — project orientation
 
-A graded, **fully synthetic** DLP / compliance testbed (a fork of MIT-licensed
-FinanceDatabase © Jeroen Bouma) that scores how well the **pretense.ai** firewall
+A graded, **fully synthetic**, standalone DLP / compliance testbed that scores how
+well the **pretense.ai** firewall
 (*identify* + *mutate*) and a reference detector catch regulated data across the world's
 major compliance frameworks. Two axes: **recall per obfuscation tier** and **coverage per
 compliance framework**.
