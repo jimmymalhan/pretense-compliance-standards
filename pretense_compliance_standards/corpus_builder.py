@@ -32,6 +32,7 @@ import pathlib
 
 from . import BANNER
 from .compliance import FRAMEWORKS, frameworks_for
+from .framework_targets import validate_scannable, write_framework_targets
 from .negatives import build_negatives
 from .regulated import collect_regulated_cases
 
@@ -258,9 +259,30 @@ def _framework_readme(fw: str, sub_cases: list[dict]) -> str:
         f"**{len(sub_cases)} synthetic cases** across **{len(kinds)} data kinds** that the "
         f"**{fw}** framework regulates.",
         "",
-        "This folder is a **generated** per-framework view of the shared corpus: one data",
-        "kind maps to many frameworks, so a case appears under every framework it belongs",
-        "to. Regenerate with `python3 -m pretense_compliance_standards.corpus_builder`.",
+        "This folder is a **generated, self-contained** per-framework view of the shared",
+        "corpus: one data kind maps to many frameworks, so a case appears under every",
+        "framework it belongs to. It is independent of the other framework folders — point",
+        "a scanner at just this directory to test this framework in isolation. Regenerate",
+        "with `python3 -m pretense_compliance_standards.corpus_builder`.",
+        "",
+        "## Scan targets (realistic codebase + database files)",
+        "",
+        "Each file below embeds this framework's cases (all data kinds, obfuscation tiers",
+        "0-5) in a realistic format, so pretense scans real-looking data, not a bare manifest:",
+        "",
+        "| File | What |",
+        "|------|------|",
+        "| `database/dump.sql` | SQL `CREATE TABLE` + `INSERT` dump |",
+        '| `codebase/.env` | `KEY="value"` credential-style config |',
+        "| `codebase/config.yaml` | YAML config records |",
+        "| `codebase/seed.json` | JSON seed data |",
+        "| `codebase/app.py` | source with string-literal constants |",
+        "| `data/export.csv` | CSV export |",
+        "| `logs/service.log` | application log lines |",
+        "| `corpus/cases.json` | ground-truth manifest (id, kind, tier, compliance) |",
+        "",
+        "The data files are git-ignored (build artifacts regenerated on demand); this README",
+        "is committed so the folder is visible in git.",
         "",
         "## Data kinds covered",
         "",
@@ -269,6 +291,9 @@ def _framework_readme(fw: str, sub_cases: list[dict]) -> str:
         "## Run pretense against just this framework",
         "",
         "```bash",
+        "# point the pretense scanner at this whole folder …",
+        f"#   pretense scan frameworks/{fw}/",
+        "# … or drive the synthetic corpus through the bridge:",
         "node --experimental-transform-types \\",
         f"  pretense_compliance_standards/pretense_bridge/run.mjs --framework {fw}",
         "```",
@@ -351,6 +376,8 @@ def write_by_framework(cases: list[dict]) -> None:
         }
         with open(fw_dir / "corpus" / "cases.json", "w", encoding="utf-8") as fh:
             json.dump(manifest, fh, indent=2)
+        # Realistic codebase + database scan targets embedding this framework's data.
+        write_framework_targets(fw_dir, fw, sub)
         with open(fw_dir / "README.md", "w", encoding="utf-8") as fh:
             fh.write(_framework_readme(fw, sub))
 
@@ -361,6 +388,8 @@ def main() -> None:
     negatives = build_negatives()
     write_negatives(negatives)
     write_by_framework(cases)
+    # Build-time guarantee: every case survives embedding into each scan target.
+    validate_scannable(cases)
     tiers = sorted({c["difficulty"] for c in cases})
     print(f"Wrote {len(cases)} synthetic cases across tiers {tiers} to {CORPUS_DIR}/")
     print(

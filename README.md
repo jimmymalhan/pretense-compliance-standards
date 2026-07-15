@@ -65,11 +65,25 @@ node --experimental-transform-types \
 uv run pytest tests/test_pcs.py -m hipaa -q --noconftest            # run only HIPAA tests
 ```
 
-Each folder holds that framework's `corpus/cases.json` + a `README.md`. Because one
-data `kind` maps to many frameworks (an email is HIPAA **and** GDPR **and** CCPA), a
-case appears under every framework it belongs to — the tree is a **generated view**
-over the shared corpus. The per-framework `corpus/` data is git-ignored (a build
-artifact regenerated on demand); the folders and their READMEs are committed.
+Each folder is **self-contained** and holds that framework's data embedded in
+realistic **codebase + database scan targets**, so pretense scans real-looking
+files, not a bare manifest:
+
+```
+frameworks/HIPAA/
+├─ database/dump.sql        codebase/config.yaml   data/export.csv
+├─ codebase/.env            codebase/seed.json     logs/service.log
+├─ codebase/app.py          corpus/cases.json      README.md
+```
+
+Every file embeds the framework's cases across **all data kinds and obfuscation
+tiers 0–5** (the edge cases), and the values stay scannable through the
+embedding — a test asserts the reference detector still recovers each framework's
+kinds from every file. Because one data `kind` maps to many frameworks (an email is
+HIPAA **and** GDPR **and** CCPA), a case appears under every framework it belongs to —
+the tree is a **generated view** over the shared corpus. The per-framework data
+dirs are git-ignored (build artifacts regenerated on demand); the folders and their
+READMEs are committed.
 
 ---
 
