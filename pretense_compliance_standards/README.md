@@ -80,9 +80,15 @@ python3 -m pretense_compliance_standards.compliance   # summary + regenerates co
 
 ```bash
 python3 -m pretense_compliance_standards.harness      # recall per framework (+ per tier)
+python3 -m pretense_compliance_standards.harness \
+  --json report.json --md report.md                   # also emit machine-readable reports
 node --experimental-transform-types \
   pretense_compliance_standards/pretense_bridge/run.mjs   # pretense identify / mutate per framework
 ```
+
+`--json` writes a structured report (totals, recall per tier, recall per framework,
+and the precision / recall / F1 matrix) suitable for CI diffing; `--md` writes the
+same data as a Markdown summary. The default text output is unchanged.
 
 ### Guardrails
 

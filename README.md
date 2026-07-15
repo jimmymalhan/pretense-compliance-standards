@@ -41,6 +41,7 @@ payload. It is **test input to raise detection coverage**, not real data.
 python3 -m pretense_compliance_standards.corpus_builder    # build corpus + cases.json
 python3 -m pretense_compliance_standards.compliance        # print the framework taxonomy
 python3 -m pretense_compliance_standards.harness           # recall per tier + per framework
+python3 -m pretense_compliance_standards.harness --json report.json --md report.md  # export reports
 node --experimental-transform-types \
   pretense_compliance_standards/pretense_bridge/run.mjs     # pretense identify/mutate per framework
 uv run pytest tests/test_pcs.py -q --noconftest             # test suite

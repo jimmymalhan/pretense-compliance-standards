@@ -15,10 +15,13 @@ Run:  python -m pretense_compliance_standards.harness
 
 from __future__ import annotations
 
+import argparse
 import json
+import os
 import pathlib
 import sys
 
+from . import BANNER
 from .compliance import FRAMEWORKS, frameworks_for
 from .detector import detect
 
@@ -202,6 +205,137 @@ def missed(cases: list[dict], mode: str) -> list[str]:
     ]
 
 
+def report_data(
+    cases: list[dict],
+    negatives: list[dict] | None = None,
+    *,
+    tier_result: dict | None = None,
+    fw_result: dict | None = None,
+    precision: dict | None = None,
+) -> dict:
+    """Assemble a machine-readable report: per-tier + per-framework recall (and
+    precision when negatives are supplied). This is the single structured source
+    the JSON and Markdown exporters render, so all three outputs never drift.
+
+    The already-computed score tables can be passed in (tier_result / fw_result /
+    precision) to avoid re-running the detector; they are computed on demand
+    otherwise.
+    """
+    if tier_result is None:
+        tier_result = score(cases)
+    if fw_result is None:
+        fw_result = score_frameworks(cases)
+    empty = {"hit": 0, "total": 0}
+
+    data: dict = {
+        "_notice": BANNER,
+        "totals": {
+            "cases": len(cases),
+            "kinds": len({c["kind"] for c in cases}),
+            "frameworks": len(FRAMEWORKS),
+        },
+        "recall_by_tier": {},
+        "recall_by_framework": {},
+    }
+    # Iterate the real tier bucket keys (difficulty values + the "all" rollup).
+    # No int() cast — this works for any hashable difficulty, and an empty corpus
+    # (no buckets at all) still yields a valid "all" row via the empty default.
+    tier_keys = [k for k in tier_result[MODES[0]] if k != "all"]
+    tier_keys.sort(key=lambda k: (not isinstance(k, int), k))
+    for key in [*tier_keys, "all"]:
+        bucket = tier_result[MODES[0]].get(key, empty)
+        data["recall_by_tier"][str(key)] = {
+            "n": bucket["total"],
+            **{m: _recall(tier_result[m].get(key, empty)) for m in MODES},
+        }
+    for fw in FRAMEWORKS:
+        data["recall_by_framework"][fw] = {
+            "n": fw_result[MODES[0]].get(fw, empty)["total"],
+            **{m: _recall(fw_result[m].get(fw, empty)) for m in MODES},
+        }
+    if negatives:
+        data["precision"] = (
+            precision if precision is not None else score_precision(cases, negatives)
+        )
+    return data
+
+
+def _write_report(path: str, text: str) -> None:
+    """Write `text` to `path`, creating parent directories as needed."""
+    directory = os.path.dirname(path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+def export_json(path: str, data: dict) -> None:
+    """Write the structured report as JSON (for CI diffing / dashboards)."""
+    _write_report(path, json.dumps(data, indent=2))
+
+
+def _md_cell(value: object) -> str:
+    # Escape the Markdown table delimiters so a stray '|' / newline in a cell
+    # cannot corrupt the table layout.
+    return str(value).replace("|", "\\|").replace("\n", " ")
+
+
+def _md_row(cells: list) -> str:
+    return "| " + " | ".join(_md_cell(c) for c in cells) + " |"
+
+
+def export_markdown(path: str, data: dict) -> None:
+    """Write the structured report as a Markdown summary (tables per section)."""
+    t = data["totals"]
+    lines = [
+        "# Pretense Compliance Standards — benchmark report",
+        "",
+        f"> {_md_cell(data['_notice'])}",
+        "",
+        f"**{t['cases']} cases · {t['kinds']} kinds · {t['frameworks']} frameworks**",
+        "",
+        "## Recall by difficulty tier",
+        "",
+        _md_row(["tier", "n", *MODES]),
+        _md_row(["---", "---", *["---"] * len(MODES)]),
+    ]
+    for tier, row in data["recall_by_tier"].items():
+        lines.append(_md_row([tier, row["n"], *(f"{row[m]:.0%}" for m in MODES)]))
+    lines += [
+        "",
+        "## Recall by compliance framework",
+        "",
+        _md_row(["framework", "n", *MODES]),
+        _md_row(["---", "---", *["---"] * len(MODES)]),
+    ]
+    for fw, row in data["recall_by_framework"].items():
+        lines.append(_md_row([fw, row["n"], *(f"{row[m]:.0%}" for m in MODES)]))
+    if "precision" in data:
+        lines += [
+            "",
+            "## Precision / recall / F1",
+            "",
+            _md_row(["mode", "TP", "FP", "FN", "precision", "recall", "F1"]),
+            _md_row(["---"] * 7),
+        ]
+        for m in MODES:
+            p = data["precision"][m]
+            lines.append(
+                _md_row(
+                    [
+                        m,
+                        p["tp"],
+                        p["fp"],
+                        p["fn"],
+                        f"{p['precision']:.1%}",
+                        f"{p['recall']:.1%}",
+                        f"{p['f1']:.1%}",
+                    ]
+                )
+            )
+    _write_report(path, "\n".join(lines) + "\n")
+
+
 def check_corpus_files(cases: list[dict]) -> list[str]:
     problems = []
     for source_file in sorted({c["source_file"] for c in cases}):
@@ -212,15 +346,29 @@ def check_corpus_files(cases: list[dict]) -> list[str]:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Score the reference detector over the synthetic corpus."
+    )
+    parser.add_argument(
+        "--json", metavar="PATH", help="also write the structured report as JSON"
+    )
+    parser.add_argument(
+        "--md", metavar="PATH", help="also write the structured report as Markdown"
+    )
+    args = parser.parse_args()
+
     cases = load_cases()
+    negatives = load_negatives()
     result = score(cases)
+    fw_result = score_frameworks(cases)
+    precision = score_precision(cases, negatives) if negatives else None
+
     print(format_report(cases, result))
     print()
-    print(format_framework_report(score_frameworks(cases)))
+    print(format_framework_report(fw_result))
     print()
-    negatives = load_negatives()
     if negatives:
-        print(format_precision_report(score_precision(cases, negatives)))
+        print(format_precision_report(precision))
         fps = false_positives(negatives, "hardened")
         if fps:
             print("\nhardened false positives (benign look-alikes wrongly flagged):")
@@ -235,6 +383,26 @@ def main() -> int:
         print("\nhardened misses (open gaps — detector work remaining):")
         for item in still:
             print(f"  - {item}")
+
+    # Optional machine-readable exports (text output above is unchanged by default).
+    # A write failure is reported but never changes the benchmark's exit code.
+    if args.json or args.md:
+        data = report_data(
+            cases,
+            negatives,
+            tier_result=result,
+            fw_result=fw_result,
+            precision=precision,
+        )
+        try:
+            if args.json:
+                export_json(args.json, data)
+                print(f"\nWrote JSON report to {args.json}")
+            if args.md:
+                export_markdown(args.md, data)
+                print(f"Wrote Markdown report to {args.md}")
+        except OSError as exc:
+            print(f"\ncould not write report: {exc}", file=sys.stderr)
 
     # Regression guard: canonical, inline values MUST always be caught.
     exit_code = 0
