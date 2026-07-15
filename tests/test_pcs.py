@@ -561,3 +561,27 @@ def test_by_framework_layout(cases, tmp_path, monkeypatch):
         assert all(fw in c["compliance"] for c in sub), f"{fw} folder has foreign case"
         expected = {c["id"] for c in cases if fw in frameworks_for(c["kind"])}
         assert {c["id"] for c in sub} == expected, f"{fw} case set mismatch"
+
+
+def test_framework_targets(cases, tmp_path, monkeypatch):
+    """Each framework folder gets the realistic codebase + database scan-target
+    files, banner-stamped. Every folder is checked for structure + banner; the
+    (expensive) scannability check — the detector still recovers the framework's
+    kinds after embedding/escaping — runs on a diverse sample (the generator is
+    uniform across frameworks, so the sample is representative)."""
+    from pretense_compliance_standards import framework_targets as ft
+
+    monkeypatch.setattr(corpus_builder, "FRAMEWORKS_DIR", tmp_path / "frameworks")
+    corpus_builder.write_by_framework(cases)
+    root = tmp_path / "frameworks"
+
+    # Structure + banner for every framework's every scan-target file.
+    for fw in FRAMEWORKS:
+        for rel in ft.TARGET_FILES:
+            path = root / fw / rel
+            assert path.exists(), f"{fw}/{rel} missing"
+            assert _has_banner(path.read_text(encoding="utf-8")), f"{fw}/{rel} banner"
+
+    # Every case stays detectable as its kind after embedding in every format
+    # (per-case, so this covers all cases across all framework folders).
+    ft.validate_scannable(cases)
