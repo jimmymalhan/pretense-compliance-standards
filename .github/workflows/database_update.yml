@@ -1,11 +1,16 @@
 name: Database Update
 
+# DISABLED in this fork. This workflow is inherited verbatim from upstream
+# FinanceDatabase (github.com/JerBouma/FinanceDatabase): its jobs pull the
+# upstream ticker repo with `git pull …@JerBouma/FinanceDatabase.git main` using a
+# `PAT` secret this fork does not have, so on every push to `main` the
+# `Add-New-Ticker` job died with `exit code 128` (divergent branches) and emailed
+# a failure. The Pretense Compliance Standards testbed never updates that ticker
+# database, so the automatic triggers are removed — this is now manual-only.
+# (Re-enabling it requires the upstream repo access + `PAT`; do not.)
+# See .claude/skills/ci-triage for how this was diagnosed from the run history.
 on:
-  push:
-    branches:
-      - 'main'
-  schedule:
-    - cron: '0 12 * * SUN'
+  workflow_dispatch:
 
 jobs:
   Add-New-Ticker:
