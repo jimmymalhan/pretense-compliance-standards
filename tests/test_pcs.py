@@ -563,25 +563,56 @@ def test_by_framework_layout(cases, tmp_path, monkeypatch):
         assert {c["id"] for c in sub} == expected, f"{fw} case set mismatch"
 
 
-def test_framework_targets(cases, tmp_path, monkeypatch):
-    """Each framework folder gets the realistic codebase + database scan-target
-    files, banner-stamped. Every folder is checked for structure + banner; the
-    (expensive) scannability check — the detector still recovers the framework's
-    kinds after embedding/escaping — runs on a diverse sample (the generator is
-    uniform across frameworks, so the sample is representative)."""
+def test_framework_targets_scannable(cases):
+    """Every case stays detectable as its kind after embedding in EVERY scan-target
+    format (per-case over the whole corpus, so no framework/kind is left unchecked
+    and no single file grows past the detector's scan-length cap)."""
     from pretense_compliance_standards import framework_targets as ft
 
-    monkeypatch.setattr(corpus_builder, "FRAMEWORKS_DIR", tmp_path / "frameworks")
-    corpus_builder.write_by_framework(cases)
-    root = tmp_path / "frameworks"
-
-    # Structure + banner for every framework's every scan-target file.
-    for fw in FRAMEWORKS:
-        for rel in ft.TARGET_FILES:
-            path = root / fw / rel
-            assert path.exists(), f"{fw}/{rel} missing"
-            assert _has_banner(path.read_text(encoding="utf-8")), f"{fw}/{rel} banner"
-
-    # Every case stays detectable as its kind after embedding in every format
-    # (per-case, so this covers all cases across all framework folders).
     ft.validate_scannable(cases)
+
+
+# --- M9: per-framework testing across ALL frameworks -----------------------
+# Parametrized (and pytest-marked) per framework, so every framework is its own
+# named, filterable signal — run one framework's tests with `pytest -m hipaa`.
+# Each test is self-contained (writes/renders only its own framework's data), so
+# there is no shared global state and `-m <fw>` does the minimum work.
+from pretense_compliance_standards import framework_targets as _ft  # noqa: E402
+
+
+def _framework_cases(cases, fw):
+    return [c for c in cases if fw in frameworks_for(c["kind"])]
+
+
+@pytest.mark.parametrize("fw", _FW_PARAMS)
+def test_framework_scan_targets_present(fw, cases, tmp_path):
+    """`write_framework_targets` emits all 7 scan-target files (each banner-stamped)
+    for this framework — this exercises the actual writer, not just the taxonomy."""
+    _ft.write_framework_targets(tmp_path, fw, _framework_cases(cases, fw))
+    for rel in _ft.TARGET_FILES:
+        path = tmp_path / rel
+        assert path.exists(), f"{fw}/{rel} missing"
+        assert _has_banner(path.read_text(encoding="utf-8")), f"{fw}/{rel} banner"
+
+
+@pytest.mark.parametrize("fw", _FW_PARAMS)
+def test_framework_kinds_scannable(fw, cases):
+    """Every data kind this framework regulates survives embedding into the scan
+    targets: a representative case of each kind, embedded in a seed file, is still
+    detected as that kind. One small case per kind, so it never hits the detector's
+    scan-length cap regardless of how big the framework's corpus grows."""
+    fw_kinds = {c["kind"] for c in _framework_cases(cases, fw)}
+    assert fw_kinds, f"{fw} exercises no data kinds"
+    for kind in sorted(fw_kinds):
+        sample = next(c for c in cases if c["kind"] == kind)
+        seed = _ft._render(fw, [sample])["codebase/seed.json"]
+        assert kind in detect(seed, "hardened"), f"{fw}: kind {kind!r} not scannable"
+
+
+@pytest.mark.parametrize("fw", _FW_PARAMS)
+def test_framework_has_edge_cases(fw, cases):
+    """Every framework's data spans canonical (tier 0) AND obfuscated (tier > 0)
+    forms, so pretense is exercised on edge cases for each framework — a robust
+    invariant that does not couple to the exact tier count."""
+    tiers = {c["difficulty"] for c in _framework_cases(cases, fw)}
+    assert 0 in tiers and max(tiers) > 0, f"{fw}: no edge-case tiers ({sorted(tiers)})"
