@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**256 synthetic cases** across **23 data kinds** that the **HITRUST** framework regulates.
+**306 synthetic cases** across **28 data kinds** that the **HITRUST** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -35,11 +35,14 @@ is committed so the folder is visible in git.
 - `anthropic_key`
 - `api_key`
 - `aws_key`
+- `aws_temp_key`
 - `azure_key`
 - `date_of_birth`
 - `db_url`
 - `gcp_key`
+- `github_finegrained_pat`
 - `github_token`
+- `google_oauth_secret`
 - `health_record`
 - `icd10`
 - `insurance_member_id`
@@ -48,10 +51,12 @@ is committed so the folder is visible in git.
 - `medicare_id`
 - `npi`
 - `openai_key`
+- `pgp_private_key`
 - `secret`
 - `sendgrid_key`
 - `slack_token`
 - `ssh_private_key`
+- `stripe_restricted_key`
 - `twilio_key`
 - `vehicle_vin`
 

@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**74 synthetic cases** across **6 data kinds** that the **IRS_1075** framework regulates.
+**84 synthetic cases** across **7 data kinds** that the **IRS_1075** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -37,6 +37,7 @@ is committed so the folder is visible in git.
 - `national_id`
 - `passport`
 - `ssn`
+- `uk_nino`
 
 ## Run pretense against just this framework
 

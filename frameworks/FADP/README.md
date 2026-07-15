@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**148 synthetic cases** across **11 data kinds** that the **FADP** framework regulates.
+**188 synthetic cases** across **15 data kinds** that the **FADP** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -31,15 +31,19 @@ is committed so the folder is visible in git.
 
 ## Data kinds covered
 
+- `advertising_id`
 - `date_of_birth`
 - `drivers_license`
 - `email`
 - `iban`
+- `imei`
+- `imsi`
 - `national_id`
 - `passport`
 - `phone`
 - `ssn`
 - `swift_bic`
+- `uk_nino`
 - `vat`
 - `vehicle_vin`
 

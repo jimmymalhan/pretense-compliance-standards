@@ -474,6 +474,28 @@ def test_new_m3_kinds_detected(text, kind):
     assert kind in detect(text, "hardened")
 
 
+@pytest.mark.parametrize(
+    "text,kind",
+    [
+        # imsi: grouped MCC-MNC-MSIN (space and dash) must still be detected
+        ("imsi 001 01 0123456789", "imsi"),
+        ("imsi: 001-01-0123456789", "imsi"),
+        # imei: grouped AA-BBBBBB-CCCCCC-D with space / dash / dot / slash
+        ("imei 49 015420 323751 8", "imei"),
+        ("imei 49.015420.323751.8", "imei"),
+        ("imei 49/015420/323751/8", "imei"),
+        # uk_nhs_number: 3-3-4 with either space or dash grouping
+        ("nhs 999 000 0001", "uk_nhs_number"),
+        ("nhs 999-000-0001", "uk_nhs_number"),
+    ],
+)
+def test_m10_separator_variants_detected(text, kind):
+    """M10 device / health ids are printed grouped in the wild (space/dash/dot/
+    slash). The label-gated detectors must tolerate those inter-digit separators,
+    not just the single canonical form baked into the corpus tiers."""
+    assert kind in detect(text, "hardened"), f"{kind} not detected in {text!r}"
+
+
 def test_mac_and_ipv6_do_not_collide():
     """A 6-octet MAC is mac_address, never ipv6; an 8-group colon-hex is ipv6, not
     a MAC; and a longer colon-hex fingerprint is neither (guards both anchors)."""

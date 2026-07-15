@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**111 synthetic cases** across **9 data kinds** that the **CJIS** framework regulates.
+**121 synthetic cases** across **10 data kinds** that the **CJIS** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -40,6 +40,7 @@ is committed so the folder is visible in git.
 - `passport`
 - `phone`
 - `ssn`
+- `uk_nino`
 
 ## Run pretense against just this framework
 

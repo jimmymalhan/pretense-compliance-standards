@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**178 synthetic cases** across **14 data kinds** that the **UK_GDPR** framework regulates.
+**228 synthetic cases** across **19 data kinds** that the **UK_GDPR** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -31,10 +31,13 @@ is committed so the folder is visible in git.
 
 ## Data kinds covered
 
+- `advertising_id`
 - `date_of_birth`
 - `drivers_license`
 - `email`
 - `iban`
+- `imei`
+- `imsi`
 - `ip_address`
 - `ipv6`
 - `mac_address`
@@ -43,6 +46,8 @@ is committed so the folder is visible in git.
 - `phone`
 - `ssn`
 - `swift_bic`
+- `uk_nhs_number`
+- `uk_nino`
 - `vat`
 - `vehicle_vin`
 

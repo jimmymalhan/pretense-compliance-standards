@@ -65,9 +65,11 @@ UK-GDPR, CCPA/CPRA, LGPD, PIPEDA, POPIA, PIPL, PDPA-SG, COPPA, FERPA, DPDP (Indi
 APPI (Japan), PIPA (Korea), Australia Privacy Act, Swiss FADP, PDPA (Thailand),
 CJIS, IRS Pub 1075, SOX, GLBA, CMMC L2, PCI DSS — spanning security/credential
 regimes, health (PHI), global privacy laws, financial, and controlled-unclassified
-categories. Across 44 data kinds (incl. card CVV, bank/routing/EIN, driver's
-license, DOB, IPv4/IPv6, MAC, crypto wallet, SSH/PEM private key, SWIFT/BIC, VIN,
-Medicare ID, NPI, and cloud/vendor API keys).
+categories. Across 56 data kinds (incl. card CVV / Track-2, bank/routing/EIN,
+driver's license, DOB, IPv4/IPv6, MAC, crypto wallet + bitcoin address, SSH/PEM &
+PGP private key, SWIFT/BIC, VIN, Medicare ID, NPI, UK NINO / NHS number, IMEI /
+IMSI / mobile advertising id, and cloud/vendor API keys incl. Stripe restricted,
+GitHub fine-grained PAT, Google OAuth secret, and AWS temporary keys).
 
 The taxonomy is defined once in `compliance.py` (`FRAMEWORK_KINDS` is the source of
 truth; `KIND_FRAMEWORKS` is derived so the two can't drift). Print the live mapping:

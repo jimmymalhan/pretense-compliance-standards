@@ -264,6 +264,81 @@
       "HITRUST",
       "SOX"
     ],
+    "stripe_restricted_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "github_finegrained_pat": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "google_oauth_secret": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "pgp_private_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
+    "aws_temp_key": [
+      "SOC2",
+      "ISO_27001",
+      "ISO_27701",
+      "NIST_800_53",
+      "NIST_800_171",
+      "FedRAMP",
+      "FISMA",
+      "NIS2",
+      "NYDFS_500",
+      "DORA",
+      "APRA_CPS234",
+      "HITRUST",
+      "SOX"
+    ],
     "ip_address": [
       "SOC2",
       "ISO_27001",
@@ -396,6 +471,27 @@
       "CJIS",
       "IRS_1075"
     ],
+    "uk_nino": [
+      "ISO_27001",
+      "ISO_27701",
+      "FISMA",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH",
+      "CJIS",
+      "IRS_1075"
+    ],
     "email": [
       "ISO_27001",
       "ISO_27701",
@@ -490,6 +586,63 @@
       "FADP",
       "PDPA_TH"
     ],
+    "imei": [
+      "ISO_27701",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA",
+      "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH"
+    ],
+    "imsi": [
+      "ISO_27701",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA",
+      "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH"
+    ],
+    "advertising_id": [
+      "ISO_27701",
+      "GDPR",
+      "UK_GDPR",
+      "CCPA_CPRA",
+      "LGPD",
+      "PIPEDA",
+      "POPIA",
+      "PIPL",
+      "PDPA_SG",
+      "COPPA",
+      "FERPA",
+      "DPDP",
+      "APPI",
+      "PIPA_KR",
+      "AU_PRIVACY",
+      "FADP",
+      "PDPA_TH"
+    ],
     "contract_number": [
       "NIST_800_171",
       "CMMC_L2"
@@ -526,6 +679,10 @@
       "GLBA"
     ],
     "crypto_wallet_address": [
+      "NYDFS_500",
+      "DORA"
+    ],
+    "bitcoin_address": [
       "NYDFS_500",
       "DORA"
     ],
@@ -583,7 +740,16 @@
       "UK_GDPR",
       "FADP"
     ],
+    "uk_nhs_number": [
+      "GDPR",
+      "UK_GDPR"
+    ],
     "card_cvv": [
+      "CCPA_CPRA",
+      "GLBA",
+      "PCI_DSS"
+    ],
+    "credit_card_track2": [
       "CCPA_CPRA",
       "GLBA",
       "PCI_DSS"

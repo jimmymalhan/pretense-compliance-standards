@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**126 synthetic cases** across **9 data kinds** that the **GLBA** framework regulates.
+**136 synthetic cases** across **10 data kinds** that the **GLBA** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -33,6 +33,7 @@ is committed so the folder is visible in git.
 
 - `bank_account`
 - `card_cvv`
+- `credit_card_track2`
 - `ein`
 - `email`
 - `iban`

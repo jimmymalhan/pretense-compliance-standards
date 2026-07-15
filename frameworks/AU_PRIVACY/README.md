@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**131 synthetic cases** across **11 data kinds** that the **AU_PRIVACY** framework regulates.
+**171 synthetic cases** across **15 data kinds** that the **AU_PRIVACY** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -31,9 +31,12 @@ is committed so the folder is visible in git.
 
 ## Data kinds covered
 
+- `advertising_id`
 - `date_of_birth`
 - `drivers_license`
 - `email`
+- `imei`
+- `imsi`
 - `ip_address`
 - `ipv6`
 - `mac_address`
@@ -41,6 +44,7 @@ is committed so the folder is visible in git.
 - `passport`
 - `phone`
 - `ssn`
+- `uk_nino`
 - `vehicle_vin`
 
 ## Run pretense against just this framework
