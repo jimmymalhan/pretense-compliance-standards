@@ -33,7 +33,7 @@ jobs:
         run: uv run black --diff --check .
 
       - name: Run ruff
-        run: uv run ruff check financedatabase
+        run: uv run ruff check pretense_compliance_standards tests
 
   markdown-link-check:
     name: Markdown Linting

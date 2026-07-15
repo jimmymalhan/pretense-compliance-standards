@@ -37,15 +37,14 @@ import unicodedata
 # Make the package importable when this file is run as a standalone script.
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
-from pretense_compliance_standards import BANNER  # noqa: E402
-from pretense_compliance_standards import corpus_builder  # noqa: E402
+from pretense_compliance_standards import BANNER, corpus_builder
 
 # Reproducible corpus for test assertions (values are fixed literals below; the
 # seed keeps any incidental ordering/choices stable).
 random.seed(404)
 
 SOURCE_FILE = "corpus/blended_regulated_04.json"
-ZW = "​"  # zero-width space (same separator the detector strips)
+ZW = "\u200b"  # zero-width space (same separator the detector strips)
 
 # --- fixed synthetic literals: contract-canonical shapes, all provably fake ---
 # iban: 2 letters + "00" check digits + grouped alnum; "EXMP" marks it example.

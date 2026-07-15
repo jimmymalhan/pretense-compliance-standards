@@ -3,20 +3,19 @@ name: ci-triage
 description: >-
   Diagnose and fix a failing GitHub Actions run in this repo by learning from the
   workflow RUN HISTORY. Use when a CI check is red, the user reports "Run failed"
-  emails, or you need to know whether a failing workflow is owned (fix it) or
-  inherited from upstream FinanceDatabase (disable it).
+  emails, or you need to classify a failing workflow as owned (fix it) or a
+  leftover/inherited one (remove or disable it).
 ---
 
 # CI triage — learn from the workflow history, then fix
 
-This repo has exactly **three** GitHub Actions workflows. Two are **owned** and must
-stay green; one is **inherited from upstream FinanceDatabase** and is disabled.
+This repo has exactly **two** GitHub Actions workflows, both **owned** and both must
+stay green:
 
-| Workflow file | Run name | Owned? | Triggers | Must be green? |
-|---|---|---|---|---|
-| `.github/workflows/testing.yml` | **Run Tests** | owned | push + pull_request | **yes** |
-| `.github/workflows/linting.yml` | **General Linting** | owned | push + pull_request | **yes** |
-| `.github/workflows/database_update.yml` | **Database Update** | inherited | `workflow_dispatch` only (disabled) | n/a |
+| Workflow file | Run name | Triggers | What it runs |
+|---|---|---|---|
+| `.github/workflows/testing.yml` | **Run Tests** | push + pull_request | `pytest tests/test_pcs.py` |
+| `.github/workflows/linting.yml` | **General Linting** | push + pull_request | `black --check .` + `ruff check pretense_compliance_standards tests` + markdown-lint |
 
 ## Step 1 — read the history first (this is the "learn from history" step)
 
@@ -28,9 +27,9 @@ gh run list --limit 20 --json name,event,conclusion,headBranch \
 ```
 
 Interpret the pattern:
-- A workflow that is **red on EVERY run** (never green in history) is broken by design in
-  this repo — usually **inherited machinery that needs a secret/resource the fork lacks**.
-  → disable it (Step 3b), don't try to make it pass.
+- A workflow that is **red on EVERY run** (never green in history) is broken by design —
+  usually a **leftover/inherited workflow that needs a secret or resource this repo lacks**.
+  → remove it (or disable via `on: workflow_dispatch`), don't try to make it pass (Step 3b).
 - A workflow that is **usually green but red on a specific commit/PR** is a **real
   regression you introduced** → fix the code (Step 3a).
 - A workflow **red only on `push` (main) but never on `pull_request`** is triggered by an
@@ -51,33 +50,33 @@ annotation. (View only — never click **Re-run jobs**, and never touch a repo's
 
 Reproduce locally, exactly as CI does, then fix:
 ```bash
-uv run pytest tests/test_pcs.py -q --noconftest    # what "Run Tests" runs
-uv run black --check . && uv run ruff check financedatabase   # what "General Linting" runs
+uv run pytest tests/test_pcs.py -q                                  # what "Run Tests" runs
+uv run black --check . && uv run ruff check pretense_compliance_standards tests   # "General Linting"
 ```
 Fix the code, re-run locally to green, then ship via the [milestone-release](../milestone-release/SKILL.md) flow.
 
-## Step 3b — disable an INHERITED workflow (never re-enable without its secret)
+## Step 3b — remove/disable a LEFTOVER or INHERITED workflow
 
-If the failing workflow is upstream FinanceDatabase machinery (its steps `git pull …@JerBouma/FinanceDatabase.git` or need a `PAT`/data source this fork lacks), it has no
-role here. **Disable its automatic triggers** instead of deleting it, so it stays for
-provenance but never auto-fails:
+A workflow that only ever fails because it needs an upstream repo, a `PAT`, or a data
+source this repo does not have has no role here. **Delete it** (if it is pure upstream
+machinery) or **disable its automatic triggers** if you want to keep it for reference:
 
 ```yaml
 name: <Name>
-# DISABLED in this fork — inherited FinanceDatabase machinery; needs upstream <secret>.
+# DISABLED — leftover machinery that needs <secret/resource> this repo lacks.
 on:
   workflow_dispatch:   # manual-only; no push/schedule triggers
 ```
 
-## Worked example (the case this skill was written from)
+## Worked example (historical — the case this skill was written from)
 
-`Database Update` failed on **every** push to `main` (Run Tests + General Linting were
-green every time). The failed run: `database_update.yml` `on: push` → job
-`Add-New-Ticker` → `git pull https://${{secrets.PAT}}@github.com/JerBouma/FinanceDatabase.git main` → **`fatal: Need to specify how to reconcile divergent
-branches … exit code 128`** (the fork has diverged from upstream and there is no `PAT`).
-All five of its jobs are ticker-database updates irrelevant to this testbed. **Fix:**
-set `on: workflow_dispatch:` (as above). Result: no Database Update run fires on
-future pushes → no failure → **no more failure emails**.
+When this repo was still a fork of an upstream project, an inherited **"Database Update"**
+workflow (`database_update.yml`) failed on **every** push to `main` while the owned
+workflows stayed green. Its `git pull …@<upstream>.git main` step died with
+`exit code 128` (divergent branches; no `PAT`), emailing a failure each time. It was
+irrelevant to this testbed, so it was first disabled (`on: workflow_dispatch`) and later
+**deleted outright** along with the rest of the upstream heritage. Pattern to reuse:
+**red-on-every-run + needs-an-upstream-secret ⇒ remove/disable, don't fix.**
 
 ## About the emails
 

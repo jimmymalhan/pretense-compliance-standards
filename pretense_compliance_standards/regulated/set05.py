@@ -37,8 +37,7 @@ import sys
 if __package__ in (None, ""):
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
-from pretense_compliance_standards import BANNER
-from pretense_compliance_standards import corpus_builder
+from pretense_compliance_standards import BANNER, corpus_builder
 from pretense_compliance_standards.generator import (
     CURRENCIES,
     DIAGNOSES,

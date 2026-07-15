@@ -47,7 +47,7 @@ else:
 random.seed(303)
 
 SOURCE_FILE = "corpus/blended_regulated_03.json"
-ZW = "​"  # zero-width space
+ZW = "\u200b"  # zero-width space
 _OUT_PATH = pathlib.Path(__file__).resolve().parents[1] / SOURCE_FILE
 
 

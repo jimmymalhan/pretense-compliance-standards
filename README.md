@@ -44,7 +44,7 @@ python3 -m pretense_compliance_standards.harness           # recall per tier + p
 python3 -m pretense_compliance_standards.harness --json report.json --md report.md  # export reports
 node --experimental-transform-types \
   pretense_compliance_standards/pretense_bridge/run.mjs     # pretense identify/mutate per framework
-uv run pytest tests/test_pcs.py -q --noconftest             # test suite
+uv run pytest tests/test_pcs.py -q             # test suite
 ```
 
 See [`pretense_compliance_standards/README.md`](pretense_compliance_standards/README.md)
@@ -62,7 +62,7 @@ per compliance framework ([`frameworks/HIPAA/`](frameworks/README.md),
 python3 -m pretense_compliance_standards.corpus_builder             # (re)generate frameworks/<NAME>/
 node --experimental-transform-types \
   pretense_compliance_standards/pretense_bridge/run.mjs --framework HIPAA   # scan only HIPAA data
-uv run pytest tests/test_pcs.py -m hipaa -q --noconftest            # run only HIPAA tests
+uv run pytest tests/test_pcs.py -m hipaa -q            # run only HIPAA tests
 ```
 
 Each folder is **self-contained** and holds that framework's data embedded in
@@ -87,16 +87,5 @@ READMEs are committed.
 
 ---
 
-## Built on FinanceDatabase
-
-This project is a fork that reuses **[FinanceDatabase](https://github.com/JerBouma/FinanceDatabase)**
-— © 2023 **Jeroen Bouma**, MIT licensed — as the realistic *codebase under test*. The
-finance-symbol library at [`financedatabase/`](financedatabase/) and the data in
-`database/` remain the work of its original author and are used here under the MIT
-License (see [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE)). Full credit to Jeroen Bouma:
-
-[![GitHub Sponsors](https://img.shields.io/badge/Sponsor_Jeroen_Bouma-grey?logo=github)](https://github.com/sponsors/JerBouma)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-grey?logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/boumajeroen/)
-[![Upstream](https://img.shields.io/badge/Upstream-FinanceDatabase-grey?logo=github)](https://github.com/JerBouma/FinanceDatabase)
-
-The original FinanceDatabase documentation is preserved upstream at the link above.
+Everything in this repository is **synthetic** and MIT-licensed (see [`LICENSE`](LICENSE)
+and [`NOTICE`](NOTICE)). No value maps to a real person, account, or secret.

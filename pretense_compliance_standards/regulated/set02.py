@@ -45,7 +45,7 @@ from pretense_compliance_standards import BANNER
 from pretense_compliance_standards.corpus_builder import _write_json
 
 SOURCE_FILE = "corpus/blended_regulated_02.json"
-ZW = "​"  # zero-width space
+ZW = "\u200b"  # zero-width space
 
 # Deterministic so the "generated" corpus is reproducible for assertions.
 random.seed(202)

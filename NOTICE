@@ -1,31 +1,18 @@
 Pretense Compliance Standards
 =============================
 
-This repository is a customized fork.
+Copyright (c) 2026 Jimmy Malhan. Licensed under the MIT License (see LICENSE).
 
-Upstream project
-----------------
-Based on **FinanceDatabase** — Copyright (c) 2023 Jeroen Bouma — licensed under
-the MIT License (see LICENSE). The original FinanceDatabase code
-(`financedatabase/`, `database/`, `compression/`) is retained here as a realistic
-"codebase under test" and remains the work of its original author. Its MIT
-copyright notice is preserved verbatim.
-
-  Upstream: https://github.com/JerBouma/FinanceDatabase
-
-Additions in this fork
-----------------------
-Copyright (c) 2026 Jimmy Malhan. The `pretense_compliance_standards/` package and
-`tests/test_pcs.py` are original additions: a graded, fully SYNTHETIC data-loss-
-prevention / compliance test suite that scores how the pretense.ai firewall
-(identify + mutate) handles regulated data categories across major compliance
-frameworks. These additions are licensed under the same MIT License.
+The `pretense_compliance_standards/` package and `tests/test_pcs.py` are a graded,
+fully SYNTHETIC data-loss-prevention / compliance test suite that scores how the
+pretense.ai firewall (identify + mutate) and a reference detector handle regulated
+data categories across major compliance frameworks.
 
 Data disclaimer
 ---------------
-ALL data in `pretense_compliance_standards/` is SYNTHETIC and fake by construction
+ALL data in this repository is SYNTHETIC and fake by construction
 (reserved/never-issued identifier ranges, example.com emails, test-mode secret
-prefixes, Luhn-valid-but-random card numbers). Every corpus file carries a
-"SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL" banner. No value maps to a real
+prefixes, Luhn-valid-but-random card numbers). Every generated corpus file carries
+a "SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL" banner. No value maps to a real
 person, account, or secret. It is scanner test input for measuring detection
 coverage — never real regulated data.
