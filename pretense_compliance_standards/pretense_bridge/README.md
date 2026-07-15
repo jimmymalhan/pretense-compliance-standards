@@ -59,16 +59,36 @@ modifies corpus data.
 
 ## Requirements
 
-You need a local checkout of the pretense engine. The bridge expects its CLI
-source at:
+You need a local checkout of the pretense engine. The bridge looks for its CLI
+source at `$PRETENSE_SRC`, defaulting to:
 
 ```
 /Users/jimmymalhan/Documents/pretense/packages/cli/src
 ```
 
-If that path does not exist the bridge prints
+Set `PRETENSE_SRC` to point at your own checkout:
+
+```
+PRETENSE_SRC=/path/to/pretense/packages/cli/src \
+  node --experimental-transform-types pretense_compliance_standards/pretense_bridge/run.mjs
+```
+
+If the path does not exist the bridge prints
 `pretense engine not found at <path>; skipping` and exits 0, so it is safe to
 run in environments without the checkout.
+
+## Testing (offline, no engine checkout)
+
+The scoring core is exported (`scoreCorpus`, `parseFrameworkArg` in `run.mjs`) and
+covered by `run.test.mjs` against a **mock engine** — so the per-tier / per-framework
+tallying is verified with no pretense checkout, no network, and no env vars. This runs
+in CI (the **Bridge Tests** workflow), which the graceful-skip path would otherwise
+leave untested:
+
+```
+node --check pretense_compliance_standards/pretense_bridge/run.mjs
+node --test  pretense_compliance_standards/pretense_bridge/run.test.mjs
+```
 
 ## How to run
 

@@ -1,0 +1,32 @@
+name: Bridge Tests
+
+on:
+    push:
+        branches:
+          - 'main'
+    pull_request:
+        branches:
+          - 'main'
+    workflow_dispatch:
+
+jobs:
+    bridge:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '22'
+
+            # Syntax smoke test: the bridge is never run by the Python suite, so a
+            # parse error here would otherwise ship unnoticed.
+            - name: Syntax-check the pretense bridge
+              run: |
+                node --check pretense_compliance_standards/pretense_bridge/run.mjs
+                node --check pretense_compliance_standards/pretense_bridge/run.test.mjs
+
+            # Offline scoring tests against a mock engine (no pretense checkout needed).
+            - name: Run pretense bridge tests
+              run: node --test pretense_compliance_standards/pretense_bridge/run.test.mjs
