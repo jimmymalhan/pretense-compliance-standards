@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**209 synthetic cases** across **18 data kinds** that the **NIST_800_171** framework regulates.
+**259 synthetic cases** across **23 data kinds** that the **NIST_800_171** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -35,19 +35,24 @@ is committed so the folder is visible in git.
 - `anthropic_key`
 - `api_key`
 - `aws_key`
+- `aws_temp_key`
 - `azure_key`
 - `contract_number`
 - `db_url`
 - `gcp_key`
+- `github_finegrained_pat`
 - `github_token`
+- `google_oauth_secret`
 - `internal_program_code`
 - `jwt`
 - `openai_key`
 - `part_number`
+- `pgp_private_key`
 - `secret`
 - `sendgrid_key`
 - `slack_token`
 - `ssh_private_key`
+- `stripe_restricted_key`
 - `twilio_key`
 
 ## Run pretense against just this framework

@@ -244,6 +244,59 @@ _MEDICARE = re.compile(
     r"\b(?i:medicare(?:\s*(?:id|no|number|mbi))?|mbi)\b\s*[:=#]?\s*[1-9][0-9A-Z]{10}\b"
 )
 
+# --- M10 kinds: device ids / national ids / more credentials / crypto / card ---
+# IMEI: 15 digits (14 + Luhn check), label-gated. The digits are commonly printed
+# grouped (AA-BBBBBB-CCCCCC-D) with space / dash / dot / slash separators, so the
+# inter-digit separator class is permissive; the label gate keeps a bare 15-digit
+# run (which is PAN-length) from being mistaken for a device id.
+_IMEI = re.compile(r"\b(?i:imei)\b\s*[:=#]?\s*(?:\d[\s./-]?){14}\d\b")
+# IMSI: 14-15 digits (MCC+MNC+MSIN), label-gated. Commonly printed grouped, so the
+# inter-digit separator is permissive like _IMEI. Reserved test MCC 001.
+_IMSI = re.compile(r"\b(?i:imsi)\b\s*[:=#]?\s*(?:\d[\s./-]?){13,14}\d\b")
+# Mobile advertising id (IDFA/GAID/AAID): a UUID, label-gated. Accepts the
+# canonical dashed UUID (raw/glued views keep '-') and the 32-hex collapsed form
+# (the collapsed view strips '-'); the all-zero value is the reserved opt-out id.
+_ADVERTISING_ID = re.compile(
+    r"\b(?i:idfa|gaid|aaid|adid|advertising[\s_-]?id)\b\s*[:=#]?\s*"
+    r"(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32})\b",
+    re.IGNORECASE,
+)
+# UK National Insurance number: 2 letters + 6 digits + 1 letter, label-gated. The
+# letter classes stay permissive (the fake `QQ`/trailing letter are deliberately
+# outside the real allocatable set), so detection keys on the label + shape.
+_UK_NINO = re.compile(
+    r"\b(?i:nino|ni[\s_-]?number|national[\s_-]?insurance(?:[\s_-]?(?:no|number))?)\b"
+    r"\s*[:=#]?\s*[A-Z]{2}\s?\d{2}\s?\d{2}\s?\d{2}\s?[A-Z]\b"
+)
+# UK NHS number: 10 digits (3-3-4 grouped), label-gated. The groups may be space-
+# or dash-separated (both conventional), so the inter-group separator is [\s-]?.
+# Reserved 999-range test numbers; gated on `nhs` so a bare 10-digit run is not
+# mistaken for a patient id.
+_UK_NHS = re.compile(
+    r"\b(?i:nhs(?:[\s_-]?(?:no|number))?)\b\s*[:=#]?\s*\d{3}[\s-]?\d{3}[\s-]?\d{4}\b"
+)
+# Stripe restricted key `rk_test_`/`rk_live_` (distinct prefix from the `sk_` key).
+_STRIPE_RK = re.compile(r"\brk_(?:test|live)_[A-Za-z0-9]{16,}\b")
+# GitHub fine-grained personal access token `github_pat_...` (distinct from ghp_/ghs_).
+_GITHUB_PAT = re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b")
+# Google OAuth client secret `GOCSPX-...`.
+_GOOGLE_OAUTH = re.compile(r"\bGOCSPX-[A-Za-z0-9_-]{20,}\b")
+# PGP private-key block header. Distinct from the SSH/PEM `... PRIVATE KEY-----`
+# header (this one ends `PRIVATE KEY BLOCK-----`); spaces are `\s*` so the
+# fragment-glued view (spaces stripped) still matches.
+_PGP_KEY = re.compile(r"-----BEGIN\s*PGP\s*PRIVATE\s*KEY\s*BLOCK-----")
+# AWS temporary/STS access-key id `ASIA` + 16 (mirrors the `AKIA` long-term key).
+_AWS_TEMP_KEY = re.compile(r"\bASIA[0-9A-Z]{16}\b")
+# Bitcoin base58 P2PKH/P2SH address, label-gated (base58 excludes 0/O/I/l). The
+# documented burn address is used as the fake value.
+_BITCOIN = re.compile(
+    r"\b(?i:btc|bitcoin|xbt)\b\s*[:=#]?\s*[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b"
+)
+# Card magnetic-stripe Track 2 data: `;PAN=<expiry/service/discretionary>?`. The
+# `;...=...?` sentinel structure is distinctive; the embedded test PAN also trips
+# the PAN detector (expected cross-emission).
+_TRACK2 = re.compile(r";\d{13,19}=\d{7,}\?")
+
 # Non-ASCII homoglyph digits, in case NFKC leaves any. Intentionally does NOT
 # remap ASCII letters (O/l/I): doing so corrupts ordinary text like "example".
 _HOMOGLYPHS = str.maketrans(
@@ -412,6 +465,14 @@ def _views(text: str, mode: str):
         return [text]
 
     nfkc = unicodedata.normalize("NFKC", text).translate(_HOMOGLYPHS)
+    # Strip zero-width separators. NB: removal (not replacement-with-space) is a
+    # deliberate tradeoff — it rejoins a VALUE split by zero-width chars (e.g. an
+    # SSN "9​00​55​1234"), which is the common obfuscation. The cost is that a
+    # zero-width char placed *between a label and its value* glues them, defeating
+    # the trailing \b of every label-gated detector (npi, medicare, imei, nhs, …).
+    # That label-gluing case is a known, accepted gap shared by all label-gated
+    # kinds; recovering it would require spacing zero-width chars, which would in
+    # turn break the value-rejoin above. Value-rejoin wins.
     nfkc = _ZERO_WIDTH.sub("", nfkc)  # strip zero-width separators
     # Fragment-join: drop quotes / whitespace / '+' so values split across
     # string literals or log lines are reassembled (keeps -,. so SSN/PAN
@@ -431,7 +492,9 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
     iban, national_id, passport, vat, contract_number, part_number,
     github_token, slack_token, db_url, gcp_key, medical_record_number,
     icd10, insurance_member_id, internal_program_code, access_log,
-    health_record
+    health_record, imei, imsi, advertising_id, uk_nino, uk_nhs_number,
+    stripe_restricted_key, github_finegrained_pat, google_oauth_secret,
+    pgp_private_key, aws_temp_key, bitcoin_address, credit_card_track2
     `mode` is "naive" or "hardened".
     """
     if mode not in ("naive", "hardened"):
@@ -529,6 +592,30 @@ def detect(text: str, mode: str = "hardened") -> set[str]:
             found.add("vehicle_vin")
         if _MEDICARE.search(view):
             found.add("medicare_id")
+        if _IMEI.search(view):
+            found.add("imei")
+        if _IMSI.search(view):
+            found.add("imsi")
+        if _ADVERTISING_ID.search(view):
+            found.add("advertising_id")
+        if _UK_NINO.search(view):
+            found.add("uk_nino")
+        if _UK_NHS.search(view):
+            found.add("uk_nhs_number")
+        if _STRIPE_RK.search(view):
+            found.add("stripe_restricted_key")
+        if _GITHUB_PAT.search(view):
+            found.add("github_finegrained_pat")
+        if _GOOGLE_OAUTH.search(view):
+            found.add("google_oauth_secret")
+        if _PGP_KEY.search(view):
+            found.add("pgp_private_key")
+        if _AWS_TEMP_KEY.search(view):
+            found.add("aws_temp_key")
+        if _BITCOIN.search(view):
+            found.add("bitcoin_address")
+        if _TRACK2.search(view):
+            found.add("credit_card_track2")
         # Deterministic-hashing denylist check.
         for tok in _tokens(view):
             if hashlib.sha256(tok.encode()).hexdigest() in _DENYLIST_HASHES:

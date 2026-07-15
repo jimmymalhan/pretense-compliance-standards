@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**251 synthetic cases** across **22 data kinds** that the **FISMA** framework regulates.
+**311 synthetic cases** across **28 data kinds** that the **FISMA** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -35,11 +35,14 @@ is committed so the folder is visible in git.
 - `anthropic_key`
 - `api_key`
 - `aws_key`
+- `aws_temp_key`
 - `azure_key`
 - `db_url`
 - `drivers_license`
 - `gcp_key`
+- `github_finegrained_pat`
 - `github_token`
+- `google_oauth_secret`
 - `ip_address`
 - `ipv6`
 - `jwt`
@@ -47,12 +50,15 @@ is committed so the folder is visible in git.
 - `national_id`
 - `openai_key`
 - `passport`
+- `pgp_private_key`
 - `secret`
 - `sendgrid_key`
 - `slack_token`
 - `ssh_private_key`
 - `ssn`
+- `stripe_restricted_key`
 - `twilio_key`
+- `uk_nino`
 
 ## Run pretense against just this framework
 

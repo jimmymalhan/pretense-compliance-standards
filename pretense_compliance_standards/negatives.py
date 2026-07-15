@@ -389,6 +389,79 @@ _NEGATIVES: list[tuple[str, str, str, str]] = [
         "Renamed the sk-notes file in the shared drive.",
         "sk- followed by a short word, not a 20+ char key body",
     ),
+    # --- M10 new-kind look-alikes (label present, value absent / wrong shape) ---
+    (
+        "n-imei-lookup",
+        "imei",
+        "The imei lookup service returned no device today.",
+        "the word 'imei' with no following 15-digit device id",
+    ),
+    (
+        "n-imsi-catcher",
+        "imsi",
+        "Security review flagged a rogue imsi catcher near the site.",
+        "'imsi' as a noun with no 15-digit subscriber identity",
+    ),
+    (
+        "n-adid-optout",
+        "advertising_id",
+        "The user toggled advertising id tracking off in settings.",
+        "'advertising id' phrase with no following UUID value",
+    ),
+    (
+        "n-nino-appt",
+        "uk_nino",
+        "Booked a nino appointment at the job centre next week.",
+        "'nino' with no following 2-letter/6-digit/1-letter code",
+    ),
+    (
+        "n-nhs-helpline",
+        "uk_nhs_number",
+        "Called the nhs helpline about the new coverage.",
+        "'nhs' as an org name with no following 10-digit number",
+    ),
+    (
+        "n-rk-config",
+        "stripe_restricted_key",
+        "Renamed the rk_config helper in the billing module.",
+        "rk_ prefix but not the rk_test_/rk_live_ restricted-key form",
+    ),
+    (
+        "n-ghpat-release",
+        "github_finegrained_pat",
+        "Cut the github_release_v2 branch on the repo.",
+        "github_ prefix but not a github_pat_ fine-grained token",
+    ),
+    (
+        "n-gocspx-stub",
+        "google_oauth_secret",
+        "Left the GOCSPX placeholder text in the sample config.",
+        "GOCSPX without the '-' + 20-char secret body",
+    ),
+    (
+        "n-pgp-public",
+        "pgp_private_key",
+        "Imported the -----BEGIN PGP PUBLIC KEY BLOCK----- from the keyserver.",
+        "a PGP PUBLIC key block is not a private key",
+    ),
+    (
+        "n-asia-region",
+        "aws_temp_key",
+        "Failover shifted traffic to the ASIB region overnight.",
+        "ASIB, not the ASIA temporary-key prefix the detector keys on",
+    ),
+    (
+        "n-btc-price",
+        "bitcoin_address",
+        "The btc price ticker updated on the dashboard.",
+        "'btc' as a ticker with no following base58 address",
+    ),
+    (
+        "n-track2-log",
+        "credit_card_track2",
+        "Parsed record ;field=value? from the terminal log.",
+        "the ;...=...? sentinel shape but the fields are not digits",
+    ),
 ]
 
 

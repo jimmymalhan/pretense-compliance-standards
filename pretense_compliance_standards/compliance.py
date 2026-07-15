@@ -40,6 +40,11 @@ _CREDENTIALS = [
     "sendgrid_key",
     "twilio_key",
     "ssh_private_key",
+    "stripe_restricted_key",
+    "github_finegrained_pat",
+    "google_oauth_secret",
+    "pgp_private_key",
+    "aws_temp_key",
 ]  # SOC2 / security controls (secrets, credentials, access)
 _PHI = [
     "medical_record_number",
@@ -55,6 +60,7 @@ _NATIONAL_ID = [
     "national_id",
     "passport",
     "drivers_license",
+    "uk_nino",
 ]  # government identifiers
 _EU_FINANCE = ["iban", "vat", "swift_bic"]  # EU financial identifiers
 _CUI = [
@@ -62,11 +68,12 @@ _CUI = [
     "part_number",
     "internal_program_code",
 ]  # controlled tech info
-_CARD = ["pan", "card_cvv"]  # cardholder data
+_CARD = ["pan", "card_cvv", "credit_card_track2"]  # cardholder data
 _FINANCIAL = ["bank_account", "routing_number", "ein"]  # financial account data
 _PII_EXTRA = ["date_of_birth", "vehicle_vin"]  # additional personal data
 _NETWORK = ["ip_address", "ipv6", "mac_address"]  # network identifiers
-_CRYPTO = ["crypto_wallet_address"]  # digital-asset identifiers
+_CRYPTO = ["crypto_wallet_address", "bitcoin_address"]  # digital-asset identifiers
+_DEVICE = ["imei", "imsi", "advertising_id"]  # personal device / ad identifiers
 
 # framework -> kinds it regulates. Source of truth; KIND_FRAMEWORKS is derived
 # from it so the two can never drift. Ordering here sets the report order.
@@ -75,7 +82,12 @@ FRAMEWORK_KINDS: dict[str, list[str]] = {
     # --- security / credential regimes ---
     "SOC2": _CREDENTIALS + _NETWORK,
     "ISO_27001": _CREDENTIALS + _NATIONAL_ID + _CONTACT + _NETWORK,
-    "ISO_27701": _CREDENTIALS + _NATIONAL_ID + _CONTACT + _PII_EXTRA + _NETWORK,
+    "ISO_27701": _CREDENTIALS
+    + _NATIONAL_ID
+    + _CONTACT
+    + _PII_EXTRA
+    + _NETWORK
+    + _DEVICE,  # privacy-information management
     "NIST_800_53": _CREDENTIALS + ["ssn"] + _CONTACT + _NETWORK,
     "NIST_800_171": _CUI + _CREDENTIALS,  # protecting CUI systems
     "FedRAMP": _CREDENTIALS + _NETWORK,  # cloud auth (NIST 800-53 based)
@@ -89,25 +101,54 @@ FRAMEWORK_KINDS: dict[str, list[str]] = {
     "HITECH": _PHI + ["ssn"] + _CONTACT + _PII_EXTRA,  # strengthens HIPAA (ePHI)
     "HITRUST": _PHI + _CREDENTIALS + _PII_EXTRA,  # health + security controls
     # --- privacy regimes ---
-    "GDPR": _NATIONAL_ID + _EU_FINANCE + _CONTACT + _PII_EXTRA + _NETWORK,
-    "UK_GDPR": _NATIONAL_ID + _EU_FINANCE + _CONTACT + _PII_EXTRA + _NETWORK,
-    "CCPA_CPRA": _NATIONAL_ID + _CONTACT + _CARD + _PII_EXTRA + _NETWORK,
-    "LGPD": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Brazil
-    "PIPEDA": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Canada
-    "POPIA": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # South Africa
-    "PIPL": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # China
-    "PDPA_SG": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Singapore
-    "COPPA": _CONTACT + _PII_EXTRA + ["national_id"],  # US children's privacy
-    "FERPA": ["ssn"] + _CONTACT + _PII_EXTRA,  # US student education records
-    "DPDP": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # India Digital Personal Data
-    "APPI": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Japan personal information
-    "PIPA_KR": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # South Korea personal info
+    "GDPR": _NATIONAL_ID
+    + _EU_FINANCE
+    + _CONTACT
+    + _PII_EXTRA
+    + _NETWORK
+    + _DEVICE
+    + ["uk_nhs_number"],  # incl. special-category health data
+    "UK_GDPR": _NATIONAL_ID
+    + _EU_FINANCE
+    + _CONTACT
+    + _PII_EXTRA
+    + _NETWORK
+    + _DEVICE
+    + ["uk_nhs_number"],  # UK health id is special-category personal data
+    "CCPA_CPRA": _NATIONAL_ID + _CONTACT + _CARD + _PII_EXTRA + _NETWORK + _DEVICE,
+    "LGPD": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _DEVICE,  # Brazil
+    "PIPEDA": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _DEVICE,  # Canada
+    "POPIA": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _DEVICE,  # South Africa
+    "PIPL": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _DEVICE,  # China
+    "PDPA_SG": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _DEVICE,  # Singapore
+    "COPPA": _CONTACT
+    + _PII_EXTRA
+    + ["national_id"]
+    + _DEVICE,  # US children's privacy (incl. persistent device ids)
+    "FERPA": ["ssn"] + _CONTACT + _PII_EXTRA + _DEVICE,  # US student education records
+    "DPDP": _NATIONAL_ID
+    + _CONTACT
+    + _PII_EXTRA
+    + _DEVICE,  # India Digital Personal Data
+    "APPI": _NATIONAL_ID
+    + _CONTACT
+    + _PII_EXTRA
+    + _DEVICE,  # Japan personal information
+    "PIPA_KR": _NATIONAL_ID
+    + _CONTACT
+    + _PII_EXTRA
+    + _DEVICE,  # South Korea personal info
     "AU_PRIVACY": _NATIONAL_ID
     + _CONTACT
     + _PII_EXTRA
-    + _NETWORK,  # Australia Privacy Act / NDB
-    "FADP": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _EU_FINANCE,  # Switzerland FADP
-    "PDPA_TH": _NATIONAL_ID + _CONTACT + _PII_EXTRA,  # Thailand PDPA
+    + _NETWORK
+    + _DEVICE,  # Australia Privacy Act / NDB
+    "FADP": _NATIONAL_ID
+    + _CONTACT
+    + _PII_EXTRA
+    + _EU_FINANCE
+    + _DEVICE,  # Switzerland FADP
+    "PDPA_TH": _NATIONAL_ID + _CONTACT + _PII_EXTRA + _DEVICE,  # Thailand PDPA
     "CJIS": _NATIONAL_ID + ["ssn"] + _CONTACT + _NETWORK,  # US criminal-justice info
     "IRS_1075": ["ssn", "ein", "bank_account"]
     + _NATIONAL_ID,  # US federal tax info (FTI)

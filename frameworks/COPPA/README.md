@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**65 synthetic cases** across **5 data kinds** that the **COPPA** framework regulates.
+**95 synthetic cases** across **8 data kinds** that the **COPPA** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -31,8 +31,11 @@ is committed so the folder is visible in git.
 
 ## Data kinds covered
 
+- `advertising_id`
 - `date_of_birth`
 - `email`
+- `imei`
+- `imsi`
 - `national_id`
 - `phone`
 - `vehicle_vin`

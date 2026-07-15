@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**254 synthetic cases** across **21 data kinds** that the **DORA** framework regulates.
+**314 synthetic cases** across **27 data kinds** that the **DORA** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -35,22 +35,28 @@ is committed so the folder is visible in git.
 - `anthropic_key`
 - `api_key`
 - `aws_key`
+- `aws_temp_key`
 - `azure_key`
 - `bank_account`
+- `bitcoin_address`
 - `crypto_wallet_address`
 - `db_url`
 - `ein`
 - `gcp_key`
+- `github_finegrained_pat`
 - `github_token`
+- `google_oauth_secret`
 - `iban`
 - `jwt`
 - `openai_key`
 - `pan`
+- `pgp_private_key`
 - `routing_number`
 - `secret`
 - `sendgrid_key`
 - `slack_token`
 - `ssh_private_key`
+- `stripe_restricted_key`
 - `twilio_key`
 
 ## Run pretense against just this framework

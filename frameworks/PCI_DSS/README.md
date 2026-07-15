@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**32 synthetic cases** across **2 data kinds** that the **PCI_DSS** framework regulates.
+**42 synthetic cases** across **3 data kinds** that the **PCI_DSS** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -32,6 +32,7 @@ is committed so the folder is visible in git.
 ## Data kinds covered
 
 - `card_cvv`
+- `credit_card_track2`
 - `pan`
 
 ## Run pretense against just this framework

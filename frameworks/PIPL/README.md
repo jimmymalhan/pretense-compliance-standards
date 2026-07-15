@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**101 synthetic cases** across **8 data kinds** that the **PIPL** framework regulates.
+**141 synthetic cases** across **12 data kinds** that the **PIPL** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every
@@ -31,13 +31,17 @@ is committed so the folder is visible in git.
 
 ## Data kinds covered
 
+- `advertising_id`
 - `date_of_birth`
 - `drivers_license`
 - `email`
+- `imei`
+- `imsi`
 - `national_id`
 - `passport`
 - `phone`
 - `ssn`
+- `uk_nino`
 - `vehicle_vin`
 
 ## Run pretense against just this framework
