@@ -536,3 +536,28 @@ def test_md_export_contains_frameworks(cases, negatives, tmp_path):
     for fw in ("HIPAA", "GDPR", "CJIS", "PCI_DSS"):
         assert fw in text, f"{fw} missing from Markdown report"
     assert "Precision / recall / F1" in text
+
+
+# --- per-framework folder layout (frameworks/<FRAMEWORK>/) ------------------
+
+
+def test_by_framework_layout(cases, tmp_path, monkeypatch):
+    """Every framework gets a folder whose corpus holds EXACTLY that framework's
+    cases (banner-stamped), plus a committed README and a top-level index."""
+    monkeypatch.setattr(corpus_builder, "FRAMEWORKS_DIR", tmp_path / "frameworks")
+    corpus_builder.write_by_framework(cases)
+    root = tmp_path / "frameworks"
+    assert (root / "README.md").exists(), "missing frameworks index"
+
+    for fw in FRAMEWORKS:
+        fw_dir = root / fw
+        assert (fw_dir / "README.md").exists(), f"{fw} README missing"
+        raw = (fw_dir / "corpus" / "cases.json").read_text(encoding="utf-8")
+        assert _has_banner(raw), f"{fw} corpus missing banner"
+        sub = json.loads(raw)["cases"]
+        # The folder holds EXACTLY the cases whose kind maps to this framework
+        # (set-equality also covers the valid empty case — a framework whose
+        # kinds have no corpus case yet gets an empty, still-well-formed folder).
+        assert all(fw in c["compliance"] for c in sub), f"{fw} folder has foreign case"
+        expected = {c["id"] for c in cases if fw in frameworks_for(c["kind"])}
+        assert {c["id"] for c in sub} == expected, f"{fw} case set mismatch"

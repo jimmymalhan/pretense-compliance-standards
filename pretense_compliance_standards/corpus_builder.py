@@ -31,11 +31,13 @@ import json
 import pathlib
 
 from . import BANNER
-from .compliance import frameworks_for
+from .compliance import FRAMEWORKS, frameworks_for
 from .negatives import build_negatives
 from .regulated import collect_regulated_cases
 
 CORPUS_DIR = pathlib.Path(__file__).parent / "corpus"
+# Root-level per-framework view (generated): frameworks/<FRAMEWORK>/…
+FRAMEWORKS_DIR = pathlib.Path(__file__).parent.parent / "frameworks"
 ZW = "​"  # zero-width space
 
 
@@ -245,15 +247,127 @@ def write_negatives(cases: list[dict]) -> None:
         json.dump(manifest, fh, indent=2)
 
 
+def _framework_readme(fw: str, sub_cases: list[dict]) -> str:
+    """Render the committed README for one framework's generated corpus folder."""
+    kinds = sorted({c["kind"] for c in sub_cases})
+    lines = [
+        f"# {fw} — synthetic compliance corpus",
+        "",
+        f"> {BANNER}",
+        "",
+        f"**{len(sub_cases)} synthetic cases** across **{len(kinds)} data kinds** that the "
+        f"**{fw}** framework regulates.",
+        "",
+        "This folder is a **generated** per-framework view of the shared corpus: one data",
+        "kind maps to many frameworks, so a case appears under every framework it belongs",
+        "to. Regenerate with `python3 -m pretense_compliance_standards.corpus_builder`.",
+        "",
+        "## Data kinds covered",
+        "",
+        *(f"- `{k}`" for k in kinds),
+        "",
+        "## Run pretense against just this framework",
+        "",
+        "```bash",
+        "node --experimental-transform-types \\",
+        f"  pretense_compliance_standards/pretense_bridge/run.mjs --framework {fw}",
+        "```",
+        "",
+        "## Run this framework's tests",
+        "",
+        "```bash",
+        f"uv run pytest tests/test_pcs.py -m {fw.lower()} -q --noconftest",
+        "```",
+        "",
+        "`corpus/cases.json` here is git-ignored (a build artifact regenerated on demand);",
+        "it holds only cases whose `compliance` list includes this framework.",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _frameworks_index(counts: dict[str, int]) -> str:
+    """Render the committed index README for the frameworks/ tree."""
+    lines = [
+        "# Per-framework corpus views",
+        "",
+        f"> {BANNER}",
+        "",
+        "Each subfolder is a **generated** view of the synthetic corpus scoped to a single",
+        "compliance framework, so you can point **pretense** (or the test suite) at exactly",
+        "one framework's regulated data. Because one data `kind` maps to many frameworks, a",
+        "case appears under every framework it belongs to (the mapping is many-to-many).",
+        "",
+        "Regenerate the whole tree (and the flat corpus) with:",
+        "",
+        "```bash",
+        "python3 -m pretense_compliance_standards.corpus_builder",
+        "```",
+        "",
+        "The per-framework `corpus/cases.json` files are git-ignored (build artifacts); the",
+        "folder + this index + each `<FRAMEWORK>/README.md` are committed so the layout is",
+        "visible in git.",
+        "",
+        "## Frameworks",
+        "",
+        "| Framework | Cases | Run pretense | Run tests |",
+        "|-----------|------:|--------------|-----------|",
+    ]
+    for fw in FRAMEWORKS:
+        lines.append(
+            f"| [`{fw}`]({fw}/README.md) | {counts[fw]} | "
+            f"`run.mjs --framework {fw}` | `pytest -m {fw.lower()}` |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def write_by_framework(cases: list[dict]) -> None:
+    """Generate the root `frameworks/<FRAMEWORK>/` view of the corpus.
+
+    For each framework, writes `corpus/cases.json` (only the cases whose `kind`
+    maps to that framework) plus a committed `README.md`; also writes the
+    `frameworks/README.md` index. The per-framework corpus data is a build
+    artifact (git-ignored); the READMEs are committed so the folders are visible
+    in git. Framework names live in metadata / these reports only — never in a
+    scanned `text` payload.
+    """
+    FRAMEWORKS_DIR.mkdir(parents=True, exist_ok=True)
+    # Bucket cases by framework in a single pass (the mapping is many-to-many),
+    # so the membership rule is applied once rather than per-framework twice.
+    by_fw: dict[str, list[dict]] = {fw: [] for fw in FRAMEWORKS}
+    for c in cases:
+        for fw in c.get("compliance", []):
+            if fw in by_fw:
+                by_fw[fw].append(c)
+    with open(FRAMEWORKS_DIR / "README.md", "w", encoding="utf-8") as fh:
+        fh.write(_frameworks_index({fw: len(by_fw[fw]) for fw in FRAMEWORKS}))
+    for fw in FRAMEWORKS:
+        sub = by_fw[fw]
+        fw_dir = FRAMEWORKS_DIR / fw
+        (fw_dir / "corpus").mkdir(parents=True, exist_ok=True)
+        manifest = {
+            "_notice": BANNER + f" — {fw} view (cases whose kind maps to {fw}).",
+            "framework": fw,
+            "cases": sub,
+        }
+        with open(fw_dir / "corpus" / "cases.json", "w", encoding="utf-8") as fh:
+            json.dump(manifest, fh, indent=2)
+        with open(fw_dir / "README.md", "w", encoding="utf-8") as fh:
+            fh.write(_framework_readme(fw, sub))
+
+
 def main() -> None:
     cases = build_cases()
     write_corpus(cases)
     negatives = build_negatives()
     write_negatives(negatives)
+    write_by_framework(cases)
     tiers = sorted({c["difficulty"] for c in cases})
     print(f"Wrote {len(cases)} synthetic cases across tiers {tiers} to {CORPUS_DIR}/")
     print(
         f"Wrote {len(negatives)} benign look-alike (negative) cases to {CORPUS_DIR}/negatives.json"
+    )
+    print(
+        f"Wrote per-framework views for {len(FRAMEWORKS)} frameworks to {FRAMEWORKS_DIR}/"
     )
     print(f"Reminder: {BANNER}.")
 
