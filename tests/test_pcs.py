@@ -498,3 +498,41 @@ def test_hardened_precision_is_perfect(cases, negatives):
     assert pr["precision"] == 1.0
     assert pr["recall"] == 1.0
     assert pr["f1"] == 1.0
+
+
+# --- machine-readable report exporters -------------------------------------
+
+
+def test_report_data_shape(cases, negatives):
+    """The structured report covers every framework, all tiers, and precision."""
+    data = harness.report_data(cases, negatives)
+    assert data["totals"]["frameworks"] == len(FRAMEWORKS)
+    assert set(data["recall_by_framework"]) == set(FRAMEWORKS)
+    assert "all" in data["recall_by_tier"]
+    assert data["precision"]["hardened"]["fp"] == 0
+    for row in data["recall_by_tier"].values():
+        for mode in harness.MODES:
+            assert 0.0 <= row[mode] <= 1.0
+
+
+def test_json_export_shape(cases, negatives, tmp_path):
+    """The JSON export round-trips and carries the banner + full sections."""
+    path = tmp_path / "report.json"
+    harness.export_json(str(path), harness.report_data(cases, negatives))
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    assert loaded["_notice"] == BANNER
+    assert loaded["totals"]["kinds"] == len({c["kind"] for c in cases})
+    assert loaded["recall_by_tier"]["all"]["hardened"] == 1.0
+    assert set(loaded["recall_by_framework"]) == set(FRAMEWORKS)
+
+
+def test_md_export_contains_frameworks(cases, negatives, tmp_path):
+    """The Markdown export renders the banner, framework rows, and precision table."""
+    path = tmp_path / "report.md"
+    harness.export_markdown(str(path), harness.report_data(cases, negatives))
+    text = path.read_text(encoding="utf-8")
+    assert BANNER in text
+    assert "# Pretense Compliance Standards" in text
+    for fw in ("HIPAA", "GDPR", "CJIS", "PCI_DSS"):
+        assert fw in text, f"{fw} missing from Markdown report"
+    assert "Precision / recall / F1" in text
