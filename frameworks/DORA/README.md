@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**314 synthetic cases** across **27 data kinds** that the **DORA** framework regulates.
+**334 synthetic cases** across **27 data kinds** that the **DORA** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

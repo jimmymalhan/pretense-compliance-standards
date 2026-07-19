@@ -15,7 +15,7 @@ split, base64/hex, zero-width). Every value is provably fake by construction:
     - ip_address      -> 192.0.2.x / 198.51.100.x  (RFC 5737 TEST-NET, non-routable)
     - ipv6            -> 2001:db8::  (RFC 3849 documentation range)
     - pan             -> Luhn-valid but random -> not a real account
-    - iban            -> check digits `00` (never valid) -> guaranteed fake
+    - iban            -> mod-97 VALID; published examples / unallocated bank codes
 
 Neutral `kind` labels only (no compliance-framework strings in any payload).
 Every case is scanner INPUT (`expected: True`). Each generated case is
@@ -81,7 +81,19 @@ _VALUES = {
     "ip_address": ["ip 192.0.2.44", "src 198.51.100.7"],
     "ipv6": ["addr 2001:db8:0:0:0:0:0:1", "addr 2001:db8:85a3:0:0:8a2e:370:7334"],
     "pan": ["card 4111111111111111", "card 5500005555555559"],
-    "iban": ["iban GB00WEST12345698765432", "iban DE00370400440532013000"],
+    # Checksum-VALID across four country layouts (GB/DE 22, FR 27, NL 18). The
+    # first two are the canonical published example IBANs — the same class of
+    # documented-but-unusable value as the 4111… test PAN and AWS's
+    # AKIAIOSFODNN7EXAMPLE key already used elsewhere in this corpus. The last
+    # two are built on unallocated bank codes (99999 / TEST). Check digits are
+    # real: a `00` check, as used previously, is something a correct IBAN
+    # validator must reject, so it could never measure recall.
+    "iban": [
+        "iban GB82WEST12345698765432",
+        "iban DE89370400440532013000",
+        f"iban {_cb.make_iban('FR', '99999' + '00001' + '12345678901' + '42')}",
+        f"iban {_cb.make_iban('NL', 'TEST' + '0123456789')}",
+    ],
     "phone": ["phone (415) 555-0142", "contact 020 7946 0958"],
     "national_id": ["national_id 9041-7745-8035", "id 9000-4200-0001"],
 }

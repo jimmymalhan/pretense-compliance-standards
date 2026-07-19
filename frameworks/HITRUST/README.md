@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**306 synthetic cases** across **28 data kinds** that the **HITRUST** framework regulates.
+**316 synthetic cases** across **28 data kinds** that the **HITRUST** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

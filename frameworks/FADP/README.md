@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**188 synthetic cases** across **15 data kinds** that the **FADP** framework regulates.
+**198 synthetic cases** across **15 data kinds** that the **FADP** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

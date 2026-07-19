@@ -6,7 +6,10 @@ Adds SYNTHETIC cases for the M3 data kinds, each across difficulty tiers 0-4
 
     - mac_address           -> 00:00:5E:00:53:xx  (RFC 7042 documentation range)
     - crypto_wallet_address -> Ethereum 0x + 40 hex, a null/burn-style address
-    - ssh_private_key       -> a PEM "BEGIN ... PRIVATE KEY" header (no real key)
+    - ssh_private_key       -> a COMPLETE armored PEM key (banner + armor headers
+                               + 64-char-wrapped base64 body + END banner), body
+                               being random bytes so it is not a usable key; plus
+                               one header-only `banneronly` truncated-paste case
     - swift_bic             -> "TEST"-prefixed BIC (no such institution)
     - vehicle_vin           -> a public NHTSA/maker example VIN
     - medicare_id           -> a CMS example MBI format
@@ -58,9 +61,27 @@ _VALUES = {
         "wallet 0x000000000000000000000000000000000000dEaD",
         "eth 0x00000000000000000000000000000000DeaDBeef",
     ],
+    # COMPLETE armored keys: banner + optional armor headers + a base64 body
+    # wrapped at 64 chars + the matching END banner. A bare BEGIN line carries no
+    # key material at all, so redacting it protects nothing and passing it
+    # through leaks nothing — it cannot measure whether key bytes egress. The
+    # third value is a deliberately-retained header-only EDGE CASE (see below).
     "ssh_private_key": [
-        "key -----BEGIN OPENSSH PRIVATE KEY-----",
-        "key -----BEGIN RSA PRIVATE KEY-----",
+        _cb.pem_private_key("OPENSSH PRIVATE KEY", nbytes=1200, seed=901),
+        _cb.pem_private_key(
+            "RSA PRIVATE KEY",
+            armor_headers=(
+                "Proc-Type: 4,ENCRYPTED",
+                "DEK-Info: AES-128-CBC,9A3F17C4B20E58D6F1A7C093E4B85D2A",
+            ),
+            nbytes=1190,
+            seed=902,
+        ),
+        # EDGE CASE — header-only, no key body. Kept on purpose: this shape does
+        # occur in truncated pastes and half-copied terminal output. It is NOT
+        # representative of a real key leak, so it is labelled `banneronly` in
+        # its case ids to keep it separable when reading results.
+        ("banneronly", "key -----BEGIN OPENSSH PRIVATE KEY-----"),
     ],
     "swift_bic": ["bic: TESTGB2LXXX", "swift TESTUS33"],
     "vehicle_vin": ["vin: 1HGBH41JXMN109186", "vin 5YJ3E1EA7JF000316"],
@@ -72,7 +93,10 @@ def build_cases() -> list[dict]:
     C: list[dict] = []
     for kind, values in _VALUES.items():
         for i, value in enumerate(values):
-            for cid, tier, k, obf, text in _tiers(f"r9-{kind}-{i}", kind, value):
+            # A value may be given as ("<label>", value) to tag an edge case in
+            # the id; plain strings keep the positional index as before.
+            label, value = value if isinstance(value, tuple) else (str(i), value)
+            for cid, tier, k, obf, text in _tiers(f"r9-{kind}-{label}", kind, value):
                 C.append(
                     {
                         "id": cid,

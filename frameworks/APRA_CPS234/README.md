@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**269 synthetic cases** across **24 data kinds** that the **APRA_CPS234** framework regulates.
+**279 synthetic cases** across **24 data kinds** that the **APRA_CPS234** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**136 synthetic cases** across **10 data kinds** that the **GLBA** framework regulates.
+**146 synthetic cases** across **10 data kinds** that the **GLBA** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

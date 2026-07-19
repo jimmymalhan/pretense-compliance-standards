@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**338 synthetic cases** across **30 data kinds** that the **ISO_27001** framework regulates.
+**348 synthetic cases** across **30 data kinds** that the **ISO_27001** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

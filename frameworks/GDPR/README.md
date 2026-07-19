@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**228 synthetic cases** across **19 data kinds** that the **GDPR** framework regulates.
+**238 synthetic cases** across **19 data kinds** that the **GDPR** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

@@ -17,7 +17,7 @@ detector scan a ROT13 view would double its false-positive surface for no
 realistic gain (see `detector._decode_layer`).
 
 Every value is provably fake (900-range SSN, @example.com, sk_test_ key, the AWS
-documentation key, a denylisted secret, `00`-check IBAN). Neutral `kind` labels
+documentation key, a denylisted secret, the published example IBAN). Neutral `kind` labels
 only — no compliance-framework strings in any payload. Every case is scanner
 INPUT (`expected: True`) and is self-checked to be detected in hardened mode.
 
@@ -85,7 +85,9 @@ _ITEMS: list[tuple[str, str, list[str]]] = [
     ("aws_key", f"aws_access_key_id {_cb.AWS_KEY}", ["gzip-base64", "percent-encoded"]),
     ("secret", f"jwt_signing_secret {_cb.SECRET}", ["gzip-base64", "double-base64"]),
     ("national_id", "national_id 9041-7745-8035", ["percent-encoded", "double-base64"]),
-    ("iban", "iban GB00WEST12345698765432", ["percent-encoded", "gzip-base64"]),
+    # The canonical published example IBAN, with its real mod-97 check digits
+    # (82). The previous `GB00…` form could not pass IBAN validation at all.
+    ("iban", "iban GB82WEST12345698765432", ["percent-encoded", "gzip-base64"]),
 ]
 
 

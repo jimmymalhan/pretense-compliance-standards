@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**259 synthetic cases** across **23 data kinds** that the **NIST_800_171** framework regulates.
+**269 synthetic cases** across **23 data kinds** that the **NIST_800_171** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

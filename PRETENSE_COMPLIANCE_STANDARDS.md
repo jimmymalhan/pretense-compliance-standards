@@ -21,8 +21,8 @@ with per-framework scan targets generated under [`frameworks/`](frameworks/READM
 ## The guarantee
 
 Every value is **provably fake** (900-range SSNs, `555-01xx` phones, `@example.com`
-emails, `sk_test_`/`AKIA…EXAMPLE` secrets, Luhn-valid-but-random PANs, `00`-check
-IBANs). Every corpus file carries a `SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL`
+emails, `sk_test_`/`AKIA…EXAMPLE` secrets, Luhn-valid-but-random PANs, mod-97-valid
+IBANs on unallocated bank codes). Every corpus file carries a `SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL`
 banner. Framework names appear only in metadata and reports — never inside a scanned
 payload. It is **test input to raise detection coverage**, not real data and not
 scanner-evasion.

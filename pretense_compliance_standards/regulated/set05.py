@@ -12,7 +12,7 @@ Provable-fakeness contract (identical spirit to the rest of the benchmark):
     - phone        -> 555-01xx      (reserved for fiction/testing)
     - email        -> @example.com  (RFC 2606 reserved domain)
     - PAN          -> Luhn-valid but random (generator._luhn_card) -> not real
-    - IBAN         -> check digits `00` (never valid) -> guaranteed fake
+    - IBAN         -> mod-97 VALID, unallocated bank code -> guaranteed fake
     - api_key      -> sk_test_...    (test-mode prefix)
     - db_url       -> host .example.com, test creds
 
@@ -60,12 +60,21 @@ def _digits(n: int) -> str:
 
 
 def _fake_iban(country: str = "GB", bank: str = "SYNT") -> str:
-    """A structurally-shaped IBAN with check digits ``00``.
+    """A checksum-VALID IBAN whose bank code is not an allocated institution.
 
-    Real IBAN check digits are in 02..98; ``00`` never validates, so any IBAN
-    emitted here is guaranteed fake while still *looking* like the real thing.
+    The check digits are computed with ISO 7064 mod-97-10 and the BBAN is built
+    to the country's registry length. Previously the check digits were pinned to
+    ``00``, which never validates — that made the value safe but unscoreable,
+    since a correct IBAN parser is *supposed* to reject it. Fakeness now rests on
+    the bank code (``SYNT`` / ``TEST`` / ``99999``), which no institution holds,
+    so the value cannot address a real account even though it is well-formed.
     """
-    return f"{country}00{bank}{_digits(14)}"
+    if country in ("GB", "NL"):  # 4a bank code + numeric account body
+        body = _digits(corpus_builder.IBAN_LENGTHS[country] - 4 - len(bank))
+        bban = f"{bank}{body}"
+    else:  # DE / FR / ES / CH / IT: fully numeric BBAN on a reserved bank code
+        bban = f"99{_digits(corpus_builder.IBAN_LENGTHS[country] - 6)}"
+    return corpus_builder.make_iban(country, bban)
 
 
 def _fake_ssn() -> str:
@@ -168,7 +177,7 @@ def build_cases() -> list[dict]:
         "json-fragment",
         json.dumps({"ticker": "AAPL", "card_on_file": pan2, "status": "active"}),
     )
-    iban2 = _fake_iban("DE", "TEST")
+    iban2 = _fake_iban("DE")
     add(
         "r5-iban-spaced",
         2,
@@ -227,7 +236,7 @@ def build_cases() -> list[dict]:
         "unicode-homoglyph",
         f"account_holder_ssn=９{ssn3[1:]}",
     )  # fullwidth leading 9
-    iban3 = _fake_iban("FR", "SYNT")
+    iban3 = _fake_iban("FR")
     add(
         "r5-iban-json-b64",
         3,
@@ -310,10 +319,12 @@ def _validate(cases: list[dict], payload_text: str) -> None:
         if c["kind"] == "email" and "@" in text:
             assert "@example.com" in text, f"{c['id']}: email not @example.com"
         if c["kind"] == "iban" and c["obfuscation"] in ("config-field", "csv-cell"):
-            # Country code + '00' check digits, un-obfuscated forms only.
-            assert re.search(
-                r"[A-Z]{2}00", text
-            ), f"{c['id']}: IBAN check digits not 00"
+            # Un-obfuscated forms must carry a real mod-97 check: an IBAN that
+            # fails validation is one a correct parser drops, so it would score
+            # the scanner on a value it is right to ignore.
+            assert (
+                corpus_builder.first_valid_iban(text) is not None
+            ), f"{c['id']}: IBAN fails mod-97 check"
         if c["kind"] == "health_record":
             # Contract: free-text dx that also carries an MRN or ICD anchor.
             assert _MRN_ANCHOR_RE.search(text) or _ICD_ANCHOR_RE.search(

@@ -10,7 +10,8 @@ framework** (whose regulated data is under-protected?).
 > **Everything here is SYNTHETIC.** Every "sensitive" value is fake by
 > construction — SSNs in the never-issued `900-xx-xxxx` range, `555-01xx` phone
 > numbers (reserved for fiction), `@example.com` emails, the AWS *example* key,
-> Luhn-valid-but-random card numbers, `sk_test_` keys, `00`-check IBANs. No value
+> Luhn-valid-but-random card numbers, `sk_test_` keys, mod-97-valid IBANs whose
+> bank code is not allocated to any institution. No value
 > maps to a real person, account, or secret. Every generated file carries a
 > `SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL` banner.
 >

@@ -15,8 +15,11 @@ stripe data. Every value is provably fake / reserved by construction:
     - stripe_restricted_key  -> rk_test_ / rk_live_ example key (no real account)
     - github_finegrained_pat -> github_pat_ example token (no real grant)
     - google_oauth_secret    -> GOCSPX- example secret (no real client)
-    - pgp_private_key         -> a PGP "BEGIN ... PRIVATE KEY BLOCK" header (no key)
-    - aws_temp_key           -> ASIA…EXAMPLE (mirrors AWS's documented AKIA example)
+    - pgp_private_key        -> a COMPLETE RFC 4880 armored block (banner, Version
+                               header, 64-char-wrapped body, real CRC-24 line, END
+                               banner); plus one `banneronly` truncated-paste case
+    - aws_temp_key           -> ASIA + 16 chars from the base32 alphabet [A-Z2-7]
+                               that real AWS key ids are drawn from
     - bitcoin_address        -> a well-known documented burn address (unspendable)
     - credit_card_track2     -> ;<test PAN>=…? using the 4111… test card number
 
@@ -88,11 +91,23 @@ _VALUES = {
         "GOCSPX-abcdefABCDEF0123456789xy",
         "GOCSPX-0123456789abcdefABCDEFghij",
     ],
+    # COMPLETE OpenPGP armor: banner, Version header, blank line, 64-char-wrapped
+    # base64 body, the `=<CRC-24>` checksum line (computed for real, per RFC
+    # 4880) and the END banner. A lone BEGIN line holds no key material, so it
+    # cannot show whether key bytes actually egress. The third value keeps a
+    # header-only truncated paste as a labelled edge case.
     "pgp_private_key": [
-        "key -----BEGIN PGP PRIVATE KEY BLOCK-----",
-        "-----BEGIN PGP PRIVATE KEY BLOCK-----",
+        _cb.pgp_private_key_block(version="GnuPG v2", nbytes=1190, seed=1001),
+        _cb.pgp_private_key_block(
+            version="OpenPGP.js v4.10.10", nbytes=1210, seed=1002
+        ),
+        ("banneronly", "key -----BEGIN PGP PRIVATE KEY BLOCK-----"),
     ],
-    "aws_temp_key": ["ASIAIOSFODNN7EXAMPLE", "sts ASIAJ4XZ7ABCDE123456"],
+    # Both bodies use only the RFC 4648 base32 alphabet [A-Z2-7] that AWS draws
+    # real access-key ids from. The previous second value, ASIAJ4XZ7ABCDE123456,
+    # contained `1` — a character no issued AWS key can hold — so it was not a
+    # credential any deployment could leak, and rejecting it was correct.
+    "aws_temp_key": ["ASIAIOSFODNN7EXAMPLE", "sts ASIAJ4XZ7ABCDE234567"],
     "bitcoin_address": [
         "btc 1BitcoinEaterAddressDontSendf59kuE",
         "bitcoin: 1CounterpartyXXXXXXXXXXXXXXXUWLpVr",
@@ -108,7 +123,10 @@ def build_cases() -> list[dict]:
     C: list[dict] = []
     for kind, values in _VALUES.items():
         for i, value in enumerate(values):
-            for cid, tier, k, obf, text in _tiers(f"r10-{kind}-{i}", kind, value):
+            # A value may be given as ("<label>", value) to tag an edge case in
+            # the id; plain strings keep the positional index as before.
+            label, value = value if isinstance(value, tuple) else (str(i), value)
+            for cid, tier, k, obf, text in _tiers(f"r10-{kind}-{label}", kind, value):
                 C.append(
                     {
                         "id": cid,

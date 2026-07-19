@@ -35,7 +35,7 @@ CJIS, IRS Pub 1075, SOX, GLBA, CMMC L2, PCI DSS.
 
 Every value is **provably fake** (900-range SSNs, `555-01xx` phones, `@example.com`
 emails, `sk_test_`/`AKIA…EXAMPLE` test-mode secrets, Luhn-valid-but-random PANs,
-`00`-check IBANs). Every corpus file carries a `SYNTHETIC — FAKE COMPLIANCE TEST DATA,
+mod-97-valid IBANs on unallocated bank codes). Every corpus file carries a `SYNTHETIC — FAKE COMPLIANCE TEST DATA,
 NOT REAL` banner. Framework names appear only in metadata/reports — never in a scanned
 payload. It is **test input to raise detection coverage**, not real data.
 

@@ -55,7 +55,7 @@ This cadence has shipped every change here (PRs #6–#11) with all CI green.
   source + the `frameworks/**/README.md` files. If a `git add -A` stages regenerated
   corpus, restore it before committing.
 - **Everything is synthetic and provably fake** (900-range SSNs, `@example.com`, `sk_test_`
-  keys, RFC-5737 IPs, `00`-check IBANs). Every generated file carries the
+  keys, RFC-5737 IPs, IBANs on unallocated bank codes). Every generated file carries the
   `SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL` banner.
 - **No compliance-framework names inside a scanned `text` payload** — only in metadata,
   reports, table/variable/file names, and docs.

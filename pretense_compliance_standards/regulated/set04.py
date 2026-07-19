@@ -11,7 +11,7 @@ set — every obfuscated form DECODES/NORMALIZES back to a single contract-canon
 value that the hardened detector recovers via its `_views()` normalization (NFKC +
 zero-width strip, fragment-join, separator-collapse, base64/hex decode):
 
-    iban                  GB00…            check digits 00 + "EXMP" example marker
+    iban                  GB…              mod-97 VALID; unallocated EXMP bank code
     national_id           9000-4200-0001   \\d{4}-\\d{4}-\\d{4}, 9000-range synthetic
     github_token          ghp_EXAMPLE…     ghp_ + 36 alnum, obvious example token
     medical_record_number MRN00042001      MRN + 8 digits, synthetic locator
@@ -47,9 +47,13 @@ SOURCE_FILE = "corpus/blended_regulated_04.json"
 ZW = "\u200b"  # zero-width space (same separator the detector strips)
 
 # --- fixed synthetic literals: contract-canonical shapes, all provably fake ---
-# iban: 2 letters + "00" check digits + grouped alnum; "EXMP" marks it example.
-# Digit groups are kept <=4 long so the value carries no bare SSN-shaped run.
-IBAN = "GB00EXMP6016EXMP1331EXMP9268"
+# iban: the real UK layout — 4-alpha bank code + 6-digit sort code + 8-digit
+# account = 22 chars — carrying genuine ISO 7064 mod-97-10 check digits. The
+# previous literal was `00`-checked AND 28 chars long, so it was neither a valid
+# checksum nor a valid GB length; no IBAN parser would have accepted it, and a
+# scanner was being marked down for declining it. `EXMP` is not an allocated
+# bank code, which is what keeps the value unable to name a real account.
+IBAN = corpus_builder.make_iban("GB", "EXMP" + "60161331926800")
 # national_id: \d{4}-\d{4}-\d{4}, first group 9000 -> never-issued synthetic range.
 NATIONAL_ID = "9000-4200-0001"
 # github_token: ghp_ + 36 alnum; "EXAMPLE" repeats make it an obvious example token.
@@ -244,8 +248,8 @@ def _recovered_views(text: str):
 def _assert_fake_ranges() -> None:
     """Every canonical constant is provably synthetic and contract-shaped."""
     assert (
-        IBAN[:2].isalpha() and IBAN[2:4] == "00" and "EXMP" in IBAN
-    ), "iban must be 2 letters + 00 check digits + EXMP example marker"
+        IBAN[:2].isalpha() and corpus_builder.iban_is_valid(IBAN) and "EXMP" in IBAN
+    ), "iban must be mod-97 valid on the unallocated EXMP example bank code"
     assert (
         re.fullmatch(r"\d{4}-\d{4}-\d{4}", NATIONAL_ID) and NATIONAL_ID[0] == "9"
     ), "national_id must be \\d{4}-\\d{4}-\\d{4} in the 9000-range"

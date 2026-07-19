@@ -29,6 +29,8 @@ import base64
 import csv
 import json
 import pathlib
+import random
+import re
 
 from . import BANNER
 from .compliance import FRAMEWORKS, frameworks_for
@@ -60,6 +62,187 @@ def _luhn_complete(body15: str) -> str:
         if _luhn_ok(body15 + c):
             return body15 + c
     raise AssertionError("unreachable")
+
+
+# --- IBAN: checksum-VALID, but provably not an allocated account ------------
+#
+# Earlier revisions of this corpus forced the check digits to "00" so an IBAN
+# could never validate. That made the value safe, but it also made it useless as
+# a recall fixture: a correct IBAN implementation MUST reject a `00` check, so a
+# scanner was being scored for missing a value no bank would ever accept. The
+# fixture now carries real ISO 7064 mod-97-10 check digits, and provable fakeness
+# comes from the *bank code* instead — `SYNT` / `TEST` / `ZZZZ` and the reserved
+# numeric bank codes below are not allocated to any institution, so the value is
+# structurally perfect and still cannot route to a real account. (A checksum only
+# proves the digits are self-consistent; it never proves the account exists.)
+
+# Real ISO 13616 registry lengths, so a length check on the country code passes.
+IBAN_LENGTHS = {
+    "GB": 22,  # 4a bank + 6n sort code + 8n account
+    "DE": 22,  # 8n Bankleitzahl + 10n account
+    "FR": 27,  # 5n bank + 5n branch + 11c account + 2n RIB key
+    "ES": 24,  # 4n bank + 4n branch + 2n check + 10n account
+    "NL": 18,  # 4a bank + 10n account
+    "CH": 21,  # 5n bank + 12c account
+    "IT": 27,  # 1a CIN + 5n ABI + 5n CAB + 12c account
+}
+
+
+def iban_is_valid(iban: str) -> bool:
+    """True iff `iban` passes the ISO 7064 mod-97-10 check (a valid IBAN -> 1)."""
+    s = iban.replace(" ", "").upper()
+    if not (15 <= len(s) <= 34) or not s[:2].isalpha() or not s[2:4].isdigit():
+        return False
+    rearranged = s[4:] + s[:4]
+    if not rearranged.isalnum():
+        return False
+    return int("".join(str(int(ch, 36)) for ch in rearranged)) % 97 == 1
+
+
+_IBAN_CANDIDATE = re.compile(r"\b[A-Z]{2}\d{2}(?:[ ]?[A-Za-z0-9])+")
+
+
+def first_valid_iban(text: str) -> str | None:
+    """Extract the first mod-97-valid IBAN from `text`, or None.
+
+    A permissive scan would run past the end of the IBAN into the following
+    words (an IBAN body and ordinary prose are both `[A-Za-z0-9 ]`), so each
+    candidate is trimmed one character at a time until it checksums. Used by the
+    corpus self-validators to prove the value they emitted is genuinely valid.
+    """
+    for mo in _IBAN_CANDIDATE.finditer(text):
+        candidate = mo.group(0)
+        while len(candidate.replace(" ", "")) >= 15:
+            if iban_is_valid(candidate):
+                return candidate
+            candidate = candidate[:-1].rstrip()
+    return None
+
+
+def iban_check_digits(country: str, bban: str) -> str:
+    """Return the two ISO 7064 mod-97-10 check digits for `country` + `bban`."""
+    rearranged = f"{bban}{country}00".upper()
+    numeric = "".join(str(int(ch, 36)) for ch in rearranged)
+    return f"{98 - int(numeric) % 97:02d}"
+
+
+def make_iban(country: str, bban: str) -> str:
+    """Assemble a checksum-valid IBAN from a country code and a BBAN body.
+
+    Asserts both the registry length for `country` and the mod-97 check, so a
+    malformed BBAN fails at corpus-build time rather than silently producing an
+    invalid fixture.
+    """
+    iban = f"{country}{iban_check_digits(country, bban)}{bban}"
+    expected = IBAN_LENGTHS[country]
+    assert (
+        len(iban) == expected
+    ), f"{country} IBAN must be {expected} chars, built {len(iban)}: {iban}"
+    assert iban_is_valid(iban), f"mod-97 check failed for built IBAN {iban}"
+    return iban
+
+
+# --- AWS access-key ids: real base32 alphabet -------------------------------
+#
+# AWS access-key ids are a 4-char type prefix (`AKIA` long-term, `ASIA` STS /
+# temporary) followed by 16 characters drawn from the RFC 4648 base32 alphabet
+# `[A-Z2-7]`. The digits 0/1/8/9 never appear in the body of a real key, so a
+# fixture containing them is not a credential any AWS deployment could issue.
+AWS_KEY_BODY_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+
+
+def aws_key_body_is_valid(key: str) -> bool:
+    """True iff `key` is a 20-char AWS key id whose 16-char body is base32."""
+    return (
+        len(key) == 20
+        and key[:4].isalpha()
+        and key[:4].isupper()
+        and all(ch in AWS_KEY_BODY_ALPHABET for ch in key[4:])
+    )
+
+
+# --- PEM / armored private keys: complete keys, not bare banners -------------
+#
+# A `-----BEGIN … PRIVATE KEY-----` line on its own is a banner, not a key: it
+# carries no key material, so redacting it protects nothing and a scanner that
+# passes it through has leaked nothing. Real exfiltration looks like the whole
+# armored block — banner, optional armor headers, a base64 body wrapped at 64
+# characters per line (RFC 7468 / RFC 4880), and the matching END banner. These
+# helpers emit that complete shape. The body is random bytes, so it is not a
+# functioning key, but it is byte-shaped exactly like one.
+_PEM_WRAP = 64
+
+
+def _pem_body(nbytes: int, seed: int) -> list[str]:
+    """Deterministic base64 body lines wrapped at 64 chars (real base64, padded)."""
+    rng = random.Random(seed)
+    raw = bytes(rng.getrandbits(8) for _ in range(nbytes))
+    b64 = base64.b64encode(raw).decode()
+    return [b64[i : i + _PEM_WRAP] for i in range(0, len(b64), _PEM_WRAP)]
+
+
+def pem_private_key(
+    label: str,
+    *,
+    armor_headers: tuple[str, ...] = (),
+    nbytes: int = 1190,
+    seed: int = 0,
+) -> str:
+    """A complete PEM private key: banner, optional armor headers, body, END.
+
+    `label` is the banner type, e.g. "RSA PRIVATE KEY" or "OPENSSH PRIVATE KEY".
+    `armor_headers` are RFC 1421-style lines such as "Proc-Type: 4,ENCRYPTED" or
+    "DEK-Info: AES-128-CBC,0123…"; when present they are followed by a blank line.
+    `nbytes` of 1190 base64-encodes to ~1588 chars ≈ a 2048-bit RSA private key.
+    """
+    lines = [f"-----BEGIN {label}-----"]
+    if armor_headers:
+        lines.extend(armor_headers)
+        lines.append("")
+    lines.extend(_pem_body(nbytes, seed))
+    lines.append(f"-----END {label}-----")
+    return "\n".join(lines)
+
+
+def _crc24(data: bytes) -> int:
+    """RFC 4880 CRC-24 over the raw (pre-base64) armored data."""
+    crc = 0xB704CE
+    for byte in data:
+        crc ^= byte << 16
+        for _ in range(8):
+            crc <<= 1
+            if crc & 0x1000000:
+                crc ^= 0x1864CFB
+    return crc & 0xFFFFFF
+
+
+def pgp_private_key_block(
+    *,
+    version: str = "GnuPG v2",
+    nbytes: int = 1190,
+    seed: int = 0,
+) -> str:
+    """A complete OpenPGP armored private-key block, including the CRC-24 line.
+
+    RFC 4880 armor is the banner, a `Version:` header, a blank line, the base64
+    body wrapped at 64 chars, a `=<base64 CRC-24>` checksum line, and the END
+    banner. The CRC is computed for real, so the block is well-formed armor.
+    """
+    rng = random.Random(seed)
+    raw = bytes(rng.getrandbits(8) for _ in range(nbytes))
+    b64 = base64.b64encode(raw).decode()
+    body = [b64[i : i + _PEM_WRAP] for i in range(0, len(b64), _PEM_WRAP)]
+    crc = base64.b64encode(_crc24(raw).to_bytes(3, "big")).decode()
+    return "\n".join(
+        [
+            "-----BEGIN PGP PRIVATE KEY BLOCK-----",
+            f"Version: {version}",
+            "",
+            *body,
+            f"={crc}",
+            "-----END PGP PRIVATE KEY BLOCK-----",
+        ]
+    )
 
 
 # --- fixed synthetic literals (all provably fake) ---

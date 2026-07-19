@@ -2,7 +2,7 @@
 
 > SYNTHETIC — FAKE COMPLIANCE TEST DATA, NOT REAL
 
-**267 synthetic cases** across **25 data kinds** that the **NYDFS_500** framework regulates.
+**277 synthetic cases** across **25 data kinds** that the **NYDFS_500** framework regulates.
 
 This folder is a **generated, self-contained** per-framework view of the shared
 corpus: one data kind maps to many frameworks, so a case appears under every

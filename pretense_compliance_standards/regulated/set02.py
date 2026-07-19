@@ -7,7 +7,7 @@ fake by construction and drawn from a reserved / example range:
     email        -> ...@example.com          (RFC 2606 reserved domain)
     phone (US)   -> (xxx) 555-01xx            (reserved for fiction/testing)
     phone (EU)   -> +44 (0)20 7946 0xxx       (Ofcom fictional drama range)
-    iban         -> check digits forced to 00 (structurally NOT a real IBAN)
+    iban         -> mod-97 VALID, on an unallocated bank code (SYNT/99…)
     vat          -> two-letter prefix + random digits (bogus registration)
     national_id  -> 4-4-4 grouped digits, random (never issued; not SSN-shaped)
     passport     -> 2 letters + 7 digits, random (e.g. XA0000042)
@@ -42,7 +42,11 @@ if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
 from pretense_compliance_standards import BANNER
-from pretense_compliance_standards.corpus_builder import _write_json
+from pretense_compliance_standards.corpus_builder import (
+    _write_json,
+    first_valid_iban as _first_valid_iban,
+    make_iban as _make_iban,
+)
 
 SOURCE_FILE = "corpus/blended_regulated_02.json"
 ZW = "\u200b"  # zero-width space
@@ -82,8 +86,26 @@ def _fake_eu_phone() -> str:
 
 
 def _fake_iban(country: str) -> str:
-    # Check digits forced to "00" -> structurally NOT a valid IBAN.
-    return f"{country}00 XXXX {_digits(4)} {_digits(4)} {_digits(4)} {_digits(2)}"
+    """A checksum-VALID IBAN on an unallocated bank code, spaced in 4s.
+
+    The check digits are computed for real (ISO 7064 mod-97-10) and the BBAN is
+    built to that country's registry length, because a scanner is entitled to
+    reject anything else — scoring recall against a value no bank would accept
+    measures nothing. Fakeness is guaranteed by the bank code instead: `SYNT`
+    (GB), BLZ `99…` (DE) and bank `99999` (FR) are not allocated to any
+    institution, so a structurally perfect value still cannot name a real
+    account.
+    """
+    if country == "GB":  # 4a bank + 6n sort code + 8n account
+        bban = f"SYNT{_digits(6)}{_digits(8)}"
+    elif country == "DE":  # 8n Bankleitzahl + 10n account
+        bban = f"99{_digits(6)}{_digits(10)}"
+    elif country == "FR":  # 5n bank + 5n branch + 11c account + 2n RIB key
+        bban = f"99999{_digits(5)}{_digits(11)}{_digits(2)}"
+    else:
+        raise ValueError(f"no BBAN layout defined for country {country!r}")
+    iban = _make_iban(country, bban)
+    return " ".join(iban[i : i + 4] for i in range(0, len(iban), 4))
 
 
 def _fake_vat(country: str) -> str:
@@ -291,10 +313,10 @@ def _validate(cases: list[dict], written_text: str) -> None:
             if "7946" not in text:
                 raise AssertionError(f"EU phone not in fiction range: {c['id']}")
         if c["kind"] == "iban" and c["obfuscation"] in ("inline", "labeled-field"):
-            # Check digits (2 chars after the country code) must be "00".
-            mo = re.search(r"[A-Z]{2}(\d\d)", text)
-            if not mo or mo.group(1) != "00":
-                raise AssertionError(f"IBAN check digits not 00: {c['id']}")
+            # The IBAN must pass mod-97: an invalid one is not a recall fixture,
+            # it is a value a correct validator is right to drop.
+            if _first_valid_iban(text) is None:
+                raise AssertionError(f"IBAN fails mod-97 check: {c['id']}")
         if c["kind"] == "national_id" and c["obfuscation"] in (
             "inline",
             "labeled-field",
