@@ -33,11 +33,19 @@ only when **all** of these hold:
    function the proxy calls — produced output in which the matched value is
    **verifiably gone**.
 
-The bridge scans with the proxy's own options, copied verbatim:
+The bridge scans with the proxy's own options, **derived from
+`apps/proxy/src/server.ts` on every run** (`deriveProxyScanOpts`) — never copied.
+At `release/v0.6.0-always-mutate` they derive to:
 
 ```js
-{ contextAware: true, entropyAnalysis: false, deobfuscate: false, egressSafe: true }
+{ contextAware: true, entropyAnalysis: false, deobfuscate: true, egressSafe: true }
 ```
+
+This block is illustrative only. The bridge keeps **no** hardcoded copy, and the
+run header prints what it actually derived plus the `file:line` it read them
+from. A previous version of this README said `deobfuscate: false`, which went
+stale when pretense #524 flipped it to `true` — exactly the drift the derivation
+exists to make impossible. Trust the run header, not this snippet.
 
 ### SECONDARY — identify
 
@@ -71,15 +79,17 @@ Pretense EGRESS-REDACTION benchmark  (synthetic DLP corpus)
 ==============================================================================
   engine        : @pretense/scanner@0.2.0   [SHIPPED]
   redaction     : @pretense/mutator@0.2.0  (mutateSecrets — the proxy's own path)
-  commit        : c3dc109 (release/v0.6.0-always-mutate) [clean]
+  commit        : 69cfda0 (release/v0.6.0-always-mutate) [clean]
+  scan options  : {"contextAware":true,"entropyAnalysis":false,"deobfuscate":true,"egressSafe":true}
+                  ^ DERIVED from apps/proxy/src/server.ts:682 — not a copy
   corpus        : 648 cases — REGENERATED via uv
 ==============================================================================
 
 tier       |    n | egress | ident. | wrong | miss
 -----------+------+--------+--------+-------+-----
-0          |  127 |  77.2% |  87.4% |     8 |    8
+0          |  127 |  89.0% |  94.5% |     0 |    7
 ...
-ALL        |  648 |  44.3% |  50.3% |    26 |  296
+ALL        |  648 |  88.9% |  92.0% |     2 |   50
 ```
 
 Every report header names the engine, package version, git commit and case
