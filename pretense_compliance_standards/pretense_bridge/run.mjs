@@ -44,6 +44,24 @@
  *   • It refuses to run against a STALE corpus: the builder is re-run first.
  *   • Every report header names the engine, package, version and git commit
  *     actually measured, plus the case count.
+ *   • It reports FALSE POSITIVES on the benign look-alike corpus next to the
+ *     headline. Recall alone is trivially gamed by a detector that flags
+ *     everything; precision is what stops that.
+ *
+ * ─── ANTI-STALENESS RULES ────────────────────────────────────────────────────
+ * UNDERSTATING the product is as much a bug as inflating it: a benchmark that
+ * scores a real fix as a no-op gets the fix reverted. Two hand-maintained copies
+ * of product facts did exactly that, so neither is maintained by hand any more:
+ *   • The proxy's egress SCAN OPTIONS are DERIVED from `apps/proxy/src/server.ts`
+ *     on every run (`deriveProxyScanOpts`). A hardcoded copy went stale when
+ *     pretense #524 flipped `deobfuscate` to true, and the harness reported
+ *     tiers 3-5 at 0.0% — a 30-point understatement.
+ *   • The kind->detector MAP is VALIDATED against the engine's exported
+ *     `ALL_PATTERNS` on every run (`validateKindDetectors`). A stale map scored
+ *     20 correctly-redacted NPI/NHS cases as wrong-kind after pretense #521
+ *     shipped detectors for them — a 4-point understatement.
+ * Both fail HARD (exit 2, no numbers printed) rather than measuring an
+ * unverified configuration, and every judgment call must carry a written reason.
  *
  * All corpus input is synthetic, fake, and banner-marked.
  *
@@ -82,21 +100,17 @@ const SHIPPED_SCANNER_PKG = "@pretense/scanner";
 const SHIPPED_MUTATOR_PKG = "@pretense/mutator";
 
 /**
- * Scanner options the proxy uses on the egress path, copied verbatim from
- * `apps/proxy/src/server.ts`. Measuring with different options measures
- * something the product never does.
+ * Where the proxy's egress scan lives, relative to the product repo root. The
+ * options passed at this call site are DERIVED at run time — see
+ * `deriveProxyScanOpts`. This harness deliberately keeps NO hardcoded copy.
  */
-const PROXY_SCAN_OPTS = Object.freeze({
-  contextAware: true,
-  entropyAnalysis: false,
-  deobfuscate: false,
-  egressSafe: true,
-});
+const PROXY_SERVER_REL = join("apps", "proxy", "src", "server.ts");
 
 /** Actions the proxy actually acts on. `warn`/`pass` are skipped entirely. */
 const PROXY_ACTIONS = Object.freeze(new Set(["block", "redact", "mutate"]));
 
 const CORPUS_PATH = join(PKG_ROOT, "corpus", "cases.json");
+const NEGATIVES_PATH = join(PKG_ROOT, "corpus", "negatives.json");
 const COMPLIANCE_PATH = join(PKG_ROOT, "compliance_map.json");
 const KIND_DETECTORS_PATH = join(PKG_ROOT, "kind_detectors.json");
 
@@ -199,6 +213,9 @@ function resolveEngine() {
   const productRoot = resolve(SCANNER_DIR, "..", "..");
   return {
     scannerEntry,
+    // The scanner's own built type declarations — the authority on which scan
+    // options exist. Used to validate what the proxy passes.
+    scannerDts: join(SCANNER_DIR, "dist", "index.d.ts"),
     mutatorEntry,
     provenance: {
       scannerPkg: `${pkg.name}@${pkg.version ?? "?"}`,
@@ -224,6 +241,277 @@ function wrongEngineHelp() {
     "  This harness measures ONLY the shipped engine, by design.\n" +
     "  Set PRETENSE_SRC=<pretense>/packages/scanner or leave it unset.\n"
   );
+}
+
+// ─── The proxy's REAL scan options (derived, never copied) ───────────────────
+
+/**
+ * Blank out comments, string/template literals and regex literals, replacing
+ * each with spaces so that every byte offset (and therefore every line number)
+ * is preserved. Newlines survive.
+ *
+ * String awareness is NOT optional here: `apps/proxy/src/server.ts` contains
+ * `app.all("/*", ...)`, and a naive comment stripper reads that `/*` as the
+ * start of a block comment and silently erases the rest of the file — including
+ * the very call site this harness must read. Erasing it must never look like
+ * "the proxy has no scan call"; it looks like a bug in this function, so the
+ * function is written to not have one.
+ */
+export function blankNonCode(src) {
+  const out = Array.from(src);
+  const blank = (from, to) => {
+    for (let k = from; k < to && k < out.length; k += 1) if (out[k] !== "\n") out[k] = " ";
+  };
+  // A `/` starts a regex literal (rather than division) only where a value
+  // cannot legally precede it.
+  const REGEX_PRECEDERS = new Set(["(", ",", "=", ":", "[", "!", "&", "|", "?", "{", "}", ";", "+", "-", "*", "%", "~", "^", "<", ">", "\n"]);
+  let prevMeaningful = "\n";
+  let i = 0;
+  while (i < src.length) {
+    const ch = src[i];
+    const two = src.slice(i, i + 2);
+
+    if (two === "//") {
+      const nl = src.indexOf("\n", i);
+      const end = nl === -1 ? src.length : nl;
+      blank(i, end);
+      i = end;
+      continue;
+    }
+    if (two === "/*") {
+      const close = src.indexOf("*/", i + 2);
+      const end = close === -1 ? src.length : close + 2;
+      blank(i, end);
+      i = end;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") {
+      let j = i + 1;
+      while (j < src.length) {
+        if (src[j] === "\\") {
+          j += 2;
+          continue;
+        }
+        if (src[j] === ch) break;
+        // An unterminated single/double quote would otherwise run to EOF.
+        if (ch !== "`" && src[j] === "\n") break;
+        j += 1;
+      }
+      blank(i, Math.min(j + 1, src.length));
+      i = Math.min(j + 1, src.length);
+      prevMeaningful = "x";
+      continue;
+    }
+    if (ch === "/" && REGEX_PRECEDERS.has(prevMeaningful)) {
+      let j = i + 1;
+      let inClass = false;
+      let closed = false;
+      while (j < src.length && src[j] !== "\n") {
+        if (src[j] === "\\") {
+          j += 2;
+          continue;
+        }
+        if (src[j] === "[") inClass = true;
+        else if (src[j] === "]") inClass = false;
+        else if (src[j] === "/" && !inClass) {
+          closed = true;
+          break;
+        }
+        j += 1;
+      }
+      if (closed) {
+        blank(i, j + 1);
+        i = j + 1;
+        prevMeaningful = "x";
+        continue;
+      }
+    }
+    if (!/\s/.test(ch)) prevMeaningful = ch;
+    else if (ch === "\n") prevMeaningful = prevMeaningful === "\n" ? "\n" : prevMeaningful;
+    i += 1;
+  }
+  return out.join("");
+}
+
+/**
+ * The set of option names the SHIPPED scanner actually understands, read out of
+ * its own built type declarations (`dist/index.d.ts`). Any option the proxy
+ * passes that is not in here means the harness is reading a scanner and a proxy
+ * that do not belong together — a loud failure, never a guess.
+ */
+export function parseScanOptionKeys(dts) {
+  const start = dts.search(/(?:export\s+)?(?:declare\s+)?interface\s+ScanOptions\s*\{/);
+  if (start === -1) return null;
+  const open = dts.indexOf("{", start);
+  let depth = 0;
+  let end = -1;
+  for (let i = open; i < dts.length; i += 1) {
+    if (dts[i] === "{") depth += 1;
+    else if (dts[i] === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        end = i;
+        break;
+      }
+    }
+  }
+  if (end === -1) return null;
+  const body = blankNonCode(dts.slice(open + 1, end));
+  const keys = new Set();
+  // Only top-level members: skip anything nested inside a member's own braces.
+  let nest = 0;
+  for (const line of body.split("\n")) {
+    if (nest === 0) {
+      const m = line.match(/^\s*(?:readonly\s+)?([A-Za-z_$][\w$]*)\s*\??\s*:/);
+      if (m) keys.add(m[1]);
+    }
+    nest += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
+    if (nest < 0) nest = 0;
+  }
+  return keys.size > 0 ? keys : null;
+}
+
+/**
+ * Parse ONE inline object literal of the form `{ key: true, key2: false }`.
+ * Returns `{ ok: true, value }` or `{ ok: false, reason }`. Anything that is not
+ * a plain `identifier: boolean` pair — a spread, a variable, a ternary, a nested
+ * object — is REFUSED rather than approximated: the harness must either know
+ * exactly what the proxy passes or say that it does not.
+ */
+export function parseBooleanObjectLiteral(body) {
+  const value = {};
+  const parts = body
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  if (parts.length === 0) return { ok: false, reason: "the option object is empty" };
+  for (const part of parts) {
+    const m = part.match(/^([A-Za-z_$][\w$]*)\s*:\s*(true|false)$/);
+    if (!m) {
+      return {
+        ok: false,
+        reason: `cannot statically evaluate the option \`${part}\` — the harness only understands \`name: true|false\``,
+      };
+    }
+    if (Object.prototype.hasOwnProperty.call(value, m[1])) {
+      return { ok: false, reason: `option \`${m[1]}\` is specified twice` };
+    }
+    value[m[1]] = m[2] === "true";
+  }
+  return { ok: true, value };
+}
+
+/**
+ * DERIVE the scan options the proxy actually passes on the egress path, by
+ * reading `apps/proxy/src/server.ts` in the product checkout under test.
+ *
+ * ─── WHY THIS IS NOT A CONSTANT ──────────────────────────────────────────────
+ * It used to be one, copied by hand out of the proxy. The proxy then changed
+ * (`deobfuscate: false` -> `true`, pretense #524) and the copy did not. The
+ * harness went on measuring an egress path the product had stopped running and
+ * reported tiers 3-5 at 0.0%, scoring a real 30-point improvement as a no-op.
+ * A number that UNDERSTATES the product is exactly as much a bug as one that
+ * inflates it: it gets real fixes reverted.
+ *
+ * So: the proxy source is the single source of truth, and every way this can go
+ * wrong is a hard failure with a pointer at the call site —
+ *   • proxy file missing              -> die
+ *   • no `scan(x, {...})` call        -> die (the egress path was restructured)
+ *   • more than one                   -> die (which one is egress? refuse to guess)
+ *   • a non-literal option value      -> die (cannot be evaluated statically)
+ *   • an option the scanner's own d.ts does not declare -> die (mismatched pair)
+ * There is deliberately no default and no fallback: a misconfiguration must
+ * never be able to produce a plausible-looking number.
+ */
+export function deriveProxyScanOpts(productRoot, { readFile = (p) => readFileSync(p, "utf8") } = {}) {
+  const proxyPath = join(productRoot, PROXY_SERVER_REL);
+  if (!existsSync(proxyPath)) {
+    die(
+      `cannot derive the proxy's scan options: ${proxyPath} not found.\n` +
+        "  The harness reads the egress scan options out of the shipped proxy source\n" +
+        "  rather than keeping a copy that can go stale. Point PRETENSE_SRC at a\n" +
+        "  FULL pretense checkout (<pretense>/packages/scanner), not a bare package.",
+    );
+  }
+
+  const raw = readFile(proxyPath);
+  const src = blankNonCode(raw);
+
+  const callRe = /\bscan\s*\(([^(),]*),\s*\{([^{}]*)\}\s*\)/g;
+  const found = [];
+  for (const m of src.matchAll(callRe)) {
+    found.push({ index: m.index, arg: m[1].trim(), body: m[2] });
+  }
+
+  // Every `scan(` in the file must be one we parsed. A call we cannot read
+  // might be THE egress call, and silently ignoring it is how the stale copy
+  // survived for so long.
+  const allCalls = [...src.matchAll(/\bscan\s*\(/g)].length;
+  const lineOf = (idx) => src.slice(0, idx).split("\n").length;
+
+  if (found.length === 0 || allCalls !== found.length) {
+    die(
+      `could not derive the proxy's egress scan options from ${PROXY_SERVER_REL}.\n` +
+        `  Found ${allCalls} \`scan(\` call(s), of which ${found.length} had a parseable inline\n` +
+        "  option literal of the form `scan(text, { ... })`.\n" +
+        "  The proxy's egress path has been restructured. Update deriveProxyScanOpts()\n" +
+        "  to match the new shape — do NOT re-introduce a hardcoded copy of the options.",
+    );
+  }
+  if (found.length > 1) {
+    die(
+      `${PROXY_SERVER_REL} has ${found.length} \`scan(text, {...})\` call sites ` +
+        `(lines ${found.map((f) => lineOf(f.index)).join(", ")}).\n` +
+        "  The harness cannot tell which one is the EGRESS path, and refuses to guess.\n" +
+        "  Teach deriveProxyScanOpts() how to identify the egress call site.",
+    );
+  }
+
+  const site = found[0];
+  const line = lineOf(site.index);
+  const parsed = parseBooleanObjectLiteral(site.body);
+  if (!parsed.ok) {
+    die(
+      `cannot derive the proxy's egress scan options from ${PROXY_SERVER_REL}:${line}\n` +
+        `  ${parsed.reason}.\n` +
+        "  Refusing to measure with options that may differ from the product's.",
+    );
+  }
+
+  return { opts: Object.freeze(parsed.value), source: `${PROXY_SERVER_REL}:${line}` };
+}
+
+/**
+ * Cross-check the derived options against the SHIPPED scanner's own declared
+ * option surface. Catches the case where the proxy source and the scanner
+ * package come from different checkouts/versions.
+ */
+export function assertOptionsUnderstoodByScanner(opts, dtsPath, source) {
+  if (!existsSync(dtsPath)) {
+    die(
+      `the shipped scanner has no type declarations at ${dtsPath}.\n` +
+        "  The harness validates the proxy's scan options against them. Rebuild:\n" +
+        "    pnpm --filter @pretense/scanner build",
+    );
+  }
+  const keys = parseScanOptionKeys(readFileSync(dtsPath, "utf8"));
+  if (!keys) {
+    die(
+      `could not find \`interface ScanOptions\` in ${dtsPath}.\n` +
+        "  The harness cannot validate the proxy's scan options against the shipped\n" +
+        "  scanner, so it refuses to run rather than measure an unverified config.",
+    );
+  }
+  const unknown = Object.keys(opts).filter((k) => !keys.has(k));
+  if (unknown.length > 0) {
+    die(
+      `the proxy at ${source} passes scan option(s) the SHIPPED scanner does not declare:\n` +
+        `    ${unknown.join(", ")}\n` +
+        `  Declared options: ${[...keys].sort().join(", ")}\n` +
+        "  The proxy source and the scanner package are out of sync — measuring this\n" +
+        "  pair would report a number neither one delivers.",
+    );
+  }
 }
 
 // ─── Corpus freshness ────────────────────────────────────────────────────────
@@ -264,6 +552,147 @@ function regenerateCorpus() {
   );
 }
 
+// ─── kind -> detector map: validated against the SHIPPED detector list ───────
+
+/** `uk_nhs_number` -> `uk-nhs-number`, so kinds and detector names compare. */
+const normalizeKind = (kind) => kind.replace(/_/g, "-");
+
+/**
+ * Detectors whose NAME says they detect this kind. `npi` -> `npi-labeled`,
+ * `github_token` -> `github-token`, `github-token-split`. Used to force a human
+ * decision whenever the engine ships a detector that obviously belongs to a
+ * corpus kind.
+ */
+export function nameMatchedDetectors(kind, shippedNames) {
+  const k = normalizeKind(kind);
+  return shippedNames.filter((n) => n === k || n.startsWith(`${k}-`));
+}
+
+/**
+ * Validate the kind->detector map against the detector list the SHIPPED engine
+ * ACTUALLY exports (`ALL_PATTERNS`), and fail loudly on every kind of drift.
+ *
+ * ─── WHY ─────────────────────────────────────────────────────────────────────
+ * This map used to be maintained purely by hand. pretense #521 shipped
+ * `npi-labeled` and `uk-nhs-number-labeled`; the map still said those kinds had
+ * NO detector, so 20 cases the product correctly redacted were scored as
+ * wrong-kind. Nothing anywhere failed. Now four rules make that impossible:
+ *
+ *   1. UNKNOWN DETECTOR — a name in the map that the engine does not export.
+ *      Catches renames and deletions (which would otherwise silently drop
+ *      coverage to zero for that kind).
+ *   2. UNCLASSIFIED DETECTOR — a shipped detector mapped to no kind and not
+ *      listed in `unmapped_detectors`. Every new detector must be triaged by a
+ *      human; it cannot arrive unnoticed.
+ *   3. UNCLAIMED NAME MATCH — the engine ships `<kind>` / `<kind>-*` but the
+ *      kind does not list it and `rejected_name_matches` does not explain why.
+ *      This is the exact rule that #521 would have tripped.
+ *   4. UNDOCUMENTED EMPTY KIND — a kind mapped to `[]` must say, in
+ *      `kinds_without_shipped_detector`, that this is a real product gap.
+ *
+ * Every rule resolves to a HARD FAILURE with a suggested edit. None of them can
+ * be satisfied by a default, and all of them require a written reason, so the
+ * judgment calls are on the page instead of implied by an empty list.
+ */
+export function validateKindDetectors(doc, shippedNames) {
+  // `_`-prefixed keys are prose (documentation for humans reading the file),
+  // never detector or kind names.
+  const dropDocs = (o) => Object.fromEntries(Object.entries(o ?? {}).filter(([k]) => !k.startsWith("_")));
+  const kindDetectors = dropDocs(doc.kind_detectors);
+  const unmapped = dropDocs(doc.unmapped_detectors);
+  const emptyKinds = dropDocs(doc.kinds_without_shipped_detector);
+  const rejected = dropDocs(doc.rejected_name_matches);
+  const shipped = new Set(shippedNames);
+  const problems = [];
+
+  const reasonFor = (bag, key) => {
+    const r = bag[key];
+    return typeof r === "string" && r.trim().length > 0 ? r : null;
+  };
+
+  // 1. every mapped detector must exist in the shipped engine
+  for (const [kind, list] of Object.entries(kindDetectors)) {
+    for (const name of list) {
+      if (!shipped.has(name)) {
+        problems.push(
+          `kind '${kind}' maps to detector '${name}', which the SHIPPED engine does not export.\n` +
+            "      It was renamed or removed. Fix the mapping — leaving it silently scores every\n" +
+            "      such case as wrong-kind.",
+        );
+      }
+    }
+  }
+
+  // 2. every shipped detector must be mapped, or explicitly triaged as unmapped
+  const mapped = new Set(Object.values(kindDetectors).flat());
+  for (const name of shippedNames) {
+    if (mapped.has(name)) continue;
+    if (!reasonFor(unmapped, name)) {
+      problems.push(
+        `the SHIPPED engine exports detector '${name}', which no corpus kind claims.\n` +
+          `      Either map it to a kind, or add "${name}": "<why no corpus kind uses it>"\n` +
+          "      to `unmapped_detectors`. A new detector must never arrive unnoticed.",
+      );
+    }
+  }
+  for (const name of Object.keys(unmapped)) {
+    if (!shipped.has(name)) {
+      problems.push(
+        `'${name}' is listed in \`unmapped_detectors\` but the engine no longer exports it. ` +
+          "Remove the stale entry.",
+      );
+    } else if (mapped.has(name)) {
+      problems.push(`'${name}' is BOTH mapped to a kind and listed in \`unmapped_detectors\`. Pick one.`);
+    }
+  }
+
+  // 3. name matches must be claimed or explicitly rejected, with a reason
+  for (const [kind, list] of Object.entries(kindDetectors)) {
+    for (const cand of nameMatchedDetectors(kind, shippedNames)) {
+      if (list.includes(cand)) continue;
+      if (!reasonFor(dropDocs(rejected[kind]), cand)) {
+        problems.push(
+          `the SHIPPED engine exports '${cand}', whose name means kind '${kind}', but '${kind}'\n` +
+            `      does not list it. Add it to kind_detectors['${kind}'], or record\n` +
+            `      rejected_name_matches['${kind}']['${cand}'] = "<why it is NOT this kind>".\n` +
+            "      Ignoring a real detector scores correctly-redacted cases as wrong-kind.",
+        );
+      }
+    }
+  }
+  for (const [kind, bag] of Object.entries(rejected)) {
+    for (const name of Object.keys(dropDocs(bag))) {
+      if (!shipped.has(name)) {
+        problems.push(`rejected_name_matches['${kind}'] mentions '${name}', which the engine no longer exports.`);
+      } else if ((kindDetectors[kind] ?? []).includes(name)) {
+        problems.push(`'${name}' is both listed under kind '${kind}' and rejected for it. Pick one.`);
+      }
+    }
+  }
+
+  // 4. an empty kind is a claim about the product; make it say so out loud
+  for (const [kind, list] of Object.entries(kindDetectors)) {
+    if (list.length > 0) continue;
+    if (!reasonFor(emptyKinds, kind)) {
+      problems.push(
+        `kind '${kind}' maps to NO detector. If the shipped engine genuinely has none, say so in\n` +
+          `      \`kinds_without_shipped_detector['${kind}']\` — an unexplained empty list is\n` +
+          "      indistinguishable from a mapping someone forgot to update.",
+      );
+    }
+  }
+  for (const kind of Object.keys(emptyKinds)) {
+    if ((kindDetectors[kind] ?? []).length > 0) {
+      problems.push(
+        `kind '${kind}' is documented as having no shipped detector, but now maps to ` +
+          `${JSON.stringify(kindDetectors[kind])}. The product shipped one — remove the stale note.`,
+      );
+    }
+  }
+
+  return problems;
+}
+
 // ─── Scoring ─────────────────────────────────────────────────────────────────
 
 function pct(hits, n) {
@@ -298,7 +727,13 @@ const emptyTally = () => ({ n: 0, egress: 0, identify: 0, wrongKind: 0, miss: 0 
  *
  * @returns {{egress:boolean, identify:boolean, wrongKind:boolean, matched:boolean}}
  */
-export function classifyCase(c, { kindDetectors, scan, mutateSecrets }) {
+export function classifyCase(c, { kindDetectors, scan, mutateSecrets, scanOpts }) {
+  // `scanOpts` is DERIVED from the proxy source and passed in explicitly. There
+  // is no default: a caller that forgets it must fail, not silently measure
+  // some other engine configuration.
+  if (!scanOpts || typeof scanOpts !== "object" || Object.keys(scanOpts).length === 0) {
+    throw new Error("classifyCase requires the proxy's derived scanOpts — refusing to invent a scan configuration.");
+  }
   const text = c.text ?? "";
   const allowed = kindDetectors[c.kind];
   if (allowed === undefined) {
@@ -312,7 +747,7 @@ export function classifyCase(c, { kindDetectors, scan, mutateSecrets }) {
   }
   const allowedSet = new Set(allowed);
 
-  const matches = scan(text, PROXY_SCAN_OPTS).matches ?? [];
+  const matches = scan(text, scanOpts).matches ?? [];
   const matched = matches.length > 0;
 
   // IDENTIFY (secondary): a kind-agreeing match of ANY action/span.
@@ -346,7 +781,7 @@ export function classifyCase(c, { kindDetectors, scan, mutateSecrets }) {
  * Score the whole corpus, tallying per difficulty tier and per framework.
  * Pure (no I/O, no engine loading) so it is unit-testable with a mock engine.
  */
-export function scoreCorpus(cases, { frameworks, kindFrameworks, kindDetectors, scan, mutateSecrets }) {
+export function scoreCorpus(cases, { frameworks, kindFrameworks, kindDetectors, scan, mutateSecrets, scanOpts }) {
   const tiers = new Map();
   const overall = emptyTally();
   const fw = new Map(frameworks.map((name) => [name, emptyTally()]));
@@ -357,7 +792,7 @@ export function scoreCorpus(cases, { frameworks, kindFrameworks, kindDetectors, 
     if (!tiers.has(tier)) tiers.set(tier, emptyTally());
     const t = tiers.get(tier);
 
-    const r = classifyCase(c, { kindDetectors, scan, mutateSecrets });
+    const r = classifyCase(c, { kindDetectors, scan, mutateSecrets, scanOpts });
 
     for (const bucket of [t, overall]) {
       bucket.n += 1;
@@ -382,9 +817,42 @@ export function scoreCorpus(cases, { frameworks, kindFrameworks, kindDetectors, 
   return { tiers, overall, fw, wrongKindByKind };
 }
 
+/**
+ * FALSE POSITIVES on the benign look-alike corpus — the anti-inflation
+ * counterweight to every recall number above.
+ *
+ * A recall-only benchmark is trivially gamed: a detector that flags everything
+ * scores 100% egress. So the same two gates are run over 70 cases a correct
+ * detector must flag NONE of, and both counts are printed next to the headline.
+ * `fpIdentify` is any match at all; `fpRedaction` is the stricter, more serious
+ * one — a benign value the proxy would actually have mangled in flight.
+ *
+ * Reported, never silently folded into the headline: precision and recall are
+ * different claims and must be readable separately.
+ */
+export function scoreNegatives(cases, { scan, mutateSecrets, scanOpts }) {
+  let fpIdentify = 0;
+  let fpRedaction = 0;
+  const byDetector = new Map();
+  for (const c of cases) {
+    const text = c.text ?? "";
+    const matches = scan(text, scanOpts).matches ?? [];
+    if (matches.length === 0) continue;
+    fpIdentify += 1;
+    for (const m of matches) byDetector.set(m.type, (byDetector.get(m.type) ?? 0) + 1);
+
+    const actionable = matches.filter((m) => PROXY_ACTIONS.has(m.action) && m.end > m.start);
+    if (actionable.length === 0) continue;
+    const findings = actionable.map((m) => ({ value: m.value, offset: m.start, length: m.end - m.start, type: m.type }));
+    const { content } = mutateSecrets(text, findings);
+    if (actionable.some((m) => m.value.length > 0 && !content.includes(m.value))) fpRedaction += 1;
+  }
+  return { n: cases.length, fpIdentify, fpRedaction, byDetector };
+}
+
 // ─── Report ──────────────────────────────────────────────────────────────────
 
-function printHeader(prov, corpusInfo, caseCount) {
+function printHeader(prov, corpusInfo, caseCount, scanOpts, scanOptsSource) {
   console.log("=".repeat(78));
   console.log("Pretense EGRESS-REDACTION benchmark  (synthetic DLP corpus)");
   console.log("=".repeat(78));
@@ -394,7 +862,8 @@ function printHeader(prov, corpusInfo, caseCount) {
   console.log(`  commit        : ${prov.commit} (${prov.branch}) [${prov.dirty}]`);
   console.log(`  engine path   : ${prov.scannerDir}`);
   console.log(`  configured via: ${prov.configuredVia}`);
-  console.log(`  scan options  : ${JSON.stringify(PROXY_SCAN_OPTS)}`);
+  console.log(`  scan options  : ${JSON.stringify(scanOpts)}`);
+  console.log(`                  ^ DERIVED from ${scanOptsSource} — not a copy`);
   console.log(`  proxy actions : {${[...PROXY_ACTIONS].join(", ")}}  (warn/pass are NOT acted on)`);
   console.log(
     `  corpus        : ${caseCount} cases — ${corpusInfo.regenerated ? `REGENERATED via ${corpusInfo.via}` : "NOT regenerated (STALE RISK)"}`,
@@ -427,17 +896,43 @@ function table(title, labelHdr, width, rows) {
 
 async function main() {
   const engine = resolveEngine();
+
+  // The proxy's egress scan options are READ OUT OF THE PROXY, every run.
+  const { opts: scanOpts, source: scanOptsSource } = deriveProxyScanOpts(engine.provenance.productRoot);
+  assertOptionsUnderstoodByScanner(scanOpts, engine.scannerDts, scanOptsSource);
+
   const corpusInfo = regenerateCorpus();
 
-  const { scan } = await import(pathToFileURL(engine.scannerEntry).href);
+  const scanner = await import(pathToFileURL(engine.scannerEntry).href);
+  const { scan, ALL_PATTERNS } = scanner;
   const { mutateSecrets } = await import(pathToFileURL(engine.mutatorEntry).href);
   if (typeof scan !== "function") die(`${SHIPPED_SCANNER_PKG} does not export scan()`);
   if (typeof mutateSecrets !== "function") die(`${SHIPPED_MUTATOR_PKG} does not export mutateSecrets()`);
+  if (!Array.isArray(ALL_PATTERNS) || ALL_PATTERNS.length === 0) {
+    die(
+      `${SHIPPED_SCANNER_PKG} does not export a non-empty ALL_PATTERNS.\n` +
+        "  The harness validates kind_detectors.json against the engine's REAL detector\n" +
+        "  list; without it the map could go stale unnoticed, so it refuses to run.",
+    );
+  }
+  const shippedDetectorNames = ALL_PATTERNS.map((p) => p?.name).filter((n) => typeof n === "string");
 
   const compliance = readJson(COMPLIANCE_PATH, "compliance map");
   const frameworks = compliance.frameworks ?? [];
   const kindFrameworks = compliance.kind_frameworks ?? {};
-  const kindDetectors = readJson(KIND_DETECTORS_PATH, "kind->detector map").kind_detectors ?? {};
+  const kindDetectorsDoc = readJson(KIND_DETECTORS_PATH, "kind->detector map");
+  const kindDetectors = kindDetectorsDoc.kind_detectors ?? {};
+
+  const mapProblems = validateKindDetectors(kindDetectorsDoc, shippedDetectorNames);
+  if (mapProblems.length > 0) {
+    die(
+      `kind_detectors.json is OUT OF SYNC with the shipped engine (${shippedDetectorNames.length} detectors).\n` +
+        "  Every problem below must be resolved explicitly — the harness will not guess,\n" +
+        "  because a silently stale map scores correctly-protected data as a failure.\n\n" +
+        mapProblems.map((m, i) => `  ${String(i + 1).padStart(2)}. ${m}`).join("\n\n") +
+        `\n\n  File: ${KIND_DETECTORS_PATH}`,
+    );
+  }
 
   const fwArg = parseFrameworkArg(process.argv, frameworks);
 
@@ -445,12 +940,23 @@ async function main() {
   const allCases = corpus.cases ?? [];
   const cases = fwArg ? allCases.filter((c) => (kindFrameworks[c.kind] ?? []).includes(fwArg)) : allCases;
 
+  const negatives = readJson(NEGATIVES_PATH, "benign look-alike corpus").cases ?? [];
+  if (negatives.length === 0) {
+    die(
+      `the benign look-alike corpus at ${NEGATIVES_PATH} is empty.\n` +
+        "  Without it the report would be recall-only — a number a detector that flags\n" +
+        "  EVERYTHING would max out. Refusing to publish recall with no precision check.",
+    );
+  }
+  const fp = scoreNegatives(negatives, { scan, mutateSecrets, scanOpts });
+
   const { tiers, overall, fw, wrongKindByKind } = scoreCorpus(cases, {
     frameworks,
     kindFrameworks,
     kindDetectors,
     scan,
     mutateSecrets,
+    scanOpts,
   });
 
   if (process.argv.includes("--json")) {
@@ -458,13 +964,15 @@ async function main() {
       JSON.stringify(
         {
           engine: engine.provenance,
-          scanOptions: PROXY_SCAN_OPTS,
+          scanOptions: scanOpts,
+          scanOptionsSource: scanOptsSource,
           corpus: { ...corpusInfo, cases: overall.n, totalCases: allCases.length },
           framework: fwArg,
           overall,
           tiers: Object.fromEntries(tiers),
           frameworks: Object.fromEntries(fw),
           wrongKindByKind: Object.fromEntries(wrongKindByKind),
+          falsePositives: { ...fp, byDetector: Object.fromEntries(fp.byDetector) },
         },
         null,
         2,
@@ -473,7 +981,7 @@ async function main() {
     process.exit(0);
   }
 
-  printHeader(engine.provenance, corpusInfo, allCases.length);
+  printHeader(engine.provenance, corpusInfo, allCases.length, scanOpts, scanOptsSource);
   if (fwArg) console.log(`Scoped to framework: ${fwArg} (${cases.length} of ${allCases.length} cases)\n`);
 
   table(
@@ -505,9 +1013,18 @@ async function main() {
       `(${((overall.wrongKind / Math.max(overall.n, 1)) * 100).toFixed(1)}%)`,
   );
   console.log("");
+  console.log("False positives on the benign look-alike corpus (a correct detector flags NONE)");
+  console.log(`  identify   : ${fp.fpIdentify} / ${fp.n} benign cases matched something`);
+  console.log(`  redaction  : ${fp.fpRedaction} / ${fp.n} would have been MANGLED in flight`);
+  if (fp.byDetector.size > 0) {
+    const worst = [...fp.byDetector.entries()].sort((a, b) => b[1] - a[1]);
+    console.log(`  detectors  : ${worst.map(([d, n]) => `${d} x${n}`).join(", ")}`);
+  }
+  console.log("");
   console.log(
     `HEADLINE — egress redaction: ${pct(overall.egress, overall.n).trim()}  ` +
-      `(identify, secondary: ${pct(overall.identify, overall.n).trim()})`,
+      `(identify, secondary: ${pct(overall.identify, overall.n).trim()})  ` +
+      `[false positives: ${fp.fpRedaction}/${fp.n} redaction, ${fp.fpIdentify}/${fp.n} identify]`,
   );
 
   process.exit(0);

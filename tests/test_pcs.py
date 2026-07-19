@@ -19,6 +19,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import sys
 import unicodedata
 
 import pytest
@@ -198,6 +199,50 @@ def test_all_corpus_files_carry_banner(cases):
         assert _has_banner(path.read_text(encoding="utf-8")), source_file
     manifest = _CORPUS_DIR / "corpus" / "cases.json"
     assert _has_banner(manifest.read_text(encoding="utf-8"))
+
+
+def test_corpus_is_bit_reproducible():
+    """Two fresh builds must produce a BYTE-IDENTICAL corpus.
+
+    Reported numbers are only attributable to the ENGINE if the corpus does not
+    move underneath them. ``generator.py`` seeds ``random`` at 42 (and
+    ``regulated/set01-05`` seed too), so the values were already stable — except
+    for ``set08``'s six gzip tier-5 cases, which embedded ``time.time()`` in the
+    gzip header. Every rebuild therefore differed byte-for-byte, and any
+    run-to-run wobble was impossible to distinguish from a real product change.
+    ``_gzip_b64`` now pins ``mtime=0``.
+
+    The build is run in a SUBPROCESS, twice — which is exactly how the benchmark
+    bridge regenerates it. This fails if anyone reintroduces a clock, a PID, a
+    UUID or an unseeded RNG into corpus generation.
+
+    KNOWN LIMITATION (not what this test covers): the corpus is reproducible
+    per-PROCESS, not per-CALL. `regulated/set01-05` seed the GLOBAL RNG at import
+    time and are imported lazily during the first build, so a second
+    `corpus_builder.main()` in the SAME process draws different values for ~58
+    persona-derived cases. Always build in a fresh process, as the bridge does.
+    """
+    from pretense_compliance_standards.regulated import set08
+
+    # The gzip payloads themselves, independent of the file-writing path.
+    assert set08._gzip_b64("x") == set08._gzip_b64("x")
+
+    manifest = _CORPUS_DIR / "corpus" / "cases.json"
+
+    def build_in_subprocess() -> bytes:
+        subprocess.run(
+            [sys.executable, "-m", "pretense_compliance_standards.corpus_builder"],
+            cwd=_CORPUS_DIR.parent,
+            check=True,
+            capture_output=True,
+        )
+        return manifest.read_bytes()
+
+    first = build_in_subprocess()
+    assert build_in_subprocess() == first, (
+        "the corpus is not reproducible: two fresh builds differ. Something in "
+        "generation depends on the clock, a PID, or an unseeded RNG."
+    )
 
 
 def test_generated_corpus_is_not_committed():

@@ -1,6 +1,9 @@
 {
-  "_notice": "Corpus data `kind` -> the SHIPPED scanner detector name(s) that mean the SAME datum. A match whose detector name is NOT in this list is a WRONG-KIND match: it does not count as identification or as coverage for any framework, because redacting a thing you mis-identified is luck, not detection, and the compliance claim it would earn is false. An EMPTY list means the shipped engine has NO detector for this kind — every such case is a guaranteed MISS, which is the honest result. Names are kept here (rather than derived) so adding a real detector later automatically starts counting.",
-  "_source": "detector names come from ALL_PATTERNS[].name in pretense/packages/scanner/src (the SHIPPED engine).",
+  "_notice": "Corpus data `kind` -> the SHIPPED scanner detector name(s) that mean the SAME datum. A match whose detector name is NOT in this list is a WRONG-KIND match: it does not count as identification or as coverage for any framework, because redacting a thing you mis-identified is luck, not detection, and the compliance claim it would earn is false.",
+  "_source": "Detector names are the `name` field of every entry in `ALL_PATTERNS`, exported by the SHIPPED engine `@pretense/scanner` (pretense/packages/scanner). The bridge loads that list from the BUILT dist at run time and VALIDATES this file against it.",
+  "_enforcement": "run.mjs::validateKindDetectors hard-fails (exit 2, no numbers printed) if ANY of: (1) a detector named here is not exported by the shipped engine; (2) a shipped detector is claimed by no kind and is not triaged in `unmapped_detectors`; (3) the engine ships a detector whose NAME means a kind (`<kind>` or `<kind>-*`, with `_`->`-`) that the kind does not list and `rejected_name_matches` does not explain; (4) a kind maps to [] without an entry in `kinds_without_shipped_detector`. This file cannot go quietly stale: rule (3) is exactly what pretense #521 tripped when it shipped `npi-labeled` / `uk-nhs-number-labeled` / `email-labeled` / `github-token-split` while this map still said those kinds had no detector, costing the product ~4.0 points it had actually earned.",
+  "_judgment_calls": "Where a kind is deliberately NOT credited for a detector that fires on its cases, the reason is written down: `rejected_name_matches` for name-similar detectors, `wrong_kind_notes` for everything else. An empty list or a missing entry is never shorthand for 'we decided this' — it is a hard failure.",
+
   "kind_detectors": {
     "access_log": ["env-secret", "env-secret-unquoted", "generic-secret", "generic-secret-assignment"],
     "advertising_id": [],
@@ -19,10 +22,10 @@
     "db_url": ["database-url"],
     "drivers_license": ["drivers-license"],
     "ein": ["us-ein"],
-    "email": ["email"],
+    "email": ["email", "email-labeled"],
     "gcp_key": ["gcp-service-account", "google-api-key", "google-oauth-refresh"],
     "github_finegrained_pat": ["github-fine-grained"],
-    "github_token": ["github-token"],
+    "github_token": ["github-token", "github-token-split"],
     "google_oauth_secret": ["google-oauth-refresh", "google-api-key"],
     "health_record": ["clinical-diagnosis", "icd10-code", "icd10-bracketed", "medical-record-number", "insurance-member-id", "medicare-mbi-labeled"],
     "iban": ["iban", "iban-spaced"],
@@ -38,7 +41,7 @@
     "medical_record_number": ["medical-record-number"],
     "medicare_id": ["medicare-mbi-labeled"],
     "national_id": ["national-id", "national-id-grouped"],
-    "npi": [],
+    "npi": ["npi-labeled"],
     "openai_key": ["openai-api-key"],
     "pan": ["credit-card"],
     "part_number": ["cui-part-number"],
@@ -54,9 +57,45 @@
     "stripe_restricted_key": ["stripe-restricted-key"],
     "swift_bic": ["swift-bic"],
     "twilio_key": ["twilio-auth-token", "twilio-account-sid"],
-    "uk_nhs_number": [],
+    "uk_nhs_number": ["uk-nhs-number-labeled"],
     "uk_nino": ["uk-nino-labeled"],
     "vat": ["vat-number"],
     "vehicle_vin": ["vehicle-vin"]
+  },
+
+  "kinds_without_shipped_detector": {
+    "advertising_id": "The shipped engine has NO detector for mobile advertising IDs (IDFA/GAID — bare UUIDs). Every such case is a guaranteed MISS, and that is the honest result. A bare-UUID detector would be a large false-positive source, so this is a defensible product decision rather than an oversight — but it IS an uncovered kind for the GDPR/CCPA/LGPD-class 'online identifier' obligations this corpus maps it to.",
+    "imei": "The shipped engine has NO IMEI detector. IMEIs are 15-digit Luhn-valid numbers, so a detector would overlap the card/phone space; the engine deliberately does not claim them. Uncovered for GDPR/CCPA device-identifier obligations."
+  },
+
+  "rejected_name_matches": {},
+
+  "wrong_kind_notes": {
+    "_what": "Detectors OBSERVED firing on a kind's cases that this map deliberately does NOT credit to that kind. These are the residual 23 wrong-kind cases in the report (imei 10, advertising_id 10, health_record 1, jwt 1, iban 1 on engine 122aec3). Crediting any of them would manufacture compliance coverage for data the engine detected as a different element — the framework control the credit implies is not actually satisfied. Each entry names the detector that really fires, so the judgment can be re-argued from evidence rather than re-guessed.",
+    "imei": "Fires: `credit-card` (10 cases). NOT credited. An IMEI is a 15-digit Luhn-valid number, so the card detector claims it. The value does get redacted in practice, but as a payment card — no device-identifier control under GDPR/CCPA is satisfied by a card finding, and the audit trail would state the wrong data class.",
+    "advertising_id": "Fires: `credit-card` (10 of the wrong-kind cases; 16 matches across tiers). NOT credited, same reasoning as `imei`: an advertising ID recognized as a payment card earns no online-identifier coverage.",
+    "health_record": "Fires: `phone-us` and `email` on one case — the contact lines of a clinical record, not the diagnosis/MRN the case tests for. NOT credited: HIPAA coverage for the record is not earned by catching the patient's phone number while the diagnosis egresses in plaintext.",
+    "jwt": "Fires: `generic-secret-assignment` on one case. NOT credited: the assignment match and a `jwt-token` match have different spans, so counting it conflates 'we caught the variable' with 'we caught the token'.",
+    "iban": "Fires: `credit-card` on one case (an IBAN whose digit run is Luhn-valid). NOT credited: it is redacted as a payment card, which is the wrong data class for the financial-data control the case maps to."
+  },
+
+  "unmapped_detectors": {
+    "_what": "SHIPPED detectors that no corpus kind claims. Each needs a written reason so a NEWLY-shipped detector cannot land here silently — the bridge fails until someone triages it. Being listed here has NO effect on any score; these detectors simply have no corresponding corpus cases.",
+    "circleci-token": "CI/CD vendor token. The corpus has no CircleCI case; the generic `secret` / `api_key` kinds cover the class.",
+    "datadog-api-key": "Observability vendor token. No corpus case.",
+    "digitalocean-token": "Cloud vendor token. No corpus case.",
+    "docker-registry": "Registry auth blob. No corpus case.",
+    "gitlab-token": "SCM vendor token. The corpus exercises GitHub only (`github_token`, `github_finegrained_pat`).",
+    "heroku-api-key": "PaaS vendor token. No corpus case.",
+    "launchdarkly-mobile-key": "Feature-flag vendor token. No corpus case.",
+    "launchdarkly-sdk-key": "Feature-flag vendor token. No corpus case.",
+    "mailgun-key": "Email vendor token. The corpus exercises SendGrid only (`sendgrid_key`).",
+    "newrelic-key": "Observability vendor token. No corpus case.",
+    "npm-token": "Package-registry token. No corpus case.",
+    "pagerduty-key": "Paging vendor token. No corpus case.",
+    "sentry-dsn": "Error-reporting DSN. No corpus case.",
+    "stripe-webhook-secret": "The corpus `api_key` / `stripe_restricted_key` kinds exercise Stripe's key formats, not the webhook signing secret.",
+    "travis-token": "CI vendor token. No corpus case.",
+    "x509-certificate": "Certificate body. The corpus exercises private keys (`pgp_private_key`, `ssh_private_key`), not certificates — a certificate is public material."
   }
 }
