@@ -1,10 +1,10 @@
 # Pretense Compliance Standards
 
 > A graded, **fully synthetic** compliance / data-loss-prevention (DLP) testbed that
-> measures how well the **pretense.ai** firewall — *identify* (secret/PII scan) and
-> *mutate* (identifier redaction) — protects regulated data across the major global
-> compliance frameworks. Scored two ways at once: **recall per difficulty tier** and
-> **coverage per compliance framework**.
+> measures how well the **pretense.ai** firewall protects regulated data across the
+> major global compliance frameworks. The headline metric is **egress redaction** —
+> what fraction of sensitive values actually leave the proxy *transformed* — scored
+> per difficulty tier and per compliance framework.
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](tests/test_pcs.py)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -14,12 +14,16 @@
 
 The testbed lives in **[`pretense_compliance_standards/`](pretense_compliance_standards/README.md)**:
 
-- A **graded corpus** of 530+ synthetic sensitive-data cases across 6 obfuscation tiers
-  (inline → labeled → split → encoded → zero-width → layered/nested), covering 44 data kinds.
+- A **graded corpus** of 640+ synthetic sensitive-data cases across 6 obfuscation tiers
+  (inline → labeled → split → encoded → zero-width → layered/nested), covering 56 data kinds.
+  The corpus files are git-ignored build artifacts — always regenerate before measuring
+  (`corpus_builder`); CI enforces that they are never committed, so they cannot go stale.
 - A reference **deterministic-hashing detector** (naive vs. hardened) scoring **recall
   per difficulty tier** and **per compliance framework**.
-- A **pretense bridge** that runs the real pretense.ai engine over the corpus and reports
-  **identify % / mutate %** coverage per framework.
+- A **pretense bridge** that runs the real **shipped** pretense.ai engine over the corpus
+  and reports **egress-redaction %** (primary) per framework, with **identify %** as a
+  clearly-labelled secondary. Identify is *not* protection: `warn`-action and zero-span
+  matches identify data that still egresses in plaintext.
 
 **36 frameworks covered:** SOC2, ISO 27001, ISO 27701, NIST 800-53, NIST 800-171,
 FedRAMP, FISMA, NIS2, NYDFS 500, DORA, APRA CPS 234, HIPAA, HITECH, HITRUST, GDPR,
@@ -42,8 +46,9 @@ python3 -m pretense_compliance_standards.corpus_builder    # build corpus + case
 python3 -m pretense_compliance_standards.compliance        # print the framework taxonomy
 python3 -m pretense_compliance_standards.harness           # recall per tier + per framework
 python3 -m pretense_compliance_standards.harness --json report.json --md report.md  # export reports
-node --experimental-transform-types \
-  pretense_compliance_standards/pretense_bridge/run.mjs     # pretense identify/mutate per framework
+node pretense_compliance_standards/pretense_bridge/run.mjs # egress redaction per framework
+                                                           # (needs a sibling `pretense`
+                                                           #  checkout with packages built)
 uv run pytest tests/test_pcs.py -q             # test suite
 ```
 

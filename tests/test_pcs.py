@@ -17,6 +17,9 @@ import collections
 import json
 import pathlib
 import re
+import shutil
+import subprocess
+import sys
 import unicodedata
 
 import pytest
@@ -48,6 +51,9 @@ _ZERO_WIDTH_RE = re.compile("[​‌‍⁠﻿]")
 _EXOTIC_TIER = 4
 
 _CORPUS_DIR = pathlib.Path(corpus_builder.__file__).parent
+# Package root (holds compliance_map.json / kind_detectors.json).
+_PKG_DIR = pathlib.Path(corpus_builder.__file__).parent
+_REPO_ROOT = _PKG_DIR.parent
 # JSON writers escape non-ASCII (the em-dash) as \uXXXX, so the banner may appear
 # either verbatim (csv/log) or in its JSON-escaped form (json).
 _BANNER_JSON = json.dumps(BANNER)[1:-1]
@@ -193,6 +199,117 @@ def test_all_corpus_files_carry_banner(cases):
         assert _has_banner(path.read_text(encoding="utf-8")), source_file
     manifest = _CORPUS_DIR / "corpus" / "cases.json"
     assert _has_banner(manifest.read_text(encoding="utf-8"))
+
+
+def test_corpus_is_bit_reproducible():
+    """Two fresh builds must produce a BYTE-IDENTICAL corpus.
+
+    Reported numbers are only attributable to the ENGINE if the corpus does not
+    move underneath them. ``generator.py`` seeds ``random`` at 42 (and
+    ``regulated/set01-05`` seed too), so the values were already stable — except
+    for ``set08``'s six gzip tier-5 cases, which embedded ``time.time()`` in the
+    gzip header. Every rebuild therefore differed byte-for-byte, and any
+    run-to-run wobble was impossible to distinguish from a real product change.
+    ``_gzip_b64`` now pins ``mtime=0``.
+
+    The build is run in a SUBPROCESS, twice — which is exactly how the benchmark
+    bridge regenerates it. This fails if anyone reintroduces a clock, a PID, a
+    UUID or an unseeded RNG into corpus generation.
+
+    KNOWN LIMITATION (not what this test covers): the corpus is reproducible
+    per-PROCESS, not per-CALL. `regulated/set01-05` seed the GLOBAL RNG at import
+    time and are imported lazily during the first build, so a second
+    `corpus_builder.main()` in the SAME process draws different values for ~58
+    persona-derived cases. Always build in a fresh process, as the bridge does.
+    """
+    from pretense_compliance_standards.regulated import set08
+
+    # The gzip payloads themselves, independent of the file-writing path.
+    assert set08._gzip_b64("x") == set08._gzip_b64("x")
+
+    manifest = _CORPUS_DIR / "corpus" / "cases.json"
+
+    def build_in_subprocess() -> bytes:
+        subprocess.run(
+            [sys.executable, "-m", "pretense_compliance_standards.corpus_builder"],
+            cwd=_CORPUS_DIR.parent,
+            check=True,
+            capture_output=True,
+        )
+        return manifest.read_bytes()
+
+    first = build_in_subprocess()
+    assert build_in_subprocess() == first, (
+        "the corpus is not reproducible: two fresh builds differ. Something in "
+        "generation depends on the clock, a PID, or an unseeded RNG."
+    )
+
+
+def test_generated_corpus_is_not_committed():
+    """Generated corpus artifacts MUST NOT be tracked in git.
+
+    ``corpus/cases.json`` and friends are BUILD ARTIFACTS. They used to be
+    committed, and they silently went stale — 452 cases committed against the
+    648 the builder actually emits. Every benchmark number is computed over
+    these files, so a stale copy quietly moves every published figure,
+    including which frameworks appear covered.
+
+    A guard that compares committed-vs-built would only *detect* the drift.
+    Not committing them makes the drift IMPOSSIBLE: the only corpus that can
+    ever be measured is one just built from source. The test fixtures rebuild
+    it, and the bridge regenerates before every measurement run.
+
+    (Not committing them also keeps freshly-randomized synthetic secret-shaped
+    values — ``sk_test_…``, ``ghp_…`` — out of git entirely, which GitHub push
+    protection flags on every regeneration.)
+    """
+    git = shutil.which("git")
+    if git is None:
+        pytest.skip("git not available")
+
+    tracked = subprocess.run(  # noqa: S603 - fixed argv, resolved executable
+        [git, "ls-files", "pretense_compliance_standards/corpus/"],
+        cwd=_REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if tracked.returncode != 0:
+        pytest.skip("not a git checkout")
+
+    files = [f for f in tracked.stdout.split() if f]
+    assert not files, (
+        "generated corpus artifacts are tracked in git and WILL go stale: "
+        f"{files}. Remove them: git rm -r --cached pretense_compliance_standards/corpus"
+    )
+
+
+def test_every_corpus_kind_has_a_detector_mapping():
+    """Every corpus ``kind`` must be classified in ``kind_detectors.json``.
+
+    The bridge requires KIND AGREEMENT: a match only counts as identification
+    (and only earns compliance coverage) when the detector that fired actually
+    means the same datum. An unmapped kind would have no basis for that
+    judgement, so the bridge refuses to score one.
+
+    An empty list is a VALID, deliberate answer: it records that the shipped
+    engine has no detector for this kind, making every such case an honest miss
+    (this is what `npi` and `uk_nhs_number` are — both are currently matched by
+    the unrelated `phone-us` detector and egress in plaintext).
+    """
+    mapping = json.loads(
+        (_PKG_DIR / "kind_detectors.json").read_text(encoding="utf-8")
+    )["kind_detectors"]
+    corpus_kinds = {c["kind"] for c in corpus_builder.build_cases()}
+
+    unmapped = sorted(corpus_kinds - mapping.keys())
+    assert not unmapped, (
+        f"corpus kinds missing from kind_detectors.json: {unmapped}. "
+        "Add each one (use [] if the shipped engine has no detector for it)."
+    )
+
+    stale = sorted(mapping.keys() - corpus_kinds)
+    assert not stale, f"kind_detectors.json maps kinds no longer in the corpus: {stale}"
 
 
 def test_no_framework_names_in_payload_text(cases):

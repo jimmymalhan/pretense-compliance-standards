@@ -47,7 +47,17 @@ def _double_b64(s: str) -> str:
 
 
 def _gzip_b64(s: str) -> str:
-    return base64.b64encode(gzip.compress(s.encode())).decode()
+    """base64(gzip(s)) — BIT-REPRODUCIBLE.
+
+    `mtime=0` is load-bearing. The gzip header carries a modification time, so
+    the default (`time.time()`) makes these 6 tier-5 cases differ byte-for-byte
+    between builds, purely in the header. That was the ONLY source of run-to-run
+    corpus drift: `generator.py` seeds `random` at 42, so every value in the
+    corpus is otherwise identical build to build. Pinning it makes the whole
+    648-case corpus reproducible, so any change in a reported number is
+    attributable to the ENGINE and never to the clock.
+    """
+    return base64.b64encode(gzip.compress(s.encode(), mtime=0)).decode()
 
 
 def _percent(s: str) -> str:

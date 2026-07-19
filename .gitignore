@@ -16,3 +16,17 @@ frameworks/*/database/
 frameworks/*/codebase/
 frameworks/*/data/
 frameworks/*/logs/
+
+# Generated flat corpus: build artifacts emitted by corpus_builder. These were
+# previously COMMITTED and silently went stale (452 cases committed vs 648
+# actually built), which quietly moved every published benchmark number. A
+# build artifact that is not committed cannot go stale, so they are generated
+# on demand instead — `tests/test_pcs.py` rebuilds them, and the bridge
+# regenerates before every measurement run. (Regenerating also mints fresh
+# random sk_test_/ghp_ synthetic values, which GitHub push protection flags;
+# not committing them keeps synthetic secret-shaped data out of git entirely.)
+pretense_compliance_standards/corpus/cases.json
+pretense_compliance_standards/corpus/negatives.json
+pretense_compliance_standards/corpus/tier*.json
+pretense_compliance_standards/corpus/tier*.csv
+pretense_compliance_standards/corpus/blended_regulated_*.json
