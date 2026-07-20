@@ -3,79 +3,225 @@
   "_source": "Detector names are the `name` field of every entry in `ALL_PATTERNS`, exported by the SHIPPED engine `@pretense/scanner` (pretense/packages/scanner). The bridge loads that list from the BUILT dist at run time and VALIDATES this file against it.",
   "_enforcement": "run.mjs::validateKindDetectors hard-fails (exit 2, no numbers printed) if ANY of: (1) a detector named here is not exported by the shipped engine; (2) a shipped detector is claimed by no kind and is not triaged in `unmapped_detectors`; (3) the engine ships a detector whose NAME means a kind (`<kind>` or `<kind>-*`, with `_`->`-`) that the kind does not list and `rejected_name_matches` does not explain; (4) a kind maps to [] without an entry in `kinds_without_shipped_detector`. This file cannot go quietly stale: rule (3) is exactly what pretense #521 tripped when it shipped `npi-labeled` / `uk-nhs-number-labeled` / `email-labeled` / `github-token-split` while this map still said those kinds had no detector, costing the product ~4.0 points it had actually earned.",
   "_judgment_calls": "Where a kind is deliberately NOT credited for a detector that fires on its cases, the reason is written down: `rejected_name_matches` for name-similar detectors, `wrong_kind_notes` for everything else. An empty list or a missing entry is never shorthand for 'we decided this' — it is a hard failure.",
-
   "kind_detectors": {
-    "access_log": ["env-secret", "env-secret-unquoted", "generic-secret", "generic-secret-assignment"],
-    "advertising_id": ["advertising-id"],
-    "anthropic_key": ["anthropic-api-key", "anthropic-api-key-short"],
-    "api_key": ["stripe-secret-key", "stripe-publishable-key", "stripe-restricted-key", "generic-secret", "generic-secret-assignment", "env-secret", "env-secret-unquoted"],
-    "aws_key": ["aws-access-key", "aws-secret-key"],
-    "aws_temp_key": ["aws-temp-access-key"],
-    "azure_key": ["azure-key", "azure-connection-string"],
-    "bank_account": ["bank-account-labeled"],
-    "bitcoin_address": ["bitcoin-address"],
-    "card_cvv": ["card-cvv"],
-    "contract_number": ["cui-contract-number"],
-    "credit_card_track2": ["credit-card"],
-    "crypto_wallet_address": ["eth-wallet", "bitcoin-address"],
-    "date_of_birth": ["dob"],
-    "db_url": ["database-url"],
-    "drivers_license": ["drivers-license"],
-    "ein": ["us-ein"],
-    "email": ["email", "email-labeled"],
-    "gcp_key": ["gcp-service-account", "google-api-key", "google-oauth-refresh"],
-    "github_finegrained_pat": ["github-fine-grained"],
-    "github_token": ["github-token", "github-token-split"],
-    "google_oauth_secret": ["google-oauth-refresh", "google-api-key"],
-    "health_record": ["clinical-diagnosis", "icd10-code", "icd10-bracketed", "medical-record-number", "insurance-member-id", "medicare-mbi-labeled"],
-    "iban": ["iban", "iban-spaced", "iban-grouped"],
-    "icd10": ["icd10-code", "icd10-bracketed"],
-    "imei": ["imei"],
-    "imsi": ["imsi"],
-    "insurance_member_id": ["insurance-member-id"],
-    "internal_program_code": ["cui-program-code"],
-    "ip_address": ["ip-address"],
-    "ipv6": ["ipv6-address"],
-    "jwt": ["jwt-token"],
-    "mac_address": ["mac-address"],
-    "medical_record_number": ["medical-record-number"],
-    "medicare_id": ["medicare-mbi-labeled"],
-    "national_id": ["national-id", "national-id-grouped"],
-    "npi": ["npi-labeled"],
-    "openai_key": ["openai-api-key"],
-    "pan": ["credit-card"],
-    "part_number": ["cui-part-number"],
-    "passport": ["passport"],
-    "pgp_private_key": ["private-key", "private-key-block", "private-key-body"],
-    "phone": ["phone-us", "phone-intl", "phone-intl-labeled"],
-    "routing_number": ["aba-routing"],
-    "secret": ["generic-secret", "generic-secret-assignment", "env-secret", "env-secret-unquoted", "vault-token"],
-    "sendgrid_key": ["sendgrid-key"],
-    "slack_token": ["slack-token", "slack-webhook-url"],
-    "ssh_private_key": ["private-key", "private-key-block", "private-key-body"],
-    "ssn": ["ssn"],
-    "stripe_restricted_key": ["stripe-restricted-key"],
-    "swift_bic": ["swift-bic"],
-    "twilio_key": ["twilio-auth-token", "twilio-account-sid"],
-    "uk_nhs_number": ["uk-nhs-number-labeled"],
-    "uk_nino": ["uk-nino-labeled"],
-    "vat": ["vat-number"],
-    "vehicle_vin": ["vehicle-vin"]
+    "access_log": [
+      "env-secret",
+      "env-secret-unquoted",
+      "generic-secret",
+      "generic-secret-assignment"
+    ],
+    "advertising_id": [
+      "advertising-id"
+    ],
+    "anthropic_key": [
+      "anthropic-api-key",
+      "anthropic-api-key-short"
+    ],
+    "api_key": [
+      "stripe-secret-key",
+      "stripe-publishable-key",
+      "stripe-restricted-key",
+      "generic-secret",
+      "generic-secret-assignment",
+      "env-secret",
+      "env-secret-unquoted"
+    ],
+    "aws_key": [
+      "aws-access-key",
+      "aws-secret-key"
+    ],
+    "aws_temp_key": [
+      "aws-temp-access-key"
+    ],
+    "azure_key": [
+      "azure-key",
+      "azure-connection-string"
+    ],
+    "bank_account": [
+      "bank-account-labeled"
+    ],
+    "bitcoin_address": [
+      "bitcoin-address"
+    ],
+    "card_cvv": [
+      "card-cvv"
+    ],
+    "contract_number": [
+      "cui-contract-number"
+    ],
+    "credit_card_track2": [
+      "credit-card"
+    ],
+    "crypto_wallet_address": [
+      "eth-wallet",
+      "bitcoin-address"
+    ],
+    "date_of_birth": [
+      "dob"
+    ],
+    "db_url": [
+      "database-url"
+    ],
+    "drivers_license": [
+      "drivers-license"
+    ],
+    "ein": [
+      "us-ein"
+    ],
+    "email": [
+      "email",
+      "email-labeled"
+    ],
+    "gcp_key": [
+      "gcp-service-account",
+      "google-api-key",
+      "google-oauth-refresh"
+    ],
+    "github_finegrained_pat": [
+      "github-fine-grained"
+    ],
+    "github_token": [
+      "github-token",
+      "github-token-split"
+    ],
+    "google_oauth_secret": [
+      "google-oauth-refresh",
+      "google-api-key"
+    ],
+    "health_record": [
+      "clinical-diagnosis",
+      "icd10-code",
+      "icd10-bracketed",
+      "medical-record-number",
+      "insurance-member-id",
+      "medicare-mbi-labeled"
+    ],
+    "iban": [
+      "iban",
+      "iban-spaced",
+      "iban-grouped"
+    ],
+    "icd10": [
+      "icd10-code",
+      "icd10-bracketed"
+    ],
+    "imei": [
+      "imei"
+    ],
+    "imsi": [
+      "imsi"
+    ],
+    "insurance_member_id": [
+      "insurance-member-id"
+    ],
+    "internal_program_code": [
+      "cui-program-code"
+    ],
+    "ip_address": [
+      "ip-address"
+    ],
+    "ipv6": [
+      "ipv6-address"
+    ],
+    "jwt": [
+      "jwt-token"
+    ],
+    "mac_address": [
+      "mac-address"
+    ],
+    "medical_record_number": [
+      "medical-record-number"
+    ],
+    "medicare_id": [
+      "medicare-mbi-labeled"
+    ],
+    "national_id": [
+      "national-id",
+      "national-id-grouped"
+    ],
+    "npi": [
+      "npi-labeled"
+    ],
+    "openai_key": [
+      "openai-api-key"
+    ],
+    "pan": [
+      "credit-card"
+    ],
+    "part_number": [
+      "cui-part-number"
+    ],
+    "passport": [
+      "passport"
+    ],
+    "pgp_private_key": [
+      "private-key",
+      "private-key-block",
+      "private-key-body"
+    ],
+    "phone": [
+      "phone-us",
+      "phone-intl",
+      "phone-intl-labeled"
+    ],
+    "routing_number": [
+      "aba-routing"
+    ],
+    "secret": [
+      "generic-secret",
+      "generic-secret-assignment",
+      "env-secret",
+      "env-secret-unquoted",
+      "vault-token"
+    ],
+    "sendgrid_key": [
+      "sendgrid-key"
+    ],
+    "slack_token": [
+      "slack-token",
+      "slack-webhook-url"
+    ],
+    "ssh_private_key": [
+      "private-key",
+      "private-key-block",
+      "private-key-body"
+    ],
+    "ssn": [
+      "ssn"
+    ],
+    "stripe_restricted_key": [
+      "stripe-restricted-key"
+    ],
+    "swift_bic": [
+      "swift-bic"
+    ],
+    "twilio_key": [
+      "twilio-auth-token",
+      "twilio-account-sid"
+    ],
+    "uk_nhs_number": [
+      "uk-nhs-number-labeled"
+    ],
+    "uk_nino": [
+      "uk-nino-labeled"
+    ],
+    "vat": [
+      "vat-number"
+    ],
+    "vehicle_vin": [
+      "vehicle-vin"
+    ]
   },
-
   "kinds_without_shipped_detector": {
     "_what": "Kinds mapped to [] because the shipped engine genuinely has no detector for them. Empty right now: pretense #526 shipped `imei` and `advertising-id`, which previously lived here as documented product gaps. Both are now real detectors mapped to their kinds above."
   },
-
   "rejected_name_matches": {},
-
   "wrong_kind_notes": {
     "_what": "Detectors OBSERVED firing on a kind's cases that this map deliberately does NOT credit to that kind. These are the residual 2 wrong-kind cases in the report (health_record 1, iban 1) on engine 69cfda0 (release/v0.6.0-always-mutate tip). Crediting any of them would manufacture compliance coverage for data the engine detected as a different element — the framework control the credit implies is not actually satisfied. Each entry names the detector that really fires, so the judgment can be re-argued from evidence rather than re-guessed.",
     "_resolved_by_the_product": "`imei` (10) and `advertising_id` (10) were wrong-kind at 122aec3 because `credit-card` claimed their Luhn-valid digit runs. pretense #526 shipped dedicated `imei` and `advertising-id` detectors, and both kinds now score 10/10 egress. `jwt` (1) was wrong-kind at 122aec3 via `generic-secret-assignment`; at tip `jwt-token` claims it and the kind scores 14/14. These three notes were REMOVED rather than kept, because a stale 'we deliberately do not credit this' note reads as a standing judgment call when it is really a fixed bug.",
     "health_record": "Fires: `phone-us` and `email` on one case — the contact lines of a clinical record, not the diagnosis/MRN the case tests for. NOT credited: HIPAA coverage for the record is not earned by catching the patient's phone number while the diagnosis egresses in plaintext.",
     "iban": "Fires: `credit-card` on one case (an IBAN whose digit run is Luhn-valid). NOT credited: it is redacted as a payment card, which is the wrong data class for the financial-data control the case maps to."
   },
-
   "unmapped_detectors": {
     "_what": "SHIPPED detectors that no corpus kind claims. Each needs a written reason so a NEWLY-shipped detector cannot land here silently — the bridge fails until someone triages it. Being listed here has NO effect on any score; these detectors simply have no corresponding corpus cases.",
     "circleci-token": "CI/CD vendor token. The corpus has no CircleCI case; the generic `secret` / `api_key` kinds cover the class.",
@@ -93,6 +239,14 @@
     "sentry-dsn": "Error-reporting DSN. No corpus case.",
     "stripe-webhook-secret": "The corpus `api_key` / `stripe_restricted_key` kinds exercise Stripe's key formats, not the webhook signing secret.",
     "travis-token": "CI vendor token. No corpus case.",
-    "x509-certificate": "Certificate body. The corpus exercises private keys (`pgp_private_key`, `ssh_private_key`), not certificates — a certificate is public material."
+    "x509-certificate": "Certificate body. The corpus exercises private keys (`pgp_private_key`, `ssh_private_key`), not certificates — a certificate is public material.",
+    "cui-banner-marking": "Real CUI banner marking (CUI//SP-CTI etc., 32 CFR 2002 / DoD CUI Registry). The CMMC_L2 corpus contains only generator-invented PN-/PRG-/CTR- codes, so no kind claims this yet. Adding cases with genuine markings is what would make the CMMC_L2 score a measurement rather than the corpus scoring itself.",
+    "cui-portion-marking": "Real CUI portion marking, (CUI) / (CUI//SP-CTI). Same gap as cui-banner-marking: no corpus case carries a genuine marking.",
+    "cui-distribution-statement": "DoDI 5230.24 DISTRIBUTION STATEMENT A-F. No corpus case includes a distribution statement.",
+    "export-control-eccn": "Commerce Control List ECCN (15 CFR 774), label-anchored. No corpus case carries an ECCN. Label anchoring is required: the bare 1-letter-3-digit shape collides with version strings (verified: 'release 5A002 build' matched before anchoring).",
+    "export-control-ear99": "The EAR99 catch-all literal. No corpus case carries it. Separate from export-control-eccn because an alternative that does not participate in a valueGroup capture is silently dropped.",
+    "itar-citation": "ITAR / 22 CFR 120-130 / USML category citation. No corpus case cites ITAR.",
+    "national-stock-number": "NATO/DoD 13-digit NSN (NNNN-NN-NNN-NNNN). No corpus case carries an NSN.",
+    "cage-code": "NATO Commercial And Government Entity code, label-anchored because a bare 5-alphanumeric is far too generic. No corpus case carries a CAGE code."
   }
 }
