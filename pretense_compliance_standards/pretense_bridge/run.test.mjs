@@ -146,6 +146,19 @@ test("an empty PRETENSE_SRC falls back to the default path (not the empty string
     encoding: "utf8",
     env: { ...process.env, PRETENSE_SRC: "" },
   });
-  // A non-empty path follows "at " — the empty-string bug printed "at ; skipping".
-  assert.match(out, /pretense engine not found at \S.*; skipping/);
+  // Assert the FALLBACK, not the skip. Either outcome proves it:
+  //   - default absent  → "pretense engine not found at <path>; skipping"
+  //   - default present → the bridge runs and prints the corpus header
+  // Both mean PRETENSE_SRC resolved to a real path rather than "".
+  //
+  // This used to assert the skip message alone, which made the test pass only on
+  // machines where the default path happened NOT to exist — it failed the moment
+  // a developer had the engine checked out at the default location. What it must
+  // never see is the bug signature: an EMPTY path before "; skipping".
+  assert.doesNotMatch(out, /not found at\s*;/, "empty PRETENSE_SRC leaked through as \"\"");
+  assert.ok(
+    /pretense engine not found at \S.*; skipping/.test(out) ||
+      /Cases:\s*\d+/.test(out),
+    `expected either a skip with a non-empty path or a real run; got:\n${out.slice(0, 300)}`,
+  );
 });
