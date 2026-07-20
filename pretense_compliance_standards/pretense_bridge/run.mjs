@@ -22,7 +22,8 @@
  */
 
 import {
-  copyFileSync,
+  cpSync,
+  readdirSync,
   mkdtempSync,
   existsSync,
   readFileSync,
@@ -30,7 +31,7 @@ import {
   rmSync,
   realpathSync,
 } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, relative, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -41,19 +42,34 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 // CI can point it elsewhere or leave it unset to exercise the graceful-skip path).
 // `|| default` (not `?? default`) so an exported-but-empty `PRETENSE_SRC=` — a
 // common CI/wrapper accident — falls back to the default instead of becoming "".
+// PRETENSE_SRC is the pretense REPO ROOT — the packages are derived from it.
+//
+// It used to be a directory of loose engine files and defaulted to
+// `.../packages/cli/src`. Both parts were wrong:
+//
+//   1. `packages/cli` is `@pretense/cli-legacy`, a private package that is NOT
+//      what ships. Measuring it inflated results by roughly three points, so any
+//      figure produced against that default was measuring the wrong engine.
+//   2. The flat file list (types/scanner/mutator/reverser/deterministic-id/
+//      salt/secrets.ts) describes a layout the engine no longer has. The shipped
+//      scanner is `packages/scanner/src` (index/patterns/extended-patterns/
+//      level2/lexer/entropy/deobfuscate/…) and the mutator is
+//      `packages/mutator/src`. Every one of those seven files was missing, so
+//      the bridge could not start at all — meaning the headline compliance
+//      number was unreproducible until this was repaired.
 const PRETENSE_SRC =
   process.env.PRETENSE_SRC?.trim() ||
-  "/Users/jimmymalhan/Documents/pretense/packages/cli/src";
+  "/Users/jimmymalhan/Documents/Product/pretense";
 
-// Source files the engine needs to load `mutate` and `scan`.
-const ENGINE_FILES = [
-  "types.ts",
-  "scanner.ts",
-  "mutator.ts",
-  "reverser.ts",
-  "deterministic-id.ts",
-  "salt.ts",
-  "secrets.ts",
+// The two packages that constitute the SHIPPED engine, staged as a unit.
+// NOTE: use `grep -a` when auditing this list. Several engine sources contain
+// non-UTF8 bytes, so plain grep reports NOTHING for them — which is exactly how
+// `@pretense/compliance-engine` (scanner/src/index.ts:18) was missed twice while
+// tracking down a "Cannot find package" error.
+const ENGINE_PACKAGES = [
+  { name: "scanner", srcDir: join("packages", "scanner", "src") },
+  { name: "mutator", srcDir: join("packages", "mutator", "src") },
+  { name: "compliance-engine", srcDir: join("packages", "compliance-engine", "src") },
 ];
 
 // Corpus lives one directory up from this bridge.
@@ -67,18 +83,65 @@ const COMPLIANCE_PATH = join(HERE, "..", "compliance_map.json");
  * import specifiers to `.ts` so Node's TS loader can resolve them.
  * Returns the temp dir path.
  */
-function stageEngine(srcDir) {
+function stageEngine(repoRoot) {
   const stageDir = mkdtempSync(join(tmpdir(), "pretense-bridge-"));
-  for (const name of ENGINE_FILES) {
-    const src = join(srcDir, name);
-    const dst = join(stageDir, name);
-    copyFileSync(src, dst);
-    const rewritten = readFileSync(dst, "utf8").replace(
-      /(from\s+["']\.\/[A-Za-z0-9_-]+)\.js(["'])/g,
-      "$1.ts$2",
-    );
-    writeFileSync(dst, rewritten);
+
+  for (const pkg of ENGINE_PACKAGES) {
+    const from = join(repoRoot, pkg.srcDir);
+    if (!existsSync(from)) {
+      throw new Error(
+        `engine source not found: ${from}\n` +
+          `PRETENSE_SRC must be the pretense REPO ROOT (it is "${repoRoot}").`,
+      );
+    }
+    // Recursive, because the packages have subdirectories. __tests__ is excluded:
+    // it is not engine code and its fixtures import test-only helpers.
+    cpSync(from, join(stageDir, pkg.name), {
+      recursive: true,
+      filter: (src) => !src.includes(`${sep}__tests__`),
+    });
   }
+
+  // Rewrite specifiers so Node's type-stripping loader can resolve them.
+  //
+  //   ./foo.js            → ./foo.ts        (TS source, not built output)
+  //   @pretense/scanner   → ../scanner/index.ts
+  //   @pretense/mutator   → ../mutator/index.ts
+  //
+  // The bare-specifier rewrite is the part the old staging lacked. Four shipped
+  // scanner files (extended-patterns, level2, deobfuscate, secret-vocabulary)
+  // and two mutator files (rules-engine, salt) import each other by package
+  // name, and nothing resolves those outside the pnpm workspace.
+  // `relative()` returns "index.ts" for a same-directory target, and Node reads
+  // an unprefixed specifier as a BARE package name — which fails with a
+  // misleading "Cannot find package" error. Always force a ./ prefix.
+  const rel = (fromDir, toFile) => {
+    const r = relative(fromDir, toFile).split(sep).join("/");
+    return r.startsWith(".") ? r : `./${r}`;
+  };
+
+  const rewrite = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const p = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        rewrite(p);
+      } else if (entry.name.endsWith(".ts")) {
+        const before = readFileSync(p, "utf8");
+        const after = before
+          .replace(/(from\s+["'](?:\.{1,2}\/)[A-Za-z0-9_./-]+)\.js(["'])/g, "$1.ts$2")
+          .replace(
+            // Generic over ENGINE_PACKAGES so adding one needs no new rule here.
+            // Anchored on the closing quote so `@pretense/scanner-rs` is NOT
+            // caught by the `scanner` entry.
+            new RegExp(`(["'])@pretense/(${ENGINE_PACKAGES.map((p) => p.name).join("|")})\\1`, "g"),
+            (_m, _q, name) => `"${rel(dir, join(stageDir, name, "index.ts"))}"`,
+          );
+        if (after !== before) writeFileSync(p, after);
+      }
+    }
+  };
+  rewrite(stageDir);
+
   return stageDir;
 }
 
@@ -183,8 +246,10 @@ async function main() {
   }
 
   const stageDir = stageEngine(PRETENSE_SRC);
-  const { mutate } = await import(pathToFileURL(join(stageDir, "mutator.ts")).href);
-  const { scan } = await import(pathToFileURL(join(stageDir, "secrets.ts")).href);
+  // The shipped engine exposes `mutate` from @pretense/mutator and `scan` from
+  // @pretense/scanner — not from flat `mutator.ts` / `secrets.ts` files.
+  const { mutate } = await import(pathToFileURL(join(stageDir, "mutator", "index.ts")).href);
+  const { scan } = await import(pathToFileURL(join(stageDir, "scanner", "index.ts")).href);
 
   // Engine modules are loaded; the staged copies are no longer needed.
   rmSync(stageDir, { recursive: true, force: true });
