@@ -33,3 +33,7 @@ pretense_compliance_standards/corpus/blended_regulated_*.json
 
 # Pretense mutation maps (contain project fingerprints)
 .pretense/
+
+# Working directory for tests/e2e/run.sh (per-framework bridge JSON, pytest
+# logs, engine fingerprints). Regenerated from scratch on every run.
+.e2e-work/
