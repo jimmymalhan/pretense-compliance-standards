@@ -1,5 +1,5 @@
 {
-  "_notice": "Egress-redaction floors for tests/e2e/run.sh. MEASURED, never estimated. A framework whose rate falls more than tolerance_pp below its recorded value goes RED. Regenerate deliberately and only against a pinned engine.",
+  "_notice": "Egress-redaction floors for tests/e2e/run.sh. MEASURED against the pinned engine below, never estimated. A framework whose rate falls more than tolerance_pp below its recorded value goes RED. Regenerate deliberately and only against a settled engine -- a partially rebuilt monorepo measured 89.4% while the settled tree measures 88.9%.",
   "recorded_engine": {
     "scannerPkg": "@pretense/scanner@0.2.0",
     "mutatorPkg": "@pretense/mutator@0.2.0",
@@ -10,15 +10,23 @@
     "dirty": "DIRTY",
     "configuredVia": "default (sibling checkout)"
   },
+  "scan_options": {
+    "contextAware": true,
+    "entropyAnalysis": false,
+    "deobfuscate": true,
+    "egressSafe": true
+  },
+  "scan_options_source": "apps/proxy/src/server.ts:754",
   "scanner_dist_sha256": "03e7168df3655f5099b4bb96306612b6c7349d2fa96999e4312944bf11e8fb36",
   "mutator_dist_sha256": "ee7d72a2c47e314e5db817ab59d0c8943128c70c5bf7f82dca46f1d58f136aaa",
   "overall": {
     "n": 648,
-    "egress": 579,
-    "identify": 599,
-    "wrongKind": 1,
-    "miss": 48
+    "egress": 576,
+    "identify": 596,
+    "wrongKind": 2,
+    "miss": 50
   },
+  "overall_egress_rate": 88.9,
   "false_positives": {
     "n": 70,
     "fpIdentify": 5,
@@ -29,6 +37,7 @@
       "phone-us": 1
     }
   },
+  "_cmmc_l2": "CMMC_L2 is FITTED TO FIXTURES. Its row is recorded so it can regress, but it is never evidence.",
   "tolerance_pp": 2.0,
   "frameworks": {
     "SOC2": {
@@ -78,8 +87,8 @@
     },
     "DORA": {
       "cases": 314,
-      "egress": 278,
-      "egress_rate": 88.5
+      "egress": 275,
+      "egress_rate": 87.6
     },
     "APRA_CPS234": {
       "cases": 269,
@@ -103,13 +112,13 @@
     },
     "GDPR": {
       "cases": 228,
-      "egress": 203,
-      "egress_rate": 89.0
+      "egress": 200,
+      "egress_rate": 87.7
     },
     "UK_GDPR": {
       "cases": 228,
-      "egress": 203,
-      "egress_rate": 89.0
+      "egress": 200,
+      "egress_rate": 87.7
     },
     "CCPA_CPRA": {
       "cases": 213,
@@ -173,8 +182,8 @@
     },
     "FADP": {
       "cases": 188,
-      "egress": 163,
-      "egress_rate": 86.7
+      "egress": 160,
+      "egress_rate": 85.1
     },
     "PDPA_TH": {
       "cases": 141,
@@ -198,8 +207,8 @@
     },
     "GLBA": {
       "cases": 136,
-      "egress": 120,
-      "egress_rate": 88.2
+      "egress": 117,
+      "egress_rate": 86.0
     },
     "CMMC_L2": {
       "cases": 42,

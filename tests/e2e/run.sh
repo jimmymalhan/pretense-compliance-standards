@@ -135,23 +135,49 @@ set -e
 fingerprint() {
   ( cd "$REPO" && python3 - "$1" <<'PYEOF'
 import hashlib, json, pathlib, subprocess, sys
+
+# Hashing the dist artifacts alone is NOT sufficient. A partially rebuilt
+# monorepo yields a scanner/mutator hash pair that each look fine on their own
+# yet score differently together -- observed live: a mid-rebuild tree measured
+# 89.4% and the settled tree measured 88.9%, with one of the two hashes
+# unchanged across both. So the fingerprint also carries an actual
+# RE-MEASUREMENT of one framework. If the same corpus scores differently
+# before and after the loop, the rows in between are not comparable, whatever
+# the file hashes say.
 out = pathlib.Path(sys.argv[1])
 doc = json.loads(subprocess.run(
     ["node", "pretense_compliance_standards/pretense_bridge/run.mjs",
      "--framework", "PCI_DSS", "--no-regenerate", "--json"],
     capture_output=True, text=True, check=True).stdout)
 sd = pathlib.Path(doc["engine"]["scannerDir"])
-parts = {"corpus": pathlib.Path("pretense_compliance_standards/corpus/cases.json")}
-parts["scanner"] = sd / "dist" / "index.js"
-parts["mutator"] = sd.parent / "mutator" / "dist" / "index.js"
+root = pathlib.Path(doc["engine"]["productRoot"])
+parts = {
+    "corpus": pathlib.Path("pretense_compliance_standards/corpus/cases.json"),
+    "scanner": sd / "dist" / "index.js",
+    "mutator": sd.parent / "mutator" / "dist" / "index.js",
+}
+optional = {"compliance-engine": sd.parent / "compliance-engine" / "dist" / "index.js"}
 lines = []
 for k, p in parts.items():
     if not p.exists():
         print(f"[e2e] FAIL E_ENGINE_MISSING: {k} artifact absent at {p}", file=sys.stderr)
         sys.exit(1)
     lines.append(f"{k}={hashlib.sha256(p.read_bytes()).hexdigest()}")
+for k, p in optional.items():
+    if p.exists():
+        lines.append(f"{k}={hashlib.sha256(p.read_bytes()).hexdigest()}")
+# The proxy source is a real input: run.mjs derives the scan options from it.
+# Fingerprint the derived VALUES, never the source line number -- an unrelated
+# edit above line 700 of server.ts moves `scanOptionsSource` from :754 to :824
+# while the options are byte-identical. Tripping on that is a false alarm, and
+# a noisy guard gets disabled, which is how false greens come back.
+lines.append("scanOptions=" + json.dumps(doc["scanOptions"], sort_keys=True))
+# The canary: a real score over the real corpus.
+lines.append("canary_PCI_DSS=" + json.dumps(doc["overall"], sort_keys=True))
 out.write_text("\n".join(lines) + "\n")
-print("[e2e] " + "  ".join(l[:l.index('=') + 17] for l in lines))
+print("[e2e] " + "  ".join(
+    l[:l.index("=") + 17] for l in lines if l.startswith(("corpus=", "scanner=", "mutator="))))
+print("[e2e] canary PCI_DSS=" + json.dumps(doc["overall"], sort_keys=True))
 PYEOF
   )
 }
