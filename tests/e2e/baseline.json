@@ -1,0 +1,215 @@
+{
+  "_notice": "Egress-redaction floors for tests/e2e/run.sh. MEASURED, never estimated. A framework whose rate falls more than tolerance_pp below its recorded value goes RED. Regenerate deliberately and only against a pinned engine.",
+  "recorded_engine": {
+    "scannerPkg": "@pretense/scanner@0.2.0",
+    "mutatorPkg": "@pretense/mutator@0.2.0",
+    "scannerDir": "/Users/jimmymalhan/Documents/Product/pretense/packages/scanner",
+    "productRoot": "/Users/jimmymalhan/Documents/Product/pretense",
+    "commit": "1065a52",
+    "branch": "fix/exit-code-contract",
+    "dirty": "DIRTY",
+    "configuredVia": "default (sibling checkout)"
+  },
+  "scanner_dist_sha256": "03e7168df3655f5099b4bb96306612b6c7349d2fa96999e4312944bf11e8fb36",
+  "mutator_dist_sha256": "ee7d72a2c47e314e5db817ab59d0c8943128c70c5bf7f82dca46f1d58f136aaa",
+  "overall": {
+    "n": 648,
+    "egress": 579,
+    "identify": 599,
+    "wrongKind": 1,
+    "miss": 48
+  },
+  "false_positives": {
+    "n": 70,
+    "fpIdentify": 5,
+    "fpRedaction": 2,
+    "byDetector": {
+      "ssn": 2,
+      "email": 2,
+      "phone-us": 1
+    }
+  },
+  "tolerance_pp": 2.0,
+  "frameworks": {
+    "SOC2": {
+      "cases": 247,
+      "egress": 217,
+      "egress_rate": 87.9
+    },
+    "ISO_27001": {
+      "cases": 338,
+      "egress": 289,
+      "egress_rate": 85.5
+    },
+    "ISO_27701": {
+      "cases": 388,
+      "egress": 339,
+      "egress_rate": 87.4
+    },
+    "NIST_800_53": {
+      "cases": 286,
+      "egress": 246,
+      "egress_rate": 86.0
+    },
+    "NIST_800_171": {
+      "cases": 259,
+      "egress": 227,
+      "egress_rate": 87.6
+    },
+    "FedRAMP": {
+      "cases": 247,
+      "egress": 217,
+      "egress_rate": 87.9
+    },
+    "FISMA": {
+      "cases": 311,
+      "egress": 270,
+      "egress_rate": 86.8
+    },
+    "NIS2": {
+      "cases": 247,
+      "egress": 217,
+      "egress_rate": 87.9
+    },
+    "NYDFS_500": {
+      "cases": 267,
+      "egress": 237,
+      "egress_rate": 88.8
+    },
+    "DORA": {
+      "cases": 314,
+      "egress": 278,
+      "egress_rate": 88.5
+    },
+    "APRA_CPS234": {
+      "cases": 269,
+      "egress": 238,
+      "egress_rate": 88.5
+    },
+    "HIPAA": {
+      "cases": 128,
+      "egress": 107,
+      "egress_rate": 83.6
+    },
+    "HITECH": {
+      "cases": 128,
+      "egress": 107,
+      "egress_rate": 83.6
+    },
+    "HITRUST": {
+      "cases": 306,
+      "egress": 265,
+      "egress_rate": 86.6
+    },
+    "GDPR": {
+      "cases": 228,
+      "egress": 203,
+      "egress_rate": 89.0
+    },
+    "UK_GDPR": {
+      "cases": 228,
+      "egress": 203,
+      "egress_rate": 89.0
+    },
+    "CCPA_CPRA": {
+      "cases": 213,
+      "egress": 193,
+      "egress_rate": 90.6
+    },
+    "LGPD": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "PIPEDA": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "POPIA": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "PIPL": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "PDPA_SG": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "COPPA": {
+      "cases": 95,
+      "egress": 80,
+      "egress_rate": 84.2
+    },
+    "FERPA": {
+      "cases": 89,
+      "egress": 79,
+      "egress_rate": 88.8
+    },
+    "DPDP": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "APPI": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "PIPA_KR": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "AU_PRIVACY": {
+      "cases": 171,
+      "egress": 152,
+      "egress_rate": 88.9
+    },
+    "FADP": {
+      "cases": 188,
+      "egress": 163,
+      "egress_rate": 86.7
+    },
+    "PDPA_TH": {
+      "cases": 141,
+      "egress": 122,
+      "egress_rate": 86.5
+    },
+    "CJIS": {
+      "cases": 121,
+      "egress": 102,
+      "egress_rate": 84.3
+    },
+    "IRS_1075": {
+      "cases": 84,
+      "egress": 73,
+      "egress_rate": 86.9
+    },
+    "SOX": {
+      "cases": 247,
+      "egress": 217,
+      "egress_rate": 87.9
+    },
+    "GLBA": {
+      "cases": 136,
+      "egress": 120,
+      "egress_rate": 88.2
+    },
+    "CMMC_L2": {
+      "cases": 42,
+      "egress": 40,
+      "egress_rate": 95.2
+    },
+    "PCI_DSS": {
+      "cases": 42,
+      "egress": 41,
+      "egress_rate": 97.6
+    }
+  }
+}

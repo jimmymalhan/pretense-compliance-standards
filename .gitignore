@@ -30,3 +30,6 @@ pretense_compliance_standards/corpus/negatives.json
 pretense_compliance_standards/corpus/tier*.json
 pretense_compliance_standards/corpus/tier*.csv
 pretense_compliance_standards/corpus/blended_regulated_*.json
+
+# Pretense mutation maps (contain project fingerprints)
+.pretense/
